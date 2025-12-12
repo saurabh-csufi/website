@@ -78,17 +78,25 @@ session_id = None
 tools_cache = None
 
 
-def mcp_request(method: str, params: dict = None) -> dict:
-    """Send a JSON-RPC request to the MCP server."""
-    global session_id
+def mcp_request(method: str, params: dict = None, is_notification: bool = False) -> dict:
+    """Send a JSON-RPC request or notification to the MCP server.
 
-    request_id = int(time.time() * 1000)
+    Args:
+        method: The JSON-RPC method name
+        params: Optional parameters
+        is_notification: If True, sends as notification (no id, no response expected)
+    """
+    global session_id
 
     payload = {
         "jsonrpc": "2.0",
-        "method": method,
-        "id": request_id
+        "method": method
     }
+
+    # Notifications don't have an id
+    if not is_notification:
+        payload["id"] = int(time.time() * 1000)
+
     if params:
         payload["params"] = params
 
@@ -101,6 +109,16 @@ def mcp_request(method: str, params: dict = None) -> dict:
         headers["Mcp-Session-Id"] = session_id
 
     try:
+        # For notifications, we send but don't expect a response
+        if is_notification:
+            requests.post(
+                MCP_URL,
+                json=payload,
+                headers=headers,
+                timeout=5
+            )
+            return {"result": "notification sent"}
+
         response = requests.post(
             MCP_URL,
             json=payload,
@@ -158,8 +176,8 @@ def initialize_mcp() -> bool:
 
     logger.info(f"MCP session initialized: {session_id}")
 
-    # Send initialized notification
-    mcp_request("notifications/initialized", {})
+    # Send initialized notification (no id, no response expected)
+    mcp_request("notifications/initialized", {}, is_notification=True)
     return True
 
 
@@ -179,11 +197,42 @@ def get_tools() -> list:
     return []
 
 
+def fix_tool_arguments(name: str, arguments: dict) -> dict:
+    """Fix common parameter mistakes made by LLMs."""
+    args = arguments.copy()
+
+    if name == "get_observations":
+        # Fix 1: If date_range_start/end provided but date != 'range', fix it
+        has_range_params = args.get("date_range_start") or args.get("date_range_end")
+        if has_range_params and args.get("date") != "range":
+            logger.info("Fixing: Setting date='range' because date_range params provided")
+            args["date"] = "range"
+
+        # Fix 2: Ensure date has a default if not provided
+        if "date" not in args:
+            args["date"] = "latest"
+
+        # Fix 3: Remove null/None values that might cause issues
+        args = {k: v for k, v in args.items() if v is not None}
+
+    if name == "search_indicators":
+        # Fix: Ensure places is a list
+        if "places" in args and isinstance(args["places"], str):
+            args["places"] = [args["places"]]
+
+    return args
+
+
 def call_tool(name: str, arguments: dict) -> Any:
     """Call a tool on the MCP server."""
+    # Fix common parameter mistakes
+    fixed_args = fix_tool_arguments(name, arguments)
+    if fixed_args != arguments:
+        logger.info(f"Fixed arguments: {arguments} -> {fixed_args}")
+
     result = mcp_request("tools/call", {
         "name": name,
-        "arguments": arguments
+        "arguments": fixed_args
     })
 
     if "result" in result:
