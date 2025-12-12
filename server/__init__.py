@@ -219,6 +219,23 @@ def register_routes_biomed_nl(app, cfg):
   app.register_blueprint(biomed_nl_html.bp)
 
 
+def register_routes_gemini_chat(app, cfg):
+  """Register Gemini Chat API routes for Custom DC homepage."""
+  # Get Gemini API key from environment or GCP secrets
+  app.config['GEMINI_API_KEY'] = _get_api_key(['GEMINI_API_KEY'],
+                                              cfg.SECRET_PROJECT,
+                                              'gemini-api-key')
+
+  if not app.config['GEMINI_API_KEY']:
+    app.logger.warning(
+        'Gemini Chat routes registered but API key not configured. '
+        'Set GEMINI_API_KEY environment variable to enable.')
+
+  # Install blueprint for Gemini Chat API
+  from server.routes.gemini import api as gemini_api
+  app.register_blueprint(gemini_api.bp)
+
+
 def register_routes_common(app):
   # apply blueprints for main app
   from server.routes import static
@@ -379,6 +396,9 @@ def create_app(nl_root=DEFAULT_NL_ROOT):
 
   if is_feature_enabled(BIOMED_NL_FEATURE_FLAG, app):
     register_routes_biomed_nl(app, cfg)
+
+  # Register Gemini Chat API routes for Custom DC
+  register_routes_gemini_chat(app, cfg)
 
   if is_feature_enabled(DATA_OVERVIEW_FEATURE_FLAG, app):
     from server.routes.data_overview import html as data_overview_html
