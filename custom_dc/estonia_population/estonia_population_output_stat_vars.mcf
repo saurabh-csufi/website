@@ -1,0 +1,23 @@
+Node: dcid:Count_Person_AgeNotStated
+typeOf: dcid:StatisticalVariable
+populationType: dcid:Person
+measuredProperty: dcid:count
+statType: dcid:measuredValue
+age: dcid:AgeNotStated
+
+Node: dcid:Count_Person_AgeNotStated_Female
+typeOf: dcid:StatisticalVariable
+populationType: dcid:Person
+measuredProperty: dcid:count
+statType: dcid:measuredValue
+age: dcid:AgeNotStated
+gender: dcid:Female
+
+Node: dcid:Count_Person_AgeNotStated_Male
+typeOf: dcid:StatisticalVariable
+populationType: dcid:Person
+measuredProperty: dcid:count
+statType: dcid:measuredValue
+age: dcid:AgeNotStated
+gender: dcid:Male
+
