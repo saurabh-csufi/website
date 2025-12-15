@@ -67,7 +67,7 @@ docker run -it \
   --env-file custom_dc/env.list \
   -p 8080:8080 \
   -e DEBUG=true \
-  -v /Users/saurabhgupta/Documents/2026/website/custom_dc/sample/:/Users/saurabhgupta/Documents/2026/website/custom_dc/sample/ \
+  -v /Users/saurabhgupta/Documents/2026/website/custom_dc:/Users/saurabhgupta/Documents/2026/website/custom_dc \
   -v /Users/saurabhgupta/Documents/2026/website/server/templates/custom_dc/custom:/workspace/server/templates/custom_dc/custom \
   gcr.io/datcom-ci/datacommons-services:stable
 ```
@@ -295,7 +295,7 @@ docker run -d \
   --env-file custom_dc/env.list \
   -p 8080:8080 \
   -e DEBUG=true \
-  -v $(pwd)/custom_dc/sample/:$(pwd)/custom_dc/sample/ \
+  -v $(pwd)/custom_dc/:$(pwd)/custom_dc/ \
   -v $(pwd)/server/templates/custom_dc/custom:/workspace/server/templates/custom_dc/custom \
   gcr.io/datcom-ci/datacommons-services:stable
 
