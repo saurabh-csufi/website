@@ -16,12 +16,208 @@
 
 {%- extends BASE_HTML -%}
 
-{% set main_id = 'about' %}
-{% set page_id = 'page-about' %}
-{% set title = 'About Us' %}
+{% set main_id = 'standard-insights' %}
+{% set page_id = 'page-standard-insights' %}
+{% set title = 'Standard Insights' %}
+
+{% block head %}
+{{ super() }}
+<script src="https://datacommons.org/datacommons.js"></script>
+<style>
+  .insights-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+  }
+
+  .insights-header {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+
+  .insights-header h1 {
+    font-size: 2.2rem;
+    color: #333;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+  }
+
+  .insights-header p {
+    color: #666;
+    font-size: 1.1rem;
+  }
+
+  .highlight-section {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .highlight-card {
+    background: linear-gradient(135deg, #4285f4 0%, #34a853 100%);
+    border-radius: 12px;
+    padding: 1.5rem;
+    color: white;
+    box-shadow: 0 4px 12px rgba(66, 133, 244, 0.3);
+  }
+
+  .insights-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .insight-card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    padding: 1.5rem;
+    min-height: 450px;
+  }
+
+  .insight-card h3 {
+    font-size: 1.1rem;
+    color: #333;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 3px solid #4285f4;
+    font-weight: 600;
+  }
+
+  .full-width-card {
+    grid-column: 1 / -1;
+  }
+
+  @media (max-width: 768px) {
+    .insights-grid {
+      grid-template-columns: 1fr;
+    }
+    .insight-card {
+      min-height: 380px;
+    }
+    .insights-header h1 {
+      font-size: 1.6rem;
+    }
+  }
+</style>
+{% endblock %}
 
 {% block content %}
-  <section class="container">
-    <h1>About goes here</h1>
-  </section>
+<div class="insights-container">
+  <div class="insights-header">
+    <h1>Standard Insights Dashboard</h1>
+    <p>Explore key data insights powered by Data Commons</p>
+  </div>
+
+  <!-- Key Highlights Section -->
+  <div class="highlight-section">
+    <div class="highlight-card">
+      <datacommons-highlight
+        header="World Population"
+        place="Earth"
+        variable="Count_Person"
+      ></datacommons-highlight>
+    </div>
+    <div class="highlight-card">
+      <datacommons-highlight
+        header="US Population"
+        place="country/USA"
+        variable="Count_Person"
+      ></datacommons-highlight>
+    </div>
+    <div class="highlight-card">
+      <datacommons-highlight
+        header="India Population"
+        place="country/IND"
+        variable="Count_Person"
+      ></datacommons-highlight>
+    </div>
+    <div class="highlight-card">
+      <datacommons-highlight
+        header="China Population"
+        place="country/CHN"
+        variable="Count_Person"
+      ></datacommons-highlight>
+    </div>
+  </div>
+
+  <!-- Charts Grid -->
+  <div class="insights-grid">
+    <!-- Population Trends -->
+    <div class="insight-card">
+      <h3>Population Trends - Major Economies</h3>
+      <datacommons-line
+        header="Population Over Time"
+        places="country/USA country/IND country/CHN country/DEU country/JPN"
+        variables="Count_Person"
+      ></datacommons-line>
+    </div>
+
+    <!-- GDP Comparison -->
+    <div class="insight-card">
+      <h3>GDP Comparison</h3>
+      <datacommons-bar
+        header="GDP by Country (Current US$)"
+        places="country/USA country/CHN country/JPN country/DEU country/IND country/GBR country/FRA"
+        variables="Amount_EconomicActivity_GrossDomesticProduction_Nominal"
+        sort="descending"
+      ></datacommons-bar>
+    </div>
+
+    <!-- Life Expectancy -->
+    <div class="insight-card">
+      <h3>Life Expectancy Trends</h3>
+      <datacommons-line
+        header="Life Expectancy at Birth"
+        places="country/USA country/JPN country/DEU country/IND country/BRA"
+        variables="LifeExpectancy_Person"
+      ></datacommons-line>
+    </div>
+
+    <!-- CO2 Emissions -->
+    <div class="insight-card">
+      <h3>CO2 Emissions</h3>
+      <datacommons-line
+        header="Annual CO2 Emissions"
+        places="country/USA country/CHN country/IND country/RUS country/DEU"
+        variables="Annual_Emissions_GreenhouseGas_CO2"
+      ></datacommons-line>
+    </div>
+
+    <!-- US Map - Population -->
+    <div class="insight-card full-width-card">
+      <h3>US Population by State</h3>
+      <datacommons-map
+        header="Population Distribution"
+        parentPlace="country/USA"
+        childPlaceType="State"
+        variable="Count_Person"
+      ></datacommons-map>
+    </div>
+
+    <!-- Ranking Chart -->
+    <div class="insight-card">
+      <h3>Top Countries by Population</h3>
+      <datacommons-ranking
+        header="Most Populous Countries"
+        parentPlace="Earth"
+        childPlaceType="Country"
+        variable="Count_Person"
+      ></datacommons-ranking>
+    </div>
+
+    <!-- Scatter Plot -->
+    <div class="insight-card">
+      <h3>GDP vs Life Expectancy</h3>
+      <datacommons-scatter
+        header="Economic Development vs Health"
+        parentPlace="Earth"
+        childPlaceType="Country"
+        variables="Amount_EconomicActivity_GrossDomesticProduction_Nominal LifeExpectancy_Person"
+      ></datacommons-scatter>
+    </div>
+  </div>
+</div>
 {% endblock %}

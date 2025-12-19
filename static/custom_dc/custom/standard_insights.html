@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<!--
+ Copyright 2023 Google LLC
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Standard Insights - Custom Data Commons</title>
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;600&family=Roboto&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined">
+
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+
+  <!-- Data Commons Web Components -->
+  <script src="https://datacommons.org/datacommons.js"></script>
+
+  <!-- Custom Styles -->
+  <link href="/custom_dc/custom/overrides.css" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Public Sans', 'Roboto', sans-serif;
+      background-color: #f8f9fa;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* Header Styles */
+    #main-header {
+      background-color: #333;
+    }
+    #main-nav {
+      background-color: #333;
+    }
+    .navbar-brand a {
+      color: #fff;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 1.2rem;
+    }
+    .navbar-brand a:hover {
+      color: #ddd;
+    }
+    .nav-link-main {
+      color: rgba(255,255,255,0.8) !important;
+      padding: 0.5rem 1rem;
+    }
+    .nav-link-main:hover {
+      color: #fff !important;
+    }
+    .nav-link-main.active {
+      color: #fff !important;
+      font-weight: 600;
+    }
+
+    /* Main Content */
+    .main-content {
+      min-height: calc(100vh - 120px);
+      padding-top: 1rem;
+    }
+
+    .insights-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2rem 1rem;
+    }
+
+    .insights-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .insights-header h1 {
+      font-size: 2.2rem;
+      color: #333;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+
+    .insights-header p {
+      color: #666;
+      font-size: 1.1rem;
+    }
+
+    /* Highlight Cards */
+    .highlight-section {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .highlight-card {
+      background: linear-gradient(135deg, #4285f4 0%, #34a853 100%);
+      border-radius: 12px;
+      padding: 1.5rem;
+      color: white;
+      box-shadow: 0 4px 12px rgba(66, 133, 244, 0.3);
+    }
+
+    .highlight-card datacommons-highlight {
+      --dc-headings-font-family: 'Public Sans', sans-serif;
+      --dc-font-family: 'Public Sans', sans-serif;
+    }
+
+    /* Chart Grid */
+    .insights-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(550px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .insight-card {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+      padding: 1.5rem;
+      min-height: 450px;
+    }
+
+    .insight-card h3 {
+      font-size: 1.1rem;
+      color: #333;
+      margin-bottom: 1rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 3px solid #4285f4;
+      font-weight: 600;
+    }
+
+    .full-width-card {
+      grid-column: 1 / -1;
+    }
+
+    /* Footer */
+    #main-footer {
+      background-color: #333;
+      color: #fff;
+      padding: 1rem 0;
+      text-align: center;
+    }
+
+    #main-footer a {
+      color: #aaa;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .insights-grid {
+        grid-template-columns: 1fr;
+      }
+      .insight-card {
+        min-height: 380px;
+      }
+      .insights-header h1 {
+        font-size: 1.6rem;
+      }
+    }
+
+    /* Back link */
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      color: #4285f4;
+      text-decoration: none;
+      margin-bottom: 1rem;
+      font-weight: 500;
+    }
+    .back-link:hover {
+      color: #1a73e8;
+      text-decoration: underline;
+    }
+    .back-link .material-icons-outlined {
+      margin-right: 0.25rem;
+      font-size: 1.2rem;
+    }
+  </style>
+</head>
+<body>
+  <div id="main">
+    <!-- Header -->
+    <header id="main-header">
+      <nav class="navbar navbar-dark navbar-expand-lg" id="main-nav">
+        <div class="container-fluid">
+          <div class="navbar-brand">
+            <a href="/">Custom Data Commons</a>
+          </div>
+          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#dc-main-nav">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse justify-content-md-end" id="dc-main-nav">
+            <ul class="navbar-nav float-md-right">
+              <li class="nav-item">
+                <a href="/static/custom_dc/custom/standard_insights.html" class="nav-link-main active"><span>Standard Insights</span></a>
+              </li>
+              <li class="nav-item">
+                <a href="/tools/visualization#visType=timeline" class="nav-link-main"><span>Timeline</span></a>
+              </li>
+              <li class="nav-item">
+                <a href="/tools/visualization#visType=scatter" class="nav-link-main"><span>Scatter</span></a>
+              </li>
+              <li class="nav-item">
+                <a href="/tools/visualization#visType=map" class="nav-link-main"><span>Map</span></a>
+              </li>
+              <li class="nav-item">
+                <a href="/tools/download" class="nav-link-main"><span>Download</span></a>
+              </li>
+              <li class="nav-item">
+                <a href="/tools/statvar" class="nav-link-main"><span>Variables</span></a>
+              </li>
+              <li class="nav-item">
+                <a href="/browser" class="nav-link-main"><span>Knowledge Graph</span></a>
+              </li>
+              <li class="nav-item">
+                <a href="/explore" class="nav-link-main"><span>Search</span></a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <div class="insights-container">
+        <a href="/" class="back-link">
+          <span class="material-icons-outlined">arrow_back</span> Back to Home
+        </a>
+
+        <div class="insights-header">
+          <h1>Standard Insights Dashboard</h1>
+          <p>Explore key data insights powered by Data Commons</p>
+        </div>
+
+        <!-- Key Highlights Section -->
+        <div class="highlight-section">
+          <div class="highlight-card">
+            <datacommons-highlight
+              header="World Population"
+              place="Earth"
+              variable="Count_Person"
+            ></datacommons-highlight>
+          </div>
+          <div class="highlight-card">
+            <datacommons-highlight
+              header="US Population"
+              place="country/USA"
+              variable="Count_Person"
+            ></datacommons-highlight>
+          </div>
+          <div class="highlight-card">
+            <datacommons-highlight
+              header="India Population"
+              place="country/IND"
+              variable="Count_Person"
+            ></datacommons-highlight>
+          </div>
+          <div class="highlight-card">
+            <datacommons-highlight
+              header="China Population"
+              place="country/CHN"
+              variable="Count_Person"
+            ></datacommons-highlight>
+          </div>
+        </div>
+
+        <!-- Charts Grid -->
+        <div class="insights-grid">
+          <!-- Population Trends -->
+          <div class="insight-card">
+            <h3>Population Trends - Major Economies</h3>
+            <datacommons-line
+              header="Population Over Time"
+              places="country/USA country/IND country/CHN country/DEU country/JPN"
+              variables="Count_Person"
+            ></datacommons-line>
+          </div>
+
+          <!-- GDP Comparison -->
+          <div class="insight-card">
+            <h3>GDP Comparison</h3>
+            <datacommons-bar
+              header="GDP by Country (Current US$)"
+              places="country/USA country/CHN country/JPN country/DEU country/IND country/GBR country/FRA"
+              variables="Amount_EconomicActivity_GrossDomesticProduction_Nominal"
+              sort="descending"
+            ></datacommons-bar>
+          </div>
+
+          <!-- Life Expectancy -->
+          <div class="insight-card">
+            <h3>Life Expectancy Trends</h3>
+            <datacommons-line
+              header="Life Expectancy at Birth"
+              places="country/USA country/JPN country/DEU country/IND country/BRA"
+              variables="LifeExpectancy_Person"
+            ></datacommons-line>
+          </div>
+
+          <!-- CO2 Emissions -->
+          <div class="insight-card">
+            <h3>CO2 Emissions</h3>
+            <datacommons-line
+              header="Annual CO2 Emissions"
+              places="country/USA country/CHN country/IND country/RUS country/DEU"
+              variables="Annual_Emissions_GreenhouseGas_CO2"
+            ></datacommons-line>
+          </div>
+
+          <!-- US Map - Population -->
+          <div class="insight-card full-width-card">
+            <h3>US Population by State</h3>
+            <datacommons-map
+              header="Population Distribution"
+              parentPlace="country/USA"
+              childPlaceType="State"
+              variable="Count_Person"
+            ></datacommons-map>
+          </div>
+
+          <!-- Ranking Chart -->
+          <div class="insight-card">
+            <h3>Top Countries by Population</h3>
+            <datacommons-ranking
+              header="Most Populous Countries"
+              parentPlace="Earth"
+              childPlaceType="Country"
+              variable="Count_Person"
+            ></datacommons-ranking>
+          </div>
+
+          <!-- Scatter Plot -->
+          <div class="insight-card">
+            <h3>GDP vs Life Expectancy</h3>
+            <datacommons-scatter
+              header="Economic Development vs Health"
+              parentPlace="Earth"
+              childPlaceType="Country"
+              variables="Amount_EconomicActivity_GrossDomesticProduction_Nominal LifeExpectancy_Person"
+            ></datacommons-scatter>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer id="main-footer">
+      <div class="container">
+        <p>Powered by <a href="https://datacommons.org" target="_blank">Data Commons</a></p>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+</body>
+</html>
