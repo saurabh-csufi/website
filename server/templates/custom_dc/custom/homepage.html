@@ -527,7 +527,7 @@
   <div class="gemini-chat-container">
     <div class="chat-header">
       <h1>Data Commons AI Assistant</h1>
-      <p>Ask questions about statistics, upload PDFs, and explore data powered by Gemini AI + Data Commons MCP</p>
+      <p>Ask about statistics, policies, or search through the knowledge base - powered by Gemini AI + Data Commons MCP + File Search</p>
     </div>
 
     <div class="config-section" id="config-section">
@@ -547,6 +547,16 @@
       </div>
 
       <div class="config-row">
+        <label for="kb-store-input">Knowledge Base:</label>
+        <input type="text" id="kb-store-input" placeholder="fileSearchStores/your-store-id" value="fileSearchStores/msmepolicies-8pibj9lwmrws">
+        <div class="mcp-toggle">
+          <input type="checkbox" id="kb-enabled" checked>
+          <label for="kb-enabled">Use Knowledge Base</label>
+        </div>
+        <span class="mcp-status disconnected" id="kb-status">Ready</span>
+      </div>
+
+      <div class="config-row">
         <button id="save-config">Save & Connect</button>
       </div>
 
@@ -563,7 +573,7 @@
         <div class="suggestions">
           <button class="suggestion" data-text="What is the population of California?" disabled>Population of California</button>
           <button class="suggestion" data-text="What is the GDP of Germany?" disabled>GDP of Germany</button>
-          <button class="suggestion" data-text="What is the life expectancy in Japan?" disabled>Life expectancy in Japan</button>
+          <button class="suggestion" data-text="What are the key MSME policies in India?" disabled>MSME Policies (KB)</button>
         </div>
       </div>
     </div>
@@ -602,12 +612,14 @@
     (function() {
       // Configuration
       const GEMINI_API_BASE = 'https://generativelanguage.googleapis.com/v1beta/models';
-      const GEMINI_MODEL = 'gemini-2.0-flash';
+      const GEMINI_MODEL = 'gemini-2.5-flash';  // 2.5 required for file_search
 
       // State
       let geminiApiKey = localStorage.getItem('gemini_api_key') || '';
       let mcpProxyUrl = localStorage.getItem('mcp_proxy_url') || 'http://localhost:5001';
       let mcpEnabled = localStorage.getItem('mcp_enabled') !== 'false';
+      let kbStoreId = localStorage.getItem('kb_store_id') || 'fileSearchStores/msmepolicies-8pibj9lwmrws';
+      let kbEnabled = localStorage.getItem('kb_enabled') !== 'false';
       let mcpTools = [];
       let mcpConnected = false;
       let uploadedFiles = [];
@@ -627,11 +639,18 @@
       const mcpUrlInput = document.getElementById('mcp-url-input');
       const mcpEnabledCheckbox = document.getElementById('mcp-enabled');
       const mcpStatusEl = document.getElementById('mcp-status');
+      const kbStoreInput = document.getElementById('kb-store-input');
+      const kbEnabledCheckbox = document.getElementById('kb-enabled');
+      const kbStatusEl = document.getElementById('kb-status');
       const saveConfigBtn = document.getElementById('save-config');
       const configStatus = document.getElementById('config-status');
 
       // System instruction
-      const systemInstruction = `You are a Data Commons AI assistant with access to real-time statistical data tools.
+      const systemInstruction = `You are a Data Commons AI assistant with access to real-time statistical data tools and a knowledge base of policy documents.
+
+CAPABILITIES:
+1. **Data Commons Tools** - Real-time statistical data (population, GDP, health, etc.)
+2. **Knowledge Base** - Search through indexed policy documents (PDFs about MSME policies, trade agreements, regulations)
 
 CRITICAL: When users ask about ANY statistics, data, numbers, demographics, economics, health, environment, population, GDP, unemployment, or similar quantitative information:
 1. You MUST use the available tools to fetch real data - NEVER make up numbers or provide code examples
@@ -646,8 +665,17 @@ Tool workflow for data queries:
 
 DO NOT generate Python code or tell users how to query - use the tools yourself and return the actual data.
 
+For POLICY/DOCUMENT QUERIES (regulations, policies, agreements, schemes, guidelines):
+- The knowledge base contains indexed documents that will be automatically searched
+- Cite the source document when providing information
+- If information is not found in the knowledge base, say so clearly
+
+DO NOT generate code - use the tools and present actual data/information.
+Be concise but comprehensive. Cite sources appropriately.
+
 You can also analyze PDF documents that users upload.
-Be concise but comprehensive. Cite "Data Commons" as the source when presenting data.`;
+Be concise but comprehensive. Cite "Data Commons" as the source when presenting data.
+`;
 
       // Initialize
       function init() {
@@ -655,6 +683,8 @@ Be concise but comprehensive. Cite "Data Commons" as the source when presenting 
         if (geminiApiKey) apiKeyInput.value = geminiApiKey;
         if (mcpProxyUrl) mcpUrlInput.value = mcpProxyUrl;
         mcpEnabledCheckbox.checked = mcpEnabled;
+        if (kbStoreId) kbStoreInput.value = kbStoreId;
+        kbEnabledCheckbox.checked = kbEnabled;
 
         // Event listeners
         saveConfigBtn.addEventListener('click', saveConfig);
@@ -688,6 +718,8 @@ Be concise but comprehensive. Cite "Data Commons" as the source when presenting 
         const key = apiKeyInput.value.trim();
         const url = mcpUrlInput.value.trim();
         const enabled = mcpEnabledCheckbox.checked;
+        const kbStore = kbStoreInput.value.trim();
+        const kbOn = kbEnabledCheckbox.checked;
 
         if (!key) {
           configStatus.textContent = 'Please enter a Gemini API key';
@@ -698,10 +730,14 @@ Be concise but comprehensive. Cite "Data Commons" as the source when presenting 
         geminiApiKey = key;
         mcpProxyUrl = url;
         mcpEnabled = enabled;
+        kbStoreId = kbStore;
+        kbEnabled = kbOn;
 
         localStorage.setItem('gemini_api_key', key);
         localStorage.setItem('mcp_proxy_url', url);
         localStorage.setItem('mcp_enabled', enabled.toString());
+        localStorage.setItem('kb_store_id', kbStore);
+        localStorage.setItem('kb_enabled', kbOn.toString());
 
         configStatus.textContent = 'Connecting...';
         configStatus.className = 'config-status';
@@ -725,6 +761,15 @@ Be concise but comprehensive. Cite "Data Commons" as the source when presenting 
           mcpConnected = false;
           mcpStatusEl.textContent = 'Disabled';
           mcpStatusEl.className = 'mcp-status disconnected';
+        }
+
+        // Update knowledge base status
+        if (kbEnabled && kbStoreId) {
+          kbStatusEl.textContent = 'Enabled';
+          kbStatusEl.className = 'mcp-status connected';
+        } else {
+          kbStatusEl.textContent = 'Disabled';
+          kbStatusEl.className = 'mcp-status disconnected';
         }
 
         enableChat();
@@ -977,36 +1022,65 @@ Be concise but comprehensive. Cite "Data Commons" as the source when presenting 
               }
             };
 
-            // Add tools if MCP is connected
-            if (mcpConnected && mcpTools.length > 0) {
-              // Check if query looks like a data request
-              const dataKeywords = /population|gdp|unemployment|rate|statistics|data|how many|what is the|number of|percent|average|median|income|health|economy|demographics|emissions|climate|crime|education/i;
-              const isDataQuery = dataKeywords.test(userMessage);
+            // Add tools if MCP is connected or Knowledge Base is enabled
+            const toolsArray = [];
 
-              // Iteration 1: Force tool call for data queries (ANY mode)
-              // Iteration 2: Allow tool OR text (AUTO mode)
-              // Iteration 3+: Force text response - don't include tools
-              if (iteration >= 3) {
-                // Don't include tools - force pure text response
-                console.log(`Iteration ${iteration}: Forcing text response (no tools)`);
-              } else {
-                // Simplify tool descriptions for Gemini (truncate long ones)
-                const simplifiedTools = mcpTools.map(t => ({
-                  name: t.name,
-                  description: t.description.length > 500
-                    ? t.description.substring(0, 500) + '...'
-                    : t.description,
-                  parameters: t.parameters
-                }));
-                payload.tools = [{ functionDeclarations: simplifiedTools }];
+            // Determine which tools to use based on query type
+            const policyKeywords = /policy|policies|regulation|agreement|scheme|guideline|msme|trade|tariff|export|import|document|pdf/i;
+            const isPolicyQuery = policyKeywords.test(userMessage);
 
+            // Add Knowledge Base file search tool FIRST if enabled and it's a policy query
+            // Using fileSearch alone (without mixing with functionDeclarations) for better results
+            // Uses camelCase per official SDK docs: https://ai.google.dev/gemini-api/docs/file-search
+            if (kbEnabled && kbStoreId && iteration < 3 && isPolicyQuery) {
+              toolsArray.push({
+                fileSearch: {
+                  fileSearchStoreNames: [kbStoreId]
+                }
+              });
+              console.log(`Knowledge Base query (policy-related): ${kbStoreId}`);
+            }
+            // Add MCP function tools for data queries (when NOT using fileSearch)
+            else if (mcpConnected && mcpTools.length > 0 && iteration < 3) {
+              // Simplify tool descriptions for Gemini (truncate long ones)
+              const simplifiedTools = mcpTools.map(t => ({
+                name: t.name,
+                description: t.description.length > 500
+                  ? t.description.substring(0, 500) + '...'
+                  : t.description,
+                parameters: t.parameters
+              }));
+              toolsArray.push({ functionDeclarations: simplifiedTools });
+              console.log('Using MCP tools for data query');
+            }
+
+            // Apply tools to payload
+            if (toolsArray.length > 0) {
+              payload.tools = toolsArray;
+
+              // Check if we're using function tools (MCP) or fileSearch
+              const hasFunctionTools = toolsArray.some(t => t.functionDeclarations);
+              const hasFileSearch = toolsArray.some(t => t.fileSearch);
+
+              // Only set functionCallingConfig when MCP function tools are present
+              // fileSearch doesn't need/want functionCallingConfig
+              if (hasFunctionTools) {
+                const dataKeywords = /population|gdp|unemployment|rate|statistics|data|how many|what is the|number of|percent|average|median|income|health|economy|demographics|emissions|climate|crime|education/i;
+                const isDataQuery = dataKeywords.test(userMessage);
                 const mode = (iteration === 1 && isDataQuery) ? 'ANY' : 'AUTO';
-                console.log(`Iteration ${iteration}: Using mode ${mode}`);
+                console.log(`Iteration ${iteration}: MCP tools with mode ${mode}`);
                 payload.toolConfig = {
                   functionCallingConfig: { mode: mode }
                 };
+              } else if (hasFileSearch) {
+                console.log(`Iteration ${iteration}: fileSearch only (no functionCallingConfig)`);
               }
+            } else if (iteration >= 3) {
+              console.log(`Iteration ${iteration}: Forcing text response (no tools)`);
             }
+
+            // Debug: Log payload
+            console.log('Gemini request payload:', JSON.stringify(payload, null, 2));
 
             // Call Gemini
             const response = await fetch(
@@ -1020,6 +1094,9 @@ Be concise but comprehensive. Cite "Data Commons" as the source when presenting 
 
             const data = await response.json();
 
+            // Debug: Log full response
+            console.log('Gemini response:', JSON.stringify(data, null, 2));
+
             if (data.error) {
               throw new Error(data.error.message || 'API request failed');
             }
@@ -1030,18 +1107,38 @@ Be concise but comprehensive. Cite "Data Commons" as the source when presenting 
             }
 
             const responseParts = candidates[0].content?.parts || [];
+
+            // Check for grounding metadata from file_search
+            const groundingMetadata = candidates[0].groundingMetadata;
+            if (groundingMetadata) {
+              console.log('Grounding metadata found:', groundingMetadata);
+            }
+
             const functionCalls = responseParts.filter(p => p.functionCall);
 
-            if (functionCalls.length > 0 && mcpConnected) {
+            // Filter to only known MCP tools - ignore unknown function calls
+            const mcpToolNames = mcpTools.map(t => t.name);
+            const knownFunctionCalls = functionCalls.filter(p =>
+              mcpToolNames.includes(p.functionCall.name)
+            );
+
+            if (functionCalls.length > knownFunctionCalls.length) {
+              console.warn('Unknown function calls filtered out:',
+                functionCalls.filter(p => !mcpToolNames.includes(p.functionCall.name))
+                  .map(p => p.functionCall.name)
+              );
+            }
+
+            if (knownFunctionCalls.length > 0 && mcpConnected) {
               // Remove typing indicator
               typingEl.remove();
 
               // Add model response to conversation
               contents.push({ role: 'model', parts: responseParts });
 
-              // Execute tool calls
+              // Execute tool calls (only known MCP tools)
               const functionResponses = [];
-              for (const part of functionCalls) {
+              for (const part of knownFunctionCalls) {
                 const fc = part.functionCall;
                 const toolEl = showToolCall(fc.name, fc.args);
 
@@ -1072,10 +1169,22 @@ Be concise but comprehensive. Cite "Data Commons" as the source when presenting 
               typingEl = showTypingIndicator();
 
             } else {
-              // Final response (no function calls)
+              // Final response (no function calls or only unknown ones)
               const textParts = responseParts.filter(p => p.text);
               if (textParts.length > 0) {
                 finalResponse = textParts.map(p => p.text).join('\n');
+
+                // Append sources from grounding metadata if available
+                if (groundingMetadata && groundingMetadata.groundingChunks) {
+                  const sources = groundingMetadata.groundingChunks
+                    .filter(chunk => chunk.retrievedContext)
+                    .map(chunk => chunk.retrievedContext.title || chunk.retrievedContext.uri)
+                    .filter((v, i, a) => a.indexOf(v) === i); // unique
+
+                  if (sources.length > 0) {
+                    finalResponse += '\n\n**Sources:**\n' + sources.map(s => `• ${s}`).join('\n');
+                  }
+                }
               }
               break;
             }
