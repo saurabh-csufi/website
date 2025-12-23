@@ -530,10 +530,14 @@
       <p>Ask about statistics, policies, or search through the knowledge base - powered by Gemini AI + Data Commons MCP + File Search</p>
     </div>
 
+    <div style="text-align: right; margin-bottom: 8px;">
+      <button type="button" id="toggle-config-btn" style="background: #6c757d; color: white; font-size: 0.8rem; padding: 4px 10px; border: none; border-radius: 4px; cursor: pointer;">Hide Settings</button>
+    </div>
+
     <div class="config-section" id="config-section">
       <div class="config-row">
         <label for="api-key-input">Gemini API Key:</label>
-        <input type="password" id="api-key-input" placeholder="Enter your Gemini API key">
+        <input type="text" id="api-key-input" placeholder="Enter your Gemini API key">
       </div>
 
       <div class="config-row">
@@ -612,7 +616,6 @@
     (function() {
       // Configuration
       const GEMINI_API_BASE = 'https://generativelanguage.googleapis.com/v1beta/models';
-      const GEMINI_MODEL = 'gemini-2.5-flash';  // 2.5 required for file_search
 
       // State
       let geminiApiKey = localStorage.getItem('gemini_api_key') || '';
@@ -644,13 +647,14 @@
       const kbStatusEl = document.getElementById('kb-status');
       const saveConfigBtn = document.getElementById('save-config');
       const configStatus = document.getElementById('config-status');
+      const toggleConfigBtn = document.getElementById('toggle-config-btn');
 
-      // System instruction
-      const systemInstruction = `You are a Data Commons AI assistant with access to real-time statistical data tools and a knowledge base of policy documents.
+      // Models - use different models for different purposes
+      const MCP_MODEL = 'gemini-2.0-flash';  // For MCP function calling (proven to work)
+      const KB_MODEL = 'gemini-2.5-flash';   // For file search (requires 2.5)
 
-CAPABILITIES:
-1. **Data Commons Tools** - Real-time statistical data (population, GDP, health, etc.)
-2. **Knowledge Base** - Search through indexed policy documents (PDFs about MSME policies, trade agreements, regulations)
+      // System instructions
+      const mcpSystemInstruction = `You are a Data Commons AI assistant with access to real-time statistical data tools.
 
 CRITICAL: When users ask about ANY statistics, data, numbers, demographics, economics, health, environment, population, GDP, unemployment, or similar quantitative information:
 1. You MUST use the available tools to fetch real data - NEVER make up numbers or provide code examples
@@ -664,18 +668,12 @@ Tool workflow for data queries:
 - Step 3: Present the numbers from the response
 
 DO NOT generate Python code or tell users how to query - use the tools yourself and return the actual data.
+Be concise but comprehensive. Cite "Data Commons" as the source when presenting data.`;
 
-For POLICY/DOCUMENT QUERIES (regulations, policies, agreements, schemes, guidelines):
-- The knowledge base contains indexed documents that will be automatically searched
-- Cite the source document when providing information
-- If information is not found in the knowledge base, say so clearly
-
-DO NOT generate code - use the tools and present actual data/information.
-Be concise but comprehensive. Cite sources appropriately.
-
-You can also analyze PDF documents that users upload.
-Be concise but comprehensive. Cite "Data Commons" as the source when presenting data.
-`;
+      const kbSystemInstruction = `You are a helpful assistant that answers questions based on the uploaded policy documents.
+Always cite which document your information comes from.
+If the answer is not found in the documents, say "No relevant information found in knowledge base."
+Be concise and factual.`;
 
       // Initialize
       function init() {
@@ -688,6 +686,10 @@ Be concise but comprehensive. Cite "Data Commons" as the source when presenting 
 
         // Event listeners
         saveConfigBtn.addEventListener('click', saveConfig);
+        toggleConfigBtn.addEventListener('click', () => {
+          const isHidden = configSection.classList.toggle('hidden');
+          toggleConfigBtn.textContent = isHidden ? 'Show Settings' : 'Hide Settings';
+        });
         sendBtn.addEventListener('click', sendMessage);
         chatInput.addEventListener('keydown', handleKeyDown);
         chatInput.addEventListener('input', autoResize);
@@ -776,9 +778,7 @@ Be concise but comprehensive. Cite "Data Commons" as the source when presenting 
         configStatus.textContent = 'Configuration saved! You can now start chatting.';
         configStatus.className = 'config-status success';
 
-        setTimeout(() => {
-          configSection.classList.add('hidden');
-        }, 2000);
+        // Don't auto-hide - let user control via toggle button
       }
 
       // Check MCP proxy connection and fetch tools
@@ -957,56 +957,39 @@ Be concise but comprehensive. Cite "Data Commons" as the source when presenting 
         resultEl.textContent = displayResult;
       }
 
-      // Send message with function calling
-      async function sendMessage() {
-        const message = chatInput.value.trim();
-        if ((!message && uploadedFiles.length === 0) || isProcessing || !geminiApiKey) return;
-
-        // Hide welcome message
-        if (welcomeMessage) {
-          welcomeMessage.style.display = 'none';
+      // ============================================================
+      // PHASE 1: MCP Tools Query (using gemini-2.0-flash)
+      // This is the EXACT logic from the old working implementation
+      // ============================================================
+      async function queryWithMcpTools(userMessage, documentData = null) {
+        if (!mcpConnected || mcpTools.length === 0) {
+          console.log('MCP not connected or no tools available');
+          return { success: false, response: null, error: 'MCP not connected' };
         }
 
-        // Show user message
-        let displayMessage = message;
-        if (uploadedFiles.length > 0) {
-          const fileNames = uploadedFiles.map(f => f.name).join(', ');
-          displayMessage = message ? `📄 ${fileNames}\n\n${message}` : `📄 Uploaded: ${fileNames}`;
-        }
-        addMessage('user', displayMessage);
-
-        // Clear input
-        chatInput.value = '';
-        autoResize();
-
-        // Start processing
-        isProcessing = true;
-        sendBtn.disabled = true;
-        chatInput.disabled = true;
-        let typingEl = showTypingIndicator();
+        console.log('=== Starting MCP Query ===');
+        console.log(`MCP Tools available: ${mcpTools.map(t => t.name).join(', ')}`);
 
         try {
           // Build contents
-          const contents = [...conversationHistory];
-
+          const contents = [];
           const currentParts = [];
-          if (uploadedFiles.length > 0) {
+
+          if (documentData) {
             currentParts.push({
               inline_data: {
-                mime_type: uploadedFiles[0].mimeType,
-                data: uploadedFiles[0].data
+                mime_type: documentData.mimeType,
+                data: documentData.data
               }
             });
           }
 
-          const userMessage = message || 'Please analyze this document and provide a summary.';
           currentParts.push({ text: userMessage });
           contents.push({ role: 'user', parts: currentParts });
 
-          // Function calling loop
+          // Function calling loop (exact copy from old working code)
           let maxIterations = 5;
           let iteration = 0;
-          let finalResponse = null;
 
           while (iteration < maxIterations) {
             iteration++;
@@ -1014,7 +997,7 @@ Be concise but comprehensive. Cite "Data Commons" as the source when presenting 
             // Build payload
             const payload = {
               contents: contents,
-              systemInstruction: { parts: [{ text: systemInstruction }] },
+              systemInstruction: { parts: [{ text: mcpSystemInstruction }] },
               generationConfig: {
                 temperature: 0.7,
                 topP: 0.95,
@@ -1022,27 +1005,15 @@ Be concise but comprehensive. Cite "Data Commons" as the source when presenting 
               }
             };
 
-            // Add tools if MCP is connected or Knowledge Base is enabled
-            const toolsArray = [];
+            // Add tools if MCP is connected (exact logic from old code)
+            const dataKeywords = /population|gdp|unemployment|rate|statistics|data|how many|what is the|number of|percent|average|median|income|health|economy|demographics|emissions|climate|crime|education/i;
+            const isDataQuery = dataKeywords.test(userMessage);
 
-            // Determine which tools to use based on query type
-            const policyKeywords = /policy|policies|regulation|agreement|scheme|guideline|msme|trade|tariff|export|import|document|pdf/i;
-            const isPolicyQuery = policyKeywords.test(userMessage);
-
-            // Add Knowledge Base file search tool FIRST if enabled and it's a policy query
-            // Using fileSearch alone (without mixing with functionDeclarations) for better results
-            // Uses camelCase per official SDK docs: https://ai.google.dev/gemini-api/docs/file-search
-            if (kbEnabled && kbStoreId && iteration < 3 && isPolicyQuery) {
-              toolsArray.push({
-                fileSearch: {
-                  fileSearchStoreNames: [kbStoreId]
-                }
-              });
-              console.log(`Knowledge Base query (policy-related): ${kbStoreId}`);
-            }
-            // Add MCP function tools for data queries (when NOT using fileSearch)
-            else if (mcpConnected && mcpTools.length > 0 && iteration < 3) {
-              // Simplify tool descriptions for Gemini (truncate long ones)
+            if (iteration >= 3) {
+              // Don't include tools - force pure text response
+              console.log(`MCP Iteration ${iteration}: Forcing text response (no tools)`);
+            } else {
+              // Simplify tool descriptions for Gemini
               const simplifiedTools = mcpTools.map(t => ({
                 name: t.name,
                 description: t.description.length > 500
@@ -1050,41 +1021,20 @@ Be concise but comprehensive. Cite "Data Commons" as the source when presenting 
                   : t.description,
                 parameters: t.parameters
               }));
-              toolsArray.push({ functionDeclarations: simplifiedTools });
-              console.log('Using MCP tools for data query');
+              payload.tools = [{ functionDeclarations: simplifiedTools }];
+
+              const mode = (iteration === 1 && isDataQuery) ? 'ANY' : 'AUTO';
+              console.log(`MCP Iteration ${iteration}: Using mode ${mode}`);
+              payload.toolConfig = {
+                functionCallingConfig: { mode: mode }
+              };
             }
 
-            // Apply tools to payload
-            if (toolsArray.length > 0) {
-              payload.tools = toolsArray;
+            // Call Gemini with MCP_MODEL (2.0-flash)
+            console.log('MCP Request payload:', JSON.stringify(payload, null, 2));
 
-              // Check if we're using function tools (MCP) or fileSearch
-              const hasFunctionTools = toolsArray.some(t => t.functionDeclarations);
-              const hasFileSearch = toolsArray.some(t => t.fileSearch);
-
-              // Only set functionCallingConfig when MCP function tools are present
-              // fileSearch doesn't need/want functionCallingConfig
-              if (hasFunctionTools) {
-                const dataKeywords = /population|gdp|unemployment|rate|statistics|data|how many|what is the|number of|percent|average|median|income|health|economy|demographics|emissions|climate|crime|education/i;
-                const isDataQuery = dataKeywords.test(userMessage);
-                const mode = (iteration === 1 && isDataQuery) ? 'ANY' : 'AUTO';
-                console.log(`Iteration ${iteration}: MCP tools with mode ${mode}`);
-                payload.toolConfig = {
-                  functionCallingConfig: { mode: mode }
-                };
-              } else if (hasFileSearch) {
-                console.log(`Iteration ${iteration}: fileSearch only (no functionCallingConfig)`);
-              }
-            } else if (iteration >= 3) {
-              console.log(`Iteration ${iteration}: Forcing text response (no tools)`);
-            }
-
-            // Debug: Log payload
-            console.log('Gemini request payload:', JSON.stringify(payload, null, 2));
-
-            // Call Gemini
             const response = await fetch(
-              `${GEMINI_API_BASE}/${GEMINI_MODEL}:generateContent?key=${geminiApiKey}`,
+              `${GEMINI_API_BASE}/${MCP_MODEL}:generateContent?key=${geminiApiKey}`,
               {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -1093,53 +1043,31 @@ Be concise but comprehensive. Cite "Data Commons" as the source when presenting 
             );
 
             const data = await response.json();
-
-            // Debug: Log full response
-            console.log('Gemini response:', JSON.stringify(data, null, 2));
+            console.log('MCP Response:', JSON.stringify(data, null, 2));
 
             if (data.error) {
-              throw new Error(data.error.message || 'API request failed');
+              throw new Error(data.error.message || 'MCP API request failed');
             }
 
             const candidates = data.candidates || [];
             if (candidates.length === 0) {
-              throw new Error('No response from AI');
+              throw new Error('No response from MCP query');
             }
 
             const responseParts = candidates[0].content?.parts || [];
-
-            // Check for grounding metadata from file_search
-            const groundingMetadata = candidates[0].groundingMetadata;
-            if (groundingMetadata) {
-              console.log('Grounding metadata found:', groundingMetadata);
-            }
-
             const functionCalls = responseParts.filter(p => p.functionCall);
 
-            // Filter to only known MCP tools - ignore unknown function calls
-            const mcpToolNames = mcpTools.map(t => t.name);
-            const knownFunctionCalls = functionCalls.filter(p =>
-              mcpToolNames.includes(p.functionCall.name)
-            );
-
-            if (functionCalls.length > knownFunctionCalls.length) {
-              console.warn('Unknown function calls filtered out:',
-                functionCalls.filter(p => !mcpToolNames.includes(p.functionCall.name))
-                  .map(p => p.functionCall.name)
-              );
-            }
-
-            if (knownFunctionCalls.length > 0 && mcpConnected) {
-              // Remove typing indicator
-              typingEl.remove();
-
+            if (functionCalls.length > 0 && mcpConnected) {
               // Add model response to conversation
               contents.push({ role: 'model', parts: responseParts });
 
-              // Execute tool calls (only known MCP tools)
+              // Execute tool calls
               const functionResponses = [];
-              for (const part of knownFunctionCalls) {
+              for (const part of functionCalls) {
                 const fc = part.functionCall;
+                console.log(`Executing MCP tool: ${fc.name}`, fc.args);
+
+                // Show tool call in UI
                 const toolEl = showToolCall(fc.name, fc.args);
 
                 try {
@@ -1165,50 +1093,210 @@ Be concise but comprehensive. Cite "Data Commons" as the source when presenting 
               // Add function responses
               contents.push({ role: 'user', parts: functionResponses });
 
-              // Show typing indicator again
-              typingEl = showTypingIndicator();
-
             } else {
-              // Final response (no function calls or only unknown ones)
+              // Got text response
               const textParts = responseParts.filter(p => p.text);
               if (textParts.length > 0) {
-                finalResponse = textParts.map(p => p.text).join('\n');
-
-                // Append sources from grounding metadata if available
-                if (groundingMetadata && groundingMetadata.groundingChunks) {
-                  const sources = groundingMetadata.groundingChunks
-                    .filter(chunk => chunk.retrievedContext)
-                    .map(chunk => chunk.retrievedContext.title || chunk.retrievedContext.uri)
-                    .filter((v, i, a) => a.indexOf(v) === i); // unique
-
-                  if (sources.length > 0) {
-                    finalResponse += '\n\n**Sources:**\n' + sources.map(s => `• ${s}`).join('\n');
-                  }
-                }
+                const response = textParts.map(p => p.text).join('\n');
+                console.log('MCP Query successful');
+                return { success: true, response: response, error: null };
               }
               break;
             }
           }
 
+          return { success: false, response: null, error: 'MCP query did not produce response' };
+
+        } catch (err) {
+          console.error('MCP Query error:', err);
+          return { success: false, response: null, error: err.message };
+        }
+      }
+
+      // ============================================================
+      // PHASE 2: Knowledge Base Query (using gemini-2.5-flash)
+      // Separate API call for file search
+      // ============================================================
+      async function queryWithKnowledgeBase(userMessage) {
+        if (!kbEnabled || !kbStoreId) {
+          console.log('Knowledge base not enabled or no store ID');
+          return { success: false, response: null, sources: [], error: 'KB not configured' };
+        }
+
+        console.log('=== Starting Knowledge Base Query ===');
+        console.log(`KB Store: ${kbStoreId}`);
+
+        try {
+          const payload = {
+            contents: [{ role: 'user', parts: [{ text: userMessage }] }],
+            systemInstruction: { parts: [{ text: kbSystemInstruction }] },
+            tools: [{
+              fileSearch: {
+                fileSearchStoreNames: [kbStoreId]
+              }
+            }],
+            generationConfig: {
+              temperature: 0.3,
+              topP: 0.95,
+              topK: 40
+            }
+          };
+
+          console.log('KB Request payload:', JSON.stringify(payload, null, 2));
+
+          const response = await fetch(
+            `${GEMINI_API_BASE}/${KB_MODEL}:generateContent?key=${geminiApiKey}`,
+            {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload)
+            }
+          );
+
+          const data = await response.json();
+          console.log('KB Response:', JSON.stringify(data, null, 2));
+
+          if (data.error) {
+            throw new Error(data.error.message || 'KB API request failed');
+          }
+
+          const candidates = data.candidates || [];
+          if (candidates.length === 0) {
+            return { success: false, response: null, sources: [], error: 'No KB response' };
+          }
+
+          const responseParts = candidates[0].content?.parts || [];
+          const textParts = responseParts.filter(p => p.text);
+          const responseText = textParts.map(p => p.text).join('\n');
+
+          // Extract sources from grounding metadata
+          const sources = [];
+          const groundingMetadata = candidates[0].groundingMetadata;
+          if (groundingMetadata && groundingMetadata.groundingChunks) {
+            groundingMetadata.groundingChunks
+              .filter(chunk => chunk.retrievedContext)
+              .forEach(chunk => {
+                const source = chunk.retrievedContext.title || chunk.retrievedContext.uri;
+                if (source && !sources.includes(source)) {
+                  sources.push(source);
+                }
+              });
+          }
+
+          console.log('KB Query successful, sources:', sources);
+          return { success: true, response: responseText, sources: sources, error: null };
+
+        } catch (err) {
+          console.error('KB Query error:', err);
+          return { success: false, response: null, sources: [], error: err.message };
+        }
+      }
+
+      // ============================================================
+      // MAIN: Send message - calls BOTH MCP and KB, combines results
+      // ============================================================
+      async function sendMessage() {
+        const message = chatInput.value.trim();
+        if ((!message && uploadedFiles.length === 0) || isProcessing || !geminiApiKey) return;
+
+        // Hide welcome message
+        if (welcomeMessage) {
+          welcomeMessage.style.display = 'none';
+        }
+
+        // Show user message
+        let displayMessage = message;
+        if (uploadedFiles.length > 0) {
+          const fileNames = uploadedFiles.map(f => f.name).join(', ');
+          displayMessage = message ? `📄 ${fileNames}\n\n${message}` : `📄 Uploaded: ${fileNames}`;
+        }
+        addMessage('user', displayMessage);
+
+        // Clear input
+        chatInput.value = '';
+        autoResize();
+
+        // Start processing
+        isProcessing = true;
+        sendBtn.disabled = true;
+        chatInput.disabled = true;
+        const typingEl = showTypingIndicator();
+
+        const userMessage = message || 'Please analyze this document and provide a summary.';
+        const documentData = uploadedFiles.length > 0 ? uploadedFiles[0] : null;
+
+        try {
+          console.log('=== Processing Query ===');
+          console.log(`User message: ${userMessage}`);
+          console.log(`MCP connected: ${mcpConnected}, Tools: ${mcpTools.length}`);
+          console.log(`KB enabled: ${kbEnabled}, Store: ${kbStoreId}`);
+
+          // Run BOTH queries in parallel
+          const [mcpResult, kbResult] = await Promise.all([
+            queryWithMcpTools(userMessage, documentData),
+            queryWithKnowledgeBase(userMessage)
+          ]);
+
+          console.log('MCP Result:', mcpResult);
+          console.log('KB Result:', kbResult);
+
           // Remove typing indicator
           typingEl.remove();
 
-          if (finalResponse) {
-            addMessage('assistant', finalResponse);
+          // Combine results
+          let finalResponse = '';
+          let hasContent = false;
 
-            // Update conversation history
-            conversationHistory.push({ role: 'user', parts: [{ text: userMessage }] });
-            conversationHistory.push({ role: 'model', parts: [{ text: finalResponse }] });
-
-            // Clear files
-            uploadedFiles = [];
-            renderUploadedFiles();
-          } else {
-            showError('No response from AI');
+          // Add MCP response (Data Commons data)
+          if (mcpResult.success && mcpResult.response) {
+            finalResponse += mcpResult.response;
+            hasContent = true;
           }
 
+          // Add KB response (Policy documents)
+          if (kbResult.success && kbResult.response) {
+            // Check if KB found relevant info (not just "no information found")
+            const noInfoPatterns = /no relevant information|not found in|cannot find|no information available/i;
+            if (!noInfoPatterns.test(kbResult.response)) {
+              if (hasContent) {
+                finalResponse += '\n\n---\n\n**From Knowledge Base:**\n';
+              }
+              finalResponse += kbResult.response;
+              hasContent = true;
+
+              // Add sources
+              if (kbResult.sources && kbResult.sources.length > 0) {
+                finalResponse += '\n\n**Sources:**\n' + kbResult.sources.map(s => `• ${s}`).join('\n');
+              }
+            }
+          }
+
+          // If neither worked, show error info
+          if (!hasContent) {
+            if (mcpResult.error && kbResult.error) {
+              finalResponse = `I couldn't retrieve information from either source.\n\nMCP: ${mcpResult.error}\nKnowledge Base: ${kbResult.error}`;
+            } else if (mcpResult.error) {
+              finalResponse = `Data Commons query failed: ${mcpResult.error}`;
+            } else if (kbResult.error) {
+              finalResponse = `Knowledge Base query failed: ${kbResult.error}`;
+            } else {
+              finalResponse = 'No relevant information found.';
+            }
+          }
+
+          // Display response
+          addMessage('assistant', finalResponse);
+
+          // Update conversation history
+          conversationHistory.push({ role: 'user', parts: [{ text: userMessage }] });
+          conversationHistory.push({ role: 'model', parts: [{ text: finalResponse }] });
+
+          // Clear files
+          uploadedFiles = [];
+          renderUploadedFiles();
+
         } catch (err) {
-          if (typingEl && typingEl.parentNode) typingEl.remove();
+          typingEl.remove();
           console.error('Chat error:', err);
 
           if (err.message.includes('API key')) {
