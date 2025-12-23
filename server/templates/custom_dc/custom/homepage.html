@@ -1077,8 +1077,14 @@ Be concise and factual.`;
         console.log(`MCP Tools available: ${mcpTools.map(t => t.name).join(', ')}`);
 
         try {
-          // Build contents
+          // Build contents with conversation history
           const contents = [];
+          // Add conversation history (limit to last 10 turns to avoid token limits)
+          const historyLimit = Math.max(0, conversationHistory.length - 20);
+          for (let i = historyLimit; i < conversationHistory.length; i++) {
+            contents.push(conversationHistory[i]);
+          }
+          // Add current user message
           contents.push({ role: 'user', parts: [{ text: userMessage }] });
 
           // Function calling loop
@@ -1220,8 +1226,18 @@ Be concise and factual.`;
         console.log(`KB Store: ${kbStoreId}`);
 
         try {
+          // Build contents with conversation history
+          const contents = [];
+          // Add conversation history (limit to last 10 turns to avoid token limits)
+          const historyLimit = Math.max(0, conversationHistory.length - 20);
+          for (let i = historyLimit; i < conversationHistory.length; i++) {
+            contents.push(conversationHistory[i]);
+          }
+          // Add current user message
+          contents.push({ role: 'user', parts: [{ text: userMessage }] });
+
           const payload = {
-            contents: [{ role: 'user', parts: [{ text: userMessage }] }],
+            contents: contents,
             systemInstruction: { parts: [{ text: kbSystemInstruction }] },
             tools: [{
               fileSearch: {
@@ -1356,8 +1372,31 @@ Be concise and factual.`;
           // If we have both, use Gemini to synthesize a natural response with streaming
           if (mcpContent && kbContent) {
             try {
-              const synthesisPayload = {
-                contents: [{
+              // Build synthesis contents with conversation history for context
+              const synthesisContents = [];
+              // Add conversation history summary for context
+              if (conversationHistory.length > 0) {
+                const recentHistory = conversationHistory.slice(-10).map(msg =>
+                  `${msg.role === 'user' ? 'User' : 'Assistant'}: ${msg.parts[0].text.substring(0, 200)}...`
+                ).join('\n');
+                synthesisContents.push({
+                  role: 'user',
+                  parts: [{
+                    text: `Previous conversation context:\n${recentHistory}\n\n---\n\nNow, combine these two pieces of information into a single, coherent, natural response to the user's latest question. Do not use labels like "From Data Commons" or "From Policy Documents". Just provide a unified helpful answer.
+
+User's latest question: ${userMessage}
+
+Statistical/Data information:
+${mcpContent}
+
+Policy/Document information:
+${kbContent}
+
+Provide a natural, combined response that integrates both pieces of information smoothly:`
+                  }]
+                });
+              } else {
+                synthesisContents.push({
                   role: 'user',
                   parts: [{
                     text: `You are an assistant helping with MSME and policy queries. Combine these two pieces of information into a single, coherent, natural response. Do not use labels like "From Data Commons" or "From Policy Documents". Just provide a unified helpful answer.
@@ -1372,7 +1411,11 @@ ${kbContent}
 
 Provide a natural, combined response that integrates both pieces of information smoothly:`
                   }]
-                }],
+                });
+              }
+
+              const synthesisPayload = {
+                contents: synthesisContents,
                 generationConfig: {
                   temperature: 0.3,
                   topP: 0.95
@@ -1389,14 +1432,21 @@ Provide a natural, combined response that integrates both pieces of information 
               streamingMessage.setText(finalResponse);
             }
           } else if (mcpContent) {
-            // Stream a refined response for MCP-only content
+            // Stream a refined response for MCP-only content with conversation context
             try {
+              let refinePrompt = '';
+              if (conversationHistory.length > 0) {
+                const recentHistory = conversationHistory.slice(-6).map(msg =>
+                  `${msg.role === 'user' ? 'User' : 'Assistant'}: ${msg.parts[0].text.substring(0, 150)}...`
+                ).join('\n');
+                refinePrompt = `Previous conversation:\n${recentHistory}\n\n---\n\nUser's latest question: ${userMessage}\n\nData retrieved:\n${mcpContent}\n\nProvide a natural, helpful response based on the data and conversation context:`;
+              } else {
+                refinePrompt = `Rephrase and present this information naturally and helpfully to the user. Keep all the data accurate but make it conversational:\n\n${mcpContent}`;
+              }
               const refinePayload = {
                 contents: [{
                   role: 'user',
-                  parts: [{
-                    text: `Rephrase and present this information naturally and helpfully to the user. Keep all the data accurate but make it conversational:\n\n${mcpContent}`
-                  }]
+                  parts: [{ text: refinePrompt }]
                 }],
                 generationConfig: { temperature: 0.3, topP: 0.95 }
               };
