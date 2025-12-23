@@ -533,6 +533,19 @@
       30% { transform: translateY(-10px); opacity: 1; }
     }
 
+    /* Streaming cursor animation */
+    .streaming-cursor {
+      display: inline-block;
+      animation: blink 0.8s infinite;
+      color: var(--gov-blue);
+      font-weight: normal;
+    }
+
+    @keyframes blink {
+      0%, 50% { opacity: 1; }
+      51%, 100% { opacity: 0; }
+    }
+
     /* Error Message */
     .error-message {
       background: #fdf2f2;
@@ -769,9 +782,9 @@
     <div class="chat-area">
       <div class="chat-messages" id="chat-messages">
         <div class="welcome-message" id="welcome-message">
-          <div class="welcome-icon">AI</div>
-          <h2>MSME Data Intelligence Assistant</h2>
-          <p>Ask questions about MSME policies, government schemes, trade statistics, or search through policy documents</p>
+          <div class="welcome-icon">VS</div>
+          <h2>VYAPAR SAH<span style="color: var(--saffron);">(AI)</span></h2>
+          <p>Your Intelligent Business Companion | आपका बुद्धिमान व्यापार सहायक</p>
           <div class="suggestions">
             <button class="suggestion" data-text="What are the key MSME policies and schemes available in India?" disabled>What are the key MSME policies and schemes available in India?</button>
             <button class="suggestion" data-text="What is the current GDP growth rate of India?" disabled>What is the current GDP growth rate of India?</button>
@@ -1314,8 +1327,9 @@ Be concise and factual.`;
           console.log('MCP Result:', mcpResult);
           console.log('KB Result:', kbResult);
 
-          // Remove typing indicator
+          // Remove typing indicator and create streaming message
           typingEl.remove();
+          const streamingMessage = createStreamingMessage();
 
           // Combine results naturally
           let finalResponse = '';
@@ -1339,7 +1353,7 @@ Be concise and factual.`;
             }
           }
 
-          // If we have both, use Gemini to synthesize a natural response
+          // If we have both, use Gemini to synthesize a natural response with streaming
           if (mcpContent && kbContent) {
             try {
               const synthesisPayload = {
@@ -1365,33 +1379,46 @@ Provide a natural, combined response that integrates both pieces of information 
                 }
               };
 
-              const synthesisResponse = await fetch(
-                `${GEMINI_API_BASE}/gemini-2.0-flash:generateContent?key=${geminiApiKey}`,
-                {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify(synthesisPayload)
-                }
-              );
+              // Use streaming for synthesis
+              finalResponse = await streamGeminiResponse(synthesisPayload, 'gemini-2.0-flash', streamingMessage);
 
-              const synthesisData = await synthesisResponse.json();
-              if (synthesisData.candidates && synthesisData.candidates[0]?.content?.parts) {
-                finalResponse = synthesisData.candidates[0].content.parts
-                  .filter(p => p.text)
-                  .map(p => p.text)
-                  .join('\n');
-              } else {
-                // Fallback: just combine them
-                finalResponse = mcpContent + '\n\n' + kbContent;
-              }
             } catch (err) {
-              console.error('Synthesis error:', err);
+              console.error('Synthesis streaming error:', err);
+              // Fallback: just combine them without streaming
               finalResponse = mcpContent + '\n\n' + kbContent;
+              streamingMessage.setText(finalResponse);
             }
           } else if (mcpContent) {
-            finalResponse = mcpContent;
+            // Stream a refined response for MCP-only content
+            try {
+              const refinePayload = {
+                contents: [{
+                  role: 'user',
+                  parts: [{
+                    text: `Rephrase and present this information naturally and helpfully to the user. Keep all the data accurate but make it conversational:\n\n${mcpContent}`
+                  }]
+                }],
+                generationConfig: { temperature: 0.3, topP: 0.95 }
+              };
+              finalResponse = await streamGeminiResponse(refinePayload, 'gemini-2.0-flash', streamingMessage);
+            } catch (err) {
+              // Fallback to non-streamed
+              finalResponse = mcpContent;
+              streamingMessage.setText(finalResponse);
+            }
           } else if (kbContent) {
-            finalResponse = kbContent;
+            // Stream the KB content directly (already formatted)
+            // Simulate streaming by adding text in chunks
+            const words = kbContent.split(' ');
+            finalResponse = '';
+            for (let i = 0; i < words.length; i++) {
+              finalResponse += (i > 0 ? ' ' : '') + words[i];
+              streamingMessage.setText(finalResponse);
+              // Small delay to simulate streaming effect
+              if (i % 5 === 0) {
+                await new Promise(r => setTimeout(r, 20));
+              }
+            }
           } else {
             // Neither worked
             if (mcpResult.error && kbResult.error) {
@@ -1399,22 +1426,27 @@ Provide a natural, combined response that integrates both pieces of information 
             } else {
               finalResponse = 'No relevant information found for your query.';
             }
+            streamingMessage.setText(finalResponse);
           }
 
           // Add sources at the end if available
           if (sources.length > 0) {
             finalResponse += '\n\n**Sources:** ' + sources.join(', ');
+            streamingMessage.setText(finalResponse);
           }
 
-          // Display response
-          addMessage('assistant', finalResponse);
+          // Finalize the streaming message (remove cursor)
+          streamingMessage.finalize();
 
           // Update conversation history
           conversationHistory.push({ role: 'user', parts: [{ text: userMessage }] });
           conversationHistory.push({ role: 'model', parts: [{ text: finalResponse }] });
 
         } catch (err) {
-          typingEl.remove();
+          // Safely remove typing indicator if it still exists
+          if (typingEl && typingEl.parentNode) {
+            typingEl.remove();
+          }
           console.error('Chat error:', err);
 
           if (err.message.includes('API key')) {
@@ -1435,7 +1467,7 @@ Provide a natural, combined response that integrates both pieces of information 
         const messageEl = document.createElement('div');
         messageEl.className = `message ${role}`;
 
-        const avatar = role === 'user' ? 'You' : 'AI';
+        const avatar = role === 'user' ? 'You' : 'VS';
         const formattedContent = formatMessage(content);
 
         messageEl.innerHTML = `
@@ -1445,6 +1477,103 @@ Provide a natural, combined response that integrates both pieces of information 
 
         chatMessages.appendChild(messageEl);
         chatMessages.scrollTop = chatMessages.scrollHeight;
+      }
+
+      // Create a streaming message bubble that can be updated
+      function createStreamingMessage() {
+        const messageEl = document.createElement('div');
+        messageEl.className = 'message assistant';
+        messageEl.innerHTML = `
+          <div class="message-avatar">VS</div>
+          <div class="message-content"><span class="streaming-cursor">▊</span></div>
+        `;
+        chatMessages.appendChild(messageEl);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+
+        const contentEl = messageEl.querySelector('.message-content');
+        let currentText = '';
+
+        return {
+          element: messageEl,
+          // Update with new text chunk
+          appendText: (text) => {
+            currentText += text;
+            contentEl.innerHTML = formatMessage(currentText) + '<span class="streaming-cursor">▊</span>';
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+          },
+          // Finalize the message (remove cursor)
+          finalize: () => {
+            contentEl.innerHTML = formatMessage(currentText);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+          },
+          // Get current text
+          getText: () => currentText,
+          // Set full text
+          setText: (text) => {
+            currentText = text;
+            contentEl.innerHTML = formatMessage(currentText) + '<span class="streaming-cursor">▊</span>';
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+          }
+        };
+      }
+
+      // Stream content from Gemini API
+      async function streamGeminiResponse(payload, model, streamingMessage) {
+        const url = `${GEMINI_API_BASE}/${model}:streamGenerateContent?key=${geminiApiKey}&alt=sse`;
+
+        try {
+          const response = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error?.message || 'Streaming request failed');
+          }
+
+          const reader = response.body.getReader();
+          const decoder = new TextDecoder();
+          let fullText = '';
+
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+
+            const chunk = decoder.decode(value, { stream: true });
+            // Parse SSE data - each chunk may have multiple "data:" lines
+            const lines = chunk.split('\n');
+
+            for (const line of lines) {
+              if (line.startsWith('data: ')) {
+                const jsonStr = line.slice(6);
+                if (jsonStr.trim() === '[DONE]') continue;
+
+                try {
+                  const data = JSON.parse(jsonStr);
+                  const candidates = data.candidates || [];
+                  if (candidates.length > 0) {
+                    const parts = candidates[0].content?.parts || [];
+                    for (const part of parts) {
+                      if (part.text) {
+                        fullText += part.text;
+                        streamingMessage.setText(fullText);
+                      }
+                    }
+                  }
+                } catch (e) {
+                  // Ignore parse errors for partial JSON
+                }
+              }
+            }
+          }
+
+          return fullText;
+        } catch (err) {
+          console.error('Streaming error:', err);
+          throw err;
+        }
       }
 
       function formatMessage(content) {
@@ -1461,7 +1590,7 @@ Provide a natural, combined response that integrates both pieces of information 
         const typingEl = document.createElement('div');
         typingEl.className = 'message assistant';
         typingEl.innerHTML = `
-          <div class="message-avatar">AI</div>
+          <div class="message-avatar">VS</div>
           <div class="typing-indicator">
             <span></span>
             <span></span>
