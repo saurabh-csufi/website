@@ -74,10 +74,140 @@
 
 <body>
   {# Set page locale. #}
-  <div id="metadata-base" class="d-none" 
+  <div id="metadata-base" class="d-none"
     data-hide-header-search-bar="{{ is_hide_header_search_bar }}"
     data-locale="{{ locale }}"
   >
+  </div>
+
+  <style>
+    /* MSME Portal Custom Header Styles */
+    .msme-tricolor {
+      display: flex;
+      height: 5px;
+      width: 100%;
+    }
+    .msme-tricolor .saffron { flex: 1; background: #FF9933; }
+    .msme-tricolor .white { flex: 1; background: #FFFFFF; }
+    .msme-tricolor .green { flex: 1; background: #138808; }
+
+    #main-nav {
+      background: linear-gradient(135deg, #003366 0%, #004080 100%) !important;
+    }
+
+    .navbar-brand {
+      display: flex !important;
+      align-items: center !important;
+      gap: 12px !important;
+    }
+
+    .msme-logo-container {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .msme-emblem {
+      width: 45px;
+      height: 45px;
+      background: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px;
+    }
+
+    .msme-emblem img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .msme-title {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.2;
+    }
+
+    .msme-title-main {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: white;
+      letter-spacing: 0.3px;
+    }
+
+    .msme-title-sub {
+      font-size: 0.7rem;
+      color: rgba(255,255,255,0.8);
+      font-weight: 400;
+    }
+
+    .nav-link-main,
+    .nav-link-main span,
+    #dc-main-nav .nav-link {
+      color: #ffffff !important;
+      font-weight: 500 !important;
+      padding: 8px 16px !important;
+      border-radius: 4px;
+      transition: background 0.2s;
+    }
+
+    .nav-link-main:hover,
+    #dc-main-nav .nav-link:hover {
+      background: rgba(255,255,255,0.15);
+      color: white !important;
+    }
+
+    .dropdown-toggle::after {
+      color: white !important;
+    }
+
+    .more-tools-dropdown {
+      position: relative;
+    }
+
+    .more-tools-dropdown .dropdown-menu {
+      background: #003366 !important;
+      border: 1px solid rgba(255,255,255,0.2) !important;
+      border-radius: 8px !important;
+      padding: 8px 0 !important;
+      min-width: 180px !important;
+    }
+
+    #dc-main-nav .dropdown-menu .dropdown-item,
+    .more-tools-dropdown .dropdown-menu .dropdown-item,
+    .more-tools-dropdown .dropdown-item,
+    .dropdown-menu .dropdown-item,
+    .navbar .dropdown-item,
+    a.dropdown-item {
+      color: #fff !important;
+      padding: 10px 18px !important;
+      font-size: 0.9rem !important;
+      font-weight: 500 !important;
+      background: transparent !important;
+    }
+
+    #dc-main-nav .dropdown-menu .dropdown-item:hover,
+    #dc-main-nav .dropdown-menu .dropdown-item:focus,
+    .more-tools-dropdown .dropdown-menu .dropdown-item:hover,
+    .more-tools-dropdown .dropdown-menu .dropdown-item:focus,
+    .more-tools-dropdown .dropdown-item:hover,
+    .more-tools-dropdown .dropdown-item:focus,
+    .dropdown-menu .dropdown-item:hover,
+    .dropdown-menu .dropdown-item:focus,
+    a.dropdown-item:hover,
+    a.dropdown-item:focus {
+      background: rgba(255,255,255,0.15) !important;
+      color: #fff !important;
+    }
+  </style>
+
+  <!-- Tricolor Strip -->
+  <div class="msme-tricolor">
+    <div class="saffron"></div>
+    <div class="white"></div>
+    <div class="green"></div>
   </div>
 
   <div id="main">
@@ -85,22 +215,14 @@
       <nav class="navbar navbar-dark navbar-expand-lg col" id="main-nav">
         <div class="container-fluid">
           <div class="navbar-brand">
-            {% if LOGO_PATH %}
-            <div class="main-header-logo">
-                <a href="{{ url_for('static.homepage') }}">
-                  <img src="{{ LOGO_PATH }}" />
-                </a>
-            </div>
-            {% endif %}
-            <a href="{{ url_for('static.homepage') }}">{{ NAME }}</a>
-            {% if subpage_title %}
-            <span class="sep">•</span>
-            <span>
-              {% if subpage_url %}<a href="{{ subpage_url }}">{% endif %}
-                {{ subpage_title }}
-                {% if subpage_url %}</a>{% endif %}
-            </span>
-            {% endif %}
+            <a href="{{ url_for('static.homepage') }}" class="msme-logo-container" style="text-decoration: none;">
+              <div class="msme-emblem">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/5/55/Emblem_of_India.svg" alt="Emblem of India" onerror="this.parentElement.innerHTML='IN';">
+              </div>
+              <div class="msme-title">
+                <span class="msme-title-main">MSME Data Intelligence Portal</span>
+                <span class="msme-title-sub">Ministry of MSME | Government of India</span>
+              </div>
             </a>
           </div>
           <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#dc-main-nav">
@@ -108,29 +230,24 @@
           </button>
           <div class="collapse navbar-collapse justify-content-md-end" id="dc-main-nav">
             <ul class="navbar-nav float-md-right">
-                <li class="nav-item dropdown">
-                  <a href="/about" id="nav-insights" class="nav-link-main "><span>Standard Insights</span></a>
+                <li class="nav-item">
+                  <a href="{{ url_for('explore.page') }}" id="nav-explorer" class="nav-link-main"><span>Search</span></a>
                 </li>
-                <li class="nav-item dropdown">
-                  <a href="{{ url_for('tools.visualization') }}#visType=timeline" id="nav-timeline" class="nav-link-main "><span>Timeline</span></a>
+                <li class="nav-item dropdown more-tools-dropdown">
+                  <a href="#" class="nav-link-main dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <span>Tools</span>
+                  </a>
+                  <div class="dropdown-menu dropdown-menu-right">
+                    <a class="dropdown-item" href="{{ url_for('tools.visualization') }}#visType=timeline">Timeline</a>
+                    <a class="dropdown-item" href="{{ url_for('tools.visualization') }}#visType=scatter">Scatter</a>
+                    <a class="dropdown-item" href="{{ url_for('tools.visualization') }}#visType=map">Map</a>
+                    <a class="dropdown-item" href="{{ url_for('tools.download') }}">Download</a>
+                    <a class="dropdown-item" href="{{ url_for('tools.stat_var') }}">Variables</a>
+                    <a class="dropdown-item" href="{{ url_for('browser.browser_main') }}">Knowledge Graph</a>
+                  </div>
                 </li>
-                <li class="nav-item dropdown">
-                  <a href="{{ url_for('tools.visualization') }}#visType=scatter" id="nav-scatter" class="nav-link-main"><span>Scatter</span> </a>
-                </li>
-                <li class="nav-item dropdown">
-                  <a href="{{ url_for('tools.visualization') }}#visType=map" id="nav-map" class="nav-link-main "><span>Map</span></a>
-                </li>
-                <li class="nav-item dropdown">
-                  <a href="{{ url_for('tools.download') }}" id="nav-download" class="nav-link-main "><span>Download</span></a>
-                </li>
-                <li class="nav-item dropdown">
-                  <a href="{{ url_for('tools.stat_var') }}" id="nav-var" class="nav-link-main "><span>Variables</span></a>
-                </li>
-                <li class="nav-item dropdown">
-                  <a href="{{ url_for('browser.browser_main') }}" id="nav-browser" class="nav-link-main "><span>Knowledge Graph</span></a>
-                </li>
-                <li class="nav-item dropdown">
-                  <a href="{{ url_for('explore.page') }}" id="nav-explorer" class="nav-link-main "><span>Search</span></a>
+                <li class="nav-item">
+                  <a href="/about" id="nav-insights" class="nav-link-main"><span>Standard Insights</span></a>
                 </li>
             </ul>
           </div>
