@@ -18,12 +18,20 @@
 
 {% set main_id = 'standard-insights' %}
 {% set page_id = 'page-standard-insights' %}
-{% set title = 'Standard Insights' %}
+{% set title = 'India Export Insights' %}
 
 {% block head %}
 {{ super() }}
 <script src="https://datacommons.org/datacommons.js"></script>
 <style>
+  :root {
+    --saffron: #FF9933;
+    --white: #FFFFFF;
+    --green: #138808;
+    --navy: #003366;
+    --chakra-blue: #000080;
+  }
+
   .insights-container {
     max-width: 1400px;
     margin: 0 auto;
@@ -33,38 +41,63 @@
   .insights-header {
     text-align: center;
     margin-bottom: 2rem;
+    padding: 2rem;
+    background: linear-gradient(135deg, var(--saffron) 0%, var(--green) 100%);
+    border-radius: 16px;
+    color: white;
   }
 
   .insights-header h1 {
     font-size: 2.2rem;
-    color: #333;
     margin-bottom: 0.5rem;
-    font-weight: 600;
+    font-weight: 700;
   }
 
   .insights-header p {
-    color: #666;
     font-size: 1.1rem;
+    opacity: 0.95;
   }
 
+  .insights-header .badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.2);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+  }
+
+  /* Highlight Section - Key Stats */
   .highlight-section {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 1rem;
     margin-bottom: 2rem;
   }
 
   .highlight-card {
-    background: linear-gradient(135deg, #4285f4 0%, #34a853 100%);
+    background: linear-gradient(135deg, var(--navy) 0%, #004488 100%);
     border-radius: 12px;
     padding: 1.5rem;
     color: white;
-    box-shadow: 0 4px 12px rgba(66, 133, 244, 0.3);
+    box-shadow: 0 4px 12px rgba(0, 51, 102, 0.25);
+    min-height: 180px;
   }
 
+  .highlight-card.saffron {
+    background: linear-gradient(135deg, var(--saffron) 0%, #FF8800 100%);
+    box-shadow: 0 4px 12px rgba(255, 153, 51, 0.3);
+  }
+
+  .highlight-card.green {
+    background: linear-gradient(135deg, var(--green) 0%, #0D6B06 100%);
+    box-shadow: 0 4px 12px rgba(19, 136, 8, 0.3);
+  }
+
+  /* Charts Grid */
   .insights-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(480px, 1fr));
     gap: 1.5rem;
     margin-bottom: 2rem;
   }
@@ -74,15 +107,24 @@
     border-radius: 12px;
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
     padding: 1.5rem;
-    min-height: 450px;
+    min-height: 420px;
+    border-top: 4px solid var(--navy);
+  }
+
+  .insight-card.saffron-border {
+    border-top-color: var(--saffron);
+  }
+
+  .insight-card.green-border {
+    border-top-color: var(--green);
   }
 
   .insight-card h3 {
-    font-size: 1.1rem;
-    color: #333;
+    font-size: 1rem;
+    color: var(--navy);
     margin-bottom: 1rem;
     padding-bottom: 0.75rem;
-    border-bottom: 3px solid #4285f4;
+    border-bottom: 2px solid #e9ecef;
     font-weight: 600;
   }
 
@@ -90,15 +132,95 @@
     grid-column: 1 / -1;
   }
 
+  /* Section Headers */
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 2rem 0 1rem 0;
+    padding-bottom: 0.75rem;
+    border-bottom: 3px solid var(--navy);
+  }
+
+  .section-header h2 {
+    font-size: 1.3rem;
+    color: var(--navy);
+    margin: 0;
+    font-weight: 600;
+  }
+
+  .section-header .icon {
+    width: 36px;
+    height: 36px;
+    background: var(--saffron);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.2rem;
+  }
+
+  /* Small Cards Grid for Gauge/Pie */
+  .small-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .small-card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    padding: 1.25rem;
+    min-height: 320px;
+  }
+
+  .small-card h3 {
+    font-size: 0.95rem;
+    color: var(--navy);
+    margin-bottom: 0.75rem;
+    font-weight: 600;
+  }
+
+  /* Footer */
+  .insights-footer {
+    text-align: center;
+    padding: 1.5rem;
+    background: #f8f9fa;
+    border-radius: 12px;
+    margin-top: 2rem;
+  }
+
+  .insights-footer p {
+    margin: 0 0 0.5rem 0;
+    color: #666;
+    font-size: 0.9rem;
+  }
+
+  .insights-footer a {
+    color: var(--navy);
+    text-decoration: none;
+  }
+
+  .insights-footer a:hover {
+    text-decoration: underline;
+  }
+
+  /* Responsive */
   @media (max-width: 768px) {
     .insights-grid {
       grid-template-columns: 1fr;
     }
     .insight-card {
-      min-height: 380px;
+      min-height: 350px;
     }
     .insights-header h1 {
       font-size: 1.6rem;
+    }
+    .small-grid {
+      grid-template-columns: 1fr;
     }
   }
 </style>
@@ -106,118 +228,195 @@
 
 {% block content %}
 <div class="insights-container">
+  <!-- Header -->
   <div class="insights-header">
-    <h1>Standard Insights Dashboard</h1>
-    <p>Explore key data insights powered by Data Commons</p>
+    <h1>India Export Insights Dashboard</h1>
+    <p>Commodity-wise and Country-wise Export Data from EIDB</p>
+    <span class="badge">Data: 2020-2025 | Source: Ministry of Commerce</span>
   </div>
 
   <!-- Key Highlights Section -->
+  <div class="section-header">
+    <div class="icon">$</div>
+    <h2>Key Export Statistics</h2>
+  </div>
+
   <div class="highlight-section">
     <div class="highlight-card">
       <datacommons-highlight
-        header="World Population"
-        place="Earth"
-        variable="Count_Person"
-      ></datacommons-highlight>
-    </div>
-    <div class="highlight-card">
-      <datacommons-highlight
-        header="US Population"
-        place="country/USA"
-        variable="Count_Person"
-      ></datacommons-highlight>
-    </div>
-    <div class="highlight-card">
-      <datacommons-highlight
-        header="India Population"
+        apiRoot="/"
+        header="Fish & Seafood Exports"
         place="country/IND"
-        variable="Count_Person"
+        variable="Exports_EconomicActivity_FishAndCrustaceansMolluscsAndOtherAquatic"
+      ></datacommons-highlight>
+    </div>
+    <div class="highlight-card saffron">
+      <datacommons-highlight
+        apiRoot="/"
+        header="Meat Exports"
+        place="country/IND"
+        variable="Exports_EconomicActivity_MeatAndEdibleMeatOffal"
+      ></datacommons-highlight>
+    </div>
+    <div class="highlight-card green">
+      <datacommons-highlight
+        apiRoot="/"
+        header="Live Animals Exports"
+        place="country/IND"
+        variable="Exports_EconomicActivity_AnimalsLive"
       ></datacommons-highlight>
     </div>
     <div class="highlight-card">
       <datacommons-highlight
-        header="China Population"
-        place="country/CHN"
-        variable="Count_Person"
+        apiRoot="/"
+        header="Dairy Products Exports"
+        place="country/IND"
+        variable="Exports_EconomicActivity_DairyProduceBirdsEggsNaturalHoneyEdibleProductsOf"
       ></datacommons-highlight>
     </div>
   </div>
 
-  <!-- Charts Grid -->
+  <!-- Time Series Trends -->
+  <div class="section-header">
+    <div class="icon">~</div>
+    <h2>Export Trends Over Time</h2>
+  </div>
+
   <div class="insights-grid">
-    <!-- Population Trends -->
+    <!-- Line Chart: Commodity Export Trends -->
     <div class="insight-card">
-      <h3>Population Trends - Major Economies</h3>
+      <h3>Commodity Export Trends (2020-2025)</h3>
       <datacommons-line
-        header="Population Over Time"
-        places="country/USA country/IND country/CHN country/DEU country/JPN"
-        variables="Count_Person"
+        apiRoot="/"
+        header="Export Values Over Time"
+        places="country/IND"
+        variables="Exports_EconomicActivity_FishAndCrustaceansMolluscsAndOtherAquatic Exports_EconomicActivity_MeatAndEdibleMeatOffal Exports_EconomicActivity_AnimalsLive"
       ></datacommons-line>
     </div>
 
-    <!-- GDP Comparison -->
-    <div class="insight-card">
-      <h3>GDP Comparison</h3>
+    <!-- Bar Chart: Top Commodities -->
+    <div class="insight-card saffron-border">
+      <h3>Top Export Commodities Comparison</h3>
       <datacommons-bar
-        header="GDP by Country (Current US$)"
-        places="country/USA country/CHN country/JPN country/DEU country/IND country/GBR country/FRA"
-        variables="Amount_EconomicActivity_GrossDomesticProduction_Nominal"
+        apiRoot="/"
+        header="Export Values by Commodity"
+        places="country/IND"
+        variables="Exports_EconomicActivity_FishAndCrustaceansMolluscsAndOtherAquatic Exports_EconomicActivity_MeatAndEdibleMeatOffal Exports_EconomicActivity_AnimalsLive Exports_EconomicActivity_DairyProduceBirdsEggsNaturalHoneyEdibleProductsOf"
+        sort="descending"
+      ></datacommons-bar>
+    </div>
+  </div>
+
+  <!-- Country-wise Exports Section -->
+  <div class="section-header">
+    <div class="icon">W</div>
+    <h2>Country-wise Export Destinations</h2>
+  </div>
+
+  <div class="insights-grid">
+    <!-- Bar Chart: Top Export Destinations -->
+    <div class="insight-card green-border">
+      <h3>Top Export Destination Countries</h3>
+      <datacommons-bar
+        apiRoot="/"
+        header="India's Exports by Destination"
+        places="country/USA country/ARE country/GBR country/DEU country/AUS country/CHN"
+        variables="Exports_EconomicActivity_ExportSourceIndia"
         sort="descending"
       ></datacommons-bar>
     </div>
 
-    <!-- Life Expectancy -->
+    <!-- Ranking Chart: Top Destinations -->
     <div class="insight-card">
-      <h3>Life Expectancy Trends</h3>
-      <datacommons-line
-        header="Life Expectancy at Birth"
-        places="country/USA country/JPN country/DEU country/IND country/BRA"
-        variables="LifeExpectancy_Person"
-      ></datacommons-line>
-    </div>
-
-    <!-- CO2 Emissions -->
-    <div class="insight-card">
-      <h3>CO2 Emissions</h3>
-      <datacommons-line
-        header="Annual CO2 Emissions"
-        places="country/USA country/CHN country/IND country/RUS country/DEU"
-        variables="Annual_Emissions_GreenhouseGas_CO2"
-      ></datacommons-line>
-    </div>
-
-    <!-- US Map - Population -->
-    <div class="insight-card full-width-card">
-      <h3>US Population by State</h3>
-      <datacommons-map
-        header="Population Distribution"
-        parentPlace="country/USA"
-        childPlaceType="State"
-        variable="Count_Person"
-      ></datacommons-map>
-    </div>
-
-    <!-- Ranking Chart -->
-    <div class="insight-card">
-      <h3>Top Countries by Population</h3>
+      <h3>Ranking: Top Export Destinations</h3>
       <datacommons-ranking
-        header="Most Populous Countries"
+        apiRoot="/"
+        header="Countries by Export Value from India"
         parentPlace="Earth"
         childPlaceType="Country"
-        variable="Count_Person"
+        variable="Exports_EconomicActivity_ExportSourceIndia"
       ></datacommons-ranking>
     </div>
+  </div>
 
-    <!-- Scatter Plot -->
-    <div class="insight-card">
-      <h3>GDP vs Life Expectancy</h3>
-      <datacommons-scatter
-        header="Economic Development vs Health"
+  <!-- Distribution Section -->
+  <div class="section-header">
+    <div class="icon">%</div>
+    <h2>Export Distribution</h2>
+  </div>
+
+  <div class="small-grid">
+    <!-- Pie Chart: Export Distribution -->
+    <div class="small-card">
+      <h3>Export Distribution by Commodity</h3>
+      <datacommons-pie
+        apiRoot="/"
+        header="Share of Total Exports"
+        place="country/IND"
+        variables="Exports_EconomicActivity_FishAndCrustaceansMolluscsAndOtherAquatic Exports_EconomicActivity_MeatAndEdibleMeatOffal Exports_EconomicActivity_AnimalsLive Exports_EconomicActivity_DairyProduceBirdsEggsNaturalHoneyEdibleProductsOf"
+      ></datacommons-pie>
+    </div>
+
+    <!-- Gauge: Fish Growth Rate -->
+    <div class="small-card">
+      <h3>Fish Exports Growth Rate</h3>
+      <datacommons-gauge
+        apiRoot="/"
+        header="Year-over-Year Growth (%)"
+        place="country/IND"
+        variable="GrowthRate_Exports_EconomicActivity_FishAndCrustaceansMolluscsAndOtherAquatic"
+        min="-50"
+        max="50"
+      ></datacommons-gauge>
+    </div>
+
+    <!-- Gauge: Meat Growth Rate -->
+    <div class="small-card">
+      <h3>Meat Exports Growth Rate</h3>
+      <datacommons-gauge
+        apiRoot="/"
+        header="Year-over-Year Growth (%)"
+        place="country/IND"
+        variable="GrowthRate_Exports_EconomicActivity_MeatAndEdibleMeatOffal"
+        min="-50"
+        max="50"
+      ></datacommons-gauge>
+    </div>
+  </div>
+
+  <!-- Map Section -->
+  <div class="section-header">
+    <div class="icon">M</div>
+    <h2>Geographic Distribution</h2>
+  </div>
+
+  <div class="insights-grid">
+    <!-- Map: Export Distribution -->
+    <div class="insight-card full-width-card">
+      <h3>Global Export Distribution</h3>
+      <datacommons-map
+        apiRoot="/"
+        header="India's Exports by Country"
         parentPlace="Earth"
         childPlaceType="Country"
-        variables="Amount_EconomicActivity_GrossDomesticProduction_Nominal LifeExpectancy_Person"
-      ></datacommons-scatter>
+        variable="Exports_EconomicActivity_ExportSourceIndia"
+      ></datacommons-map>
     </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="insights-footer">
+    <p>
+      Data Source: <a href="https://tradestat.commerce.gov.in/" target="_blank">Export Import Data Bank (EIDB)</a> - Ministry of Commerce & Industry, Government of India
+    </p>
+    <p>
+      <a href="/explore">Search Data</a> |
+      <a href="/tools/statvar">Browse Variables</a> |
+      <a href="/tools/download">Download Data</a>
+    </p>
+    <p style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #dee2e6;">
+      Powered by <a href="https://datacommons.org" target="_blank"><span style="color:#4285F4">G</span><span style="color:#EA4335">o</span><span style="color:#FBBC05">o</span><span style="color:#4285F4">g</span><span style="color:#34A853">l</span><span style="color:#EA4335">e</span></a> <a href="https://datacommons.org" target="_blank">Data Commons</a>
+    </p>
   </div>
 </div>
 {% endblock %}

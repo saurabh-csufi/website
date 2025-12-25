@@ -44,156 +44,316 @@
       box-sizing: border-box;
     }
 
-    /* Full Page Layout */
+    /* Full Page Layout - 3 Column */
     #homepage {
       display: flex;
       flex-direction: column;
-      min-height: calc(100vh - 70px);
+      height: calc(100vh - 70px);
       padding: 0;
-    }
-
-    /* Main Chat Container */
-    .main-container {
-      display: flex;
-      flex-direction: column;
-      flex: 1;
-      max-width: 1200px;
-      width: 100%;
-      margin: 0 auto;
-      padding: 16px 20px 0 20px;
-    }
-
-    /* Settings Panel */
-    .settings-panel {
-      background: white;
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      margin-bottom: 16px;
       overflow: hidden;
     }
 
-    .settings-header {
+    /* App Container - 3 columns */
+    .app-container {
       display: flex;
-      justify-content: space-between;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    /* Left Sidebar - Tool Calls */
+    .left-sidebar {
+      width: 320px;
+      background: #f8f9fa;
+      border-right: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+    }
+
+    .sidebar-header {
+      display: flex;
       align-items: center;
-      padding: 12px 16px;
+      gap: 8px;
+      padding: 16px;
       background: var(--gov-blue);
       color: white;
-      cursor: pointer;
-    }
-
-    .settings-header h3 {
-      margin: 0;
+      font-weight: 600;
       font-size: 0.9rem;
-      font-weight: 500;
     }
 
-    .settings-toggle {
+    .sidebar-header svg {
+      flex-shrink: 0;
+    }
+
+    .sidebar-close {
+      margin-left: auto;
       background: none;
       border: none;
       color: white;
-      font-size: 1.2rem;
+      font-size: 1.5rem;
       cursor: pointer;
-      padding: 0;
       line-height: 1;
+      padding: 0;
     }
 
-    .settings-content {
-      padding: 16px;
-      border-top: 1px solid var(--border-color);
+    .tool-calls-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px;
     }
 
-    .settings-content.hidden {
-      display: none;
+    .tool-calls-empty {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--text-muted);
+      font-size: 0.85rem;
     }
 
-    .config-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 16px;
+    .tool-call-item {
+      background: white;
+      border: 1px solid var(--border-color);
+      border-left: 3px solid var(--gov-blue);
+      border-radius: 6px;
+      padding: 12px;
+      margin-bottom: 10px;
+      font-size: 0.8rem;
     }
 
-    .config-item {
+    .tool-call-item.loading {
+      border-left-color: var(--saffron);
+      animation: pulse 1.5s infinite;
+    }
+
+    .tool-call-item.success {
+      border-left-color: var(--green);
+    }
+
+    .tool-call-item.error {
+      border-left-color: var(--danger);
+    }
+
+    .tool-call-name {
+      font-weight: 600;
+      color: var(--gov-blue);
+      margin-bottom: 6px;
       display: flex;
-      flex-direction: column;
+      align-items: center;
       gap: 6px;
     }
 
-    .config-item label {
+    .tool-call-name .badge {
+      font-size: 0.65rem;
+      padding: 2px 6px;
+      border-radius: 10px;
+      background: var(--saffron);
+      color: white;
+      font-weight: 500;
+    }
+
+    .tool-call-args {
+      background: #f1f3f4;
+      padding: 8px;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 0.7rem;
+      word-break: break-all;
+      margin-bottom: 8px;
+      max-height: 80px;
+      overflow-y: auto;
+    }
+
+    .tool-call-result {
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      max-height: 100px;
+      overflow-y: auto;
+    }
+
+    .tool-call-result.success {
+      color: var(--green);
+    }
+
+    .tool-call-result.error {
+      color: var(--danger);
+    }
+
+    /* Main Content Area */
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      overflow: hidden;
+    }
+
+    /* Right Sidebar - Settings */
+    .right-sidebar {
+      width: 320px;
+      background: white;
+      border-left: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      transform: translateX(0);
+      transition: transform 0.3s ease;
+    }
+
+    .right-sidebar.hidden {
+      transform: translateX(100%);
+      position: absolute;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      z-index: 100;
+      box-shadow: -4px 0 20px rgba(0,0,0,0.1);
+    }
+
+    .right-sidebar .settings-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+    }
+
+    .config-section {
+      margin-bottom: 20px;
+    }
+
+    .config-section label {
+      display: block;
       font-weight: 600;
       font-size: 0.8rem;
       color: var(--gov-blue);
+      margin-bottom: 8px;
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
 
-    .config-item input[type="text"] {
+    .config-section input[type="text"],
+    .config-section input[type="password"] {
+      width: 100%;
       padding: 10px 12px;
       border: 1px solid var(--border-color);
-      border-radius: 4px;
-      font-size: 0.9rem;
-      font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-family: inherit;
     }
 
-    .config-item input[type="text"]:focus {
+    .config-section input:focus {
       outline: none;
       border-color: var(--gov-blue);
       box-shadow: 0 0 0 3px rgba(0, 51, 102, 0.1);
     }
 
-    .config-row-inline {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .toggle-switch {
+    .config-toggle {
       display: flex;
       align-items: center;
       gap: 8px;
+      margin-top: 10px;
+      padding: 10px;
+      background: #f8f9fa;
+      border-radius: 6px;
     }
 
-    .toggle-switch input[type="checkbox"] {
-      width: 18px;
-      height: 18px;
-      accent-color: var(--gov-blue);
-    }
-
-    .toggle-switch label {
+    .config-toggle span:first-child {
+      flex: 1;
       font-size: 0.85rem;
       color: var(--text-dark);
-      text-transform: none;
+    }
+
+    .status-badge {
+      font-size: 0.7rem;
+      padding: 3px 8px;
+      border-radius: 12px;
+      background: #dc3545;
+      color: white;
       font-weight: 500;
     }
 
-    .config-actions {
-      display: flex;
-      gap: 12px;
-      align-items: center;
-      margin-top: 16px;
-      padding-top: 16px;
-      border-top: 1px solid var(--border-color);
+    .status-badge.active {
+      background: var(--green);
+    }
+
+    /* Toggle Switch */
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 44px;
+      height: 24px;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: 0.3s;
+      border-radius: 24px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: 0.3s;
+      border-radius: 50%;
+    }
+
+    input:checked + .slider {
+      background-color: var(--gov-blue);
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(20px);
     }
 
     .btn-primary {
+      width: 100%;
       background: var(--gov-blue);
       color: white;
       border: none;
-      padding: 10px 24px;
-      border-radius: 4px;
+      padding: 12px 24px;
+      border-radius: 6px;
       font-weight: 600;
       cursor: pointer;
       font-size: 0.9rem;
       transition: background 0.2s;
+      margin-top: 10px;
     }
 
     .btn-primary:hover {
       background: var(--gov-blue-light);
     }
 
+    .config-status {
+      text-align: center;
+      margin-top: 10px;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
     .config-help {
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border-color);
       font-size: 0.8rem;
       color: var(--text-muted);
+    }
+
+    .config-help p {
+      margin: 0 0 8px 0;
     }
 
     .config-help a {
@@ -209,7 +369,37 @@
       background: #e9ecef;
       padding: 2px 6px;
       border-radius: 3px;
-      font-size: 0.75rem;
+      font-size: 0.7rem;
+      word-break: break-all;
+    }
+
+    /* Settings FAB */
+    .settings-fab {
+      display: none;
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: var(--gov-blue);
+      color: white;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      z-index: 99;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .settings-fab:hover {
+      transform: scale(1.05);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.25);
+    }
+
+    .settings-fab.visible {
+      display: flex;
     }
 
     /* Chat Area */
@@ -322,56 +512,9 @@
       color: var(--gov-blue);
     }
 
-    /* Tool Call Indicator */
-    .tool-call-indicator {
-      background: linear-gradient(135deg, #e8f4fd 0%, #f0f7ff 100%);
-      border: 1px solid #b3d7f5;
-      border-left: 4px solid var(--gov-blue);
-      border-radius: 6px;
-      padding: 12px 16px;
-      margin: 12px 0;
-      font-size: 0.85rem;
-    }
-
-    .tool-call-indicator.loading {
-      animation: pulse 1.5s infinite;
-    }
-
     @keyframes pulse {
       0%, 100% { opacity: 1; }
       50% { opacity: 0.7; }
-    }
-
-    .tool-call-header {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-weight: 600;
-      color: var(--gov-blue);
-      margin-bottom: 8px;
-    }
-
-    .tool-call-args {
-      color: var(--text-muted);
-      font-family: monospace;
-      font-size: 0.8rem;
-      background: white;
-      padding: 8px 12px;
-      border-radius: 4px;
-      word-break: break-all;
-      border: 1px solid #e9ecef;
-    }
-
-    .tool-call-result {
-      margin-top: 10px;
-      padding-top: 10px;
-      border-top: 1px solid #b3d7f5;
-      color: var(--success);
-      font-size: 0.8rem;
-    }
-
-    .tool-call-result.error {
-      color: var(--danger);
     }
 
     /* Welcome Message */
@@ -597,63 +740,64 @@
       text-decoration: underline;
     }
 
-    /* Responsive */
-    @media (max-width: 992px) {
-      .main-container {
-        padding: 12px 16px 0 16px;
+    /* Responsive - 3 Column Layout */
+    @media (max-width: 1200px) {
+      .left-sidebar {
+        width: 280px;
       }
+      .right-sidebar {
+        width: 280px;
+      }
+    }
 
-      .chat-area {
-        min-height: 350px;
+    @media (max-width: 992px) {
+      /* Hide left sidebar on tablets */
+      .left-sidebar {
+        display: none;
       }
 
       .message-content {
-        max-width: 80%;
+        max-width: 85%;
       }
     }
 
     @media (max-width: 768px) {
       #homepage {
-        min-height: calc(100vh - 60px);
+        height: calc(100vh - 60px);
       }
 
-      .main-container {
-        padding: 10px 12px 0 12px;
+      /* Hide both sidebars on mobile */
+      .left-sidebar {
+        display: none;
       }
 
-      .settings-panel {
-        margin-bottom: 12px;
+      .right-sidebar {
+        display: none;
       }
 
-      .settings-header {
-        padding: 10px 14px;
+      .right-sidebar.visible {
+        display: flex;
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        max-width: 320px;
+        z-index: 1000;
+        box-shadow: -4px 0 20px rgba(0,0,0,0.15);
       }
 
-      .settings-content {
-        padding: 12px;
-      }
-
-      .config-grid {
-        grid-template-columns: 1fr;
-        gap: 12px;
-      }
-
-      .config-row-inline {
-        flex-wrap: wrap;
-      }
-
-      .chat-area {
-        min-height: 300px;
-        border-radius: 6px;
+      /* Show settings FAB on mobile */
+      .settings-fab {
+        display: flex;
       }
 
       .chat-messages {
         padding: 16px;
-        min-height: 250px;
       }
 
       .message-content {
-        max-width: 88%;
+        max-width: 90%;
         padding: 12px 14px;
         font-size: 0.9rem;
       }
@@ -717,11 +861,6 @@
         width: 60px;
         height: 60px;
         font-size: 28px;
-      }
-
-      .tool-call-indicator {
-        padding: 10px 12px;
-        font-size: 0.8rem;
       }
 
       .tool-call-args {
@@ -797,94 +936,135 @@
 {% endblock %}
 
 {% block content %}
-  <!-- Main Container -->
-  <div class="main-container">
-    <!-- Settings Panel -->
-    <div class="settings-panel">
-      <div class="settings-header" id="settings-toggle">
-        <h3>Configuration Settings</h3>
-        <button class="settings-toggle" id="toggle-icon">-</button>
+  <!-- App Container with 3-column layout -->
+  <div class="app-container">
+    <!-- Left Sidebar - Tool Calls -->
+    <aside class="left-sidebar" id="left-sidebar">
+      <div class="sidebar-header">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+        </svg>
+        <span>Tool Activity</span>
+      </div>
+      <div class="tool-calls-container" id="tool-calls-container">
+        <div class="tool-calls-empty">
+          <p>Tool calls will appear here when you ask data questions</p>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Chat Area -->
+    <main class="main-content">
+      <div class="chat-area">
+        <div class="chat-messages" id="chat-messages">
+          <div class="welcome-message" id="welcome-message">
+            <div class="welcome-icon">VS</div>
+            <h2>VYAPAR SAH<span style="color: var(--saffron);">(AI)</span></h2>
+            <p>Your Intelligent Business Companion | आपका बुद्धिमान व्यापार सहायक</p>
+            <div class="suggestions">
+              <button class="suggestion" data-text="what are rate of exports in India for the past 5 years?" disabled>what are rate of exports in India for the past 5 years?</button>
+              <button class="suggestion" data-text="What are the export trends for fish products from India?" disabled>What are the export trends for fish products from India?</button>
+              <button class="suggestion" data-text="What financial assistance is available under the PMEGP scheme for MSMEs?
+              " disabled>What financial assistance is available under the PMEGP scheme for MSMEs?
+            </button>
+            <button class="suggestion" data-text="How can MSMEs avail duty-free import of capital goods?
+            " disabled>How can MSMEs avail duty-free import of capital goods?
+            </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="chat-input-area">
+          <div class="chat-input-row">
+            <div class="chat-input-wrapper">
+              <textarea
+                id="chat-input"
+                placeholder="Configure settings to start chatting..."
+                rows="1"
+                disabled
+              ></textarea>
+            </div>
+            <button id="send-btn" title="Send message" disabled>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Google Data Commons Footer -->
+      <footer class="google-footer">
+        <div class="google-footer-content">
+          <span>Powered by</span>
+          <span class="google-logo">
+            <span class="g-blue">G</span><span class="g-red">o</span><span class="g-yellow">o</span><span class="g-blue">g</span><span class="g-green">l</span><span class="g-red">e</span>
+          </span>
+          <a href="https://datacommons.org" target="_blank" rel="noopener">Data Commons</a>
+        </div>
+      </footer>
+    </main>
+
+    <!-- Right Sidebar - Settings -->
+    <aside class="right-sidebar" id="right-sidebar">
+      <div class="sidebar-header">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="3"></circle>
+          <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+        </svg>
+        <span>Settings</span>
+        <button class="sidebar-close" id="close-settings">×</button>
       </div>
       <div class="settings-content" id="settings-content">
-        <div class="config-grid">
-          <div class="config-item">
-            <label for="api-key-input">Gemini API Key</label>
-            <input type="text" id="api-key-input" placeholder="Enter your Gemini API key">
-          </div>
-          <div class="config-item">
-            <label for="mcp-url-input">MCP Proxy URL</label>
-            <div class="config-row-inline">
-              <input type="text" id="mcp-url-input" placeholder="http://localhost:5001" value="http://localhost:5001" style="flex:1;">
-              <div class="toggle-switch">
-                <input type="checkbox" id="mcp-enabled" checked>
-                <label for="mcp-enabled">Enable</label>
-              </div>
-            </div>
-          </div>
-          <div class="config-item">
-            <label for="kb-store-input">Knowledge Base Store</label>
-            <div class="config-row-inline">
-              <input type="text" id="kb-store-input" placeholder="fileSearchStores/your-store-id" value="fileSearchStores/msmepolicies-8pibj9lwmrws" style="flex:1;">
-              <div class="toggle-switch">
-                <input type="checkbox" id="kb-enabled" checked>
-                <label for="kb-enabled">Enable</label>
-              </div>
-            </div>
-          </div>
+        <div class="config-section">
+          <label for="api-key-input">Gemini API Key</label>
+          <input type="password" id="api-key-input" placeholder="Enter your Gemini API key">
         </div>
-        <div class="config-actions">
-          <button class="btn-primary" id="save-config">Save & Connect</button>
-          <span class="config-help" id="config-status"></span>
-        </div>
-      </div>
-    </div>
 
-    <!-- Chat Area -->
-    <div class="chat-area">
-      <div class="chat-messages" id="chat-messages">
-        <div class="welcome-message" id="welcome-message">
-          <div class="welcome-icon">VS</div>
-          <h2>VYAPAR SAH<span style="color: var(--saffron);">(AI)</span></h2>
-          <p>Your Intelligent Business Companion | आपका बुद्धिमान व्यापार सहायक</p>
-          <div class="suggestions">
-            <button class="suggestion" data-text="What are the key MSME policies and schemes available in India?" disabled>What are the key MSME policies and schemes available in India?</button>
-            <button class="suggestion" data-text="What is the current GDP growth rate of India?" disabled>What is the current GDP growth rate of India?</button>
-            <button class="suggestion" data-text="What export incentives and subsidies are available for small businesses?" disabled>What export incentives and subsidies are available for small businesses?</button>
-            <!-- <button class="suggestion" data-text="How can MSMEs register under the Udyam portal?" disabled>How can MSMEs register under the Udyam portal?</button> -->
+        <div class="config-section">
+          <label for="mcp-url-input">MCP Proxy URL</label>
+          <input type="text" id="mcp-url-input" placeholder="http://localhost:5001" value="http://localhost:5001">
+          <div class="config-toggle">
+            <span>MCP Tools</span>
+            <span class="status-badge" id="mcp-status">Disconnected</span>
+            <label class="switch">
+              <input type="checkbox" id="mcp-enabled" checked>
+              <span class="slider"></span>
+            </label>
           </div>
         </div>
-      </div>
 
-      <div class="chat-input-area">
-        <div class="chat-input-row">
-          <div class="chat-input-wrapper">
-            <textarea
-              id="chat-input"
-              placeholder="Configure settings to start chatting..."
-              rows="1"
-              disabled
-            ></textarea>
+        <div class="config-section">
+          <label for="kb-store-input">Knowledge Base</label>
+          <input type="text" id="kb-store-input" placeholder="fileSearchStores/your-store-id" value="fileSearchStores/msmepolicies-8pibj9lwmrws">
+          <div class="config-toggle">
+            <span>Knowledge Base</span>
+            <span class="status-badge active" id="kb-status">Active</span>
+            <label class="switch">
+              <input type="checkbox" id="kb-enabled" checked>
+              <span class="slider"></span>
+            </label>
           </div>
-          <button id="send-btn" title="Send message" disabled>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
-            </svg>
-          </button>
+        </div>
+
+        <button class="btn-primary" id="save-config">Save and Connect</button>
+        <div class="config-status" id="config-status"></div>
+
+        <div class="config-help">
+          <!-- <p>Get Gemini key from <a href="https://aistudio.google.com/apikey" target="_blank">Google AI Studio</a>.</p> -->
+          <!-- <p>Run MCP proxy: <code>python additional_features/mcp_proxy_server.py</code></p> -->
         </div>
       </div>
-    </div>
+    </aside>
   </div>
 
-  <!-- Google Data Commons Footer -->
-  <footer class="google-footer">
-    <div class="google-footer-content">
-      <span>Powered by</span>
-      <span class="google-logo">
-        <span class="g-blue">G</span><span class="g-red">o</span><span class="g-yellow">o</span><span class="g-blue">g</span><span class="g-green">l</span><span class="g-red">e</span>
-      </span>
-      <a href="https://datacommons.org" target="_blank" rel="noopener">Data Commons</a>
-    </div>
-  </footer>
+  <!-- Settings Toggle Button (floating) -->
+  <button class="settings-fab" id="settings-fab" title="Open Settings">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="12" cy="12" r="3"></circle>
+      <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+    </svg>
+  </button>
 
   <script>
     (function() {
@@ -1146,9 +1326,6 @@
       const chatInput = document.getElementById('chat-input');
       const sendBtn = document.getElementById('send-btn');
       const welcomeMessage = document.getElementById('welcome-message');
-      const settingsContent = document.getElementById('settings-content');
-      const settingsToggle = document.getElementById('settings-toggle');
-      const toggleIcon = document.getElementById('toggle-icon');
       const apiKeyInput = document.getElementById('api-key-input');
       const mcpUrlInput = document.getElementById('mcp-url-input');
       const mcpEnabledCheckbox = document.getElementById('mcp-enabled');
@@ -1156,6 +1333,15 @@
       const kbEnabledCheckbox = document.getElementById('kb-enabled');
       const saveConfigBtn = document.getElementById('save-config');
       const configStatus = document.getElementById('config-status');
+
+      // New sidebar elements
+      const leftSidebar = document.getElementById('left-sidebar');
+      const rightSidebar = document.getElementById('right-sidebar');
+      const toolCallsContainer = document.getElementById('tool-calls-container');
+      const settingsFab = document.getElementById('settings-fab');
+      const closeSettings = document.getElementById('close-settings');
+      const mcpStatus = document.getElementById('mcp-status');
+      const kbStatus = document.getElementById('kb-status');
 
       // Models - use different models for different purposes
       const MCP_MODEL = 'gemini-2.0-flash';  // For MCP function calling (proven to work)
@@ -1222,13 +1408,27 @@ To serve as a reliable "Single Source of Truth" for organizational policies and 
 
         // Event listeners
         saveConfigBtn.addEventListener('click', saveConfig);
-        settingsToggle.addEventListener('click', () => {
-          const isHidden = settingsContent.classList.toggle('hidden');
-          toggleIcon.textContent = isHidden ? '+' : '-';
-        });
         sendBtn.addEventListener('click', sendMessage);
         chatInput.addEventListener('keydown', handleKeyDown);
         chatInput.addEventListener('input', autoResize);
+
+        // Settings sidebar toggle
+        if (closeSettings) {
+          closeSettings.addEventListener('click', () => {
+            rightSidebar.classList.add('hidden');
+            settingsFab.classList.add('visible');
+          });
+        }
+
+        if (settingsFab) {
+          settingsFab.addEventListener('click', () => {
+            rightSidebar.classList.remove('hidden');
+            settingsFab.classList.remove('visible');
+          });
+        }
+
+        // Update status badges
+        updateStatusBadges();
 
         // Suggestion buttons
         document.querySelectorAll('.suggestion').forEach(btn => {
@@ -1284,6 +1484,7 @@ To serve as a reliable "Single Source of Truth" for organizational policies and 
         }
 
         enableChat();
+        updateStatusBadges();
 
         configStatus.innerHTML = 'Connected! <span style="color: var(--success);">Ready to chat.</span>';
       }
@@ -1362,32 +1563,64 @@ To serve as a reliable "Single Source of Truth" for organizational policies and 
         }
       }
 
-      // Show tool call in UI
+      // Update status badges in settings sidebar
+      function updateStatusBadges() {
+        if (mcpStatus) {
+          mcpStatus.textContent = mcpConnected ? 'Connected' : 'Disconnected';
+          mcpStatus.className = mcpConnected ? 'status-badge active' : 'status-badge';
+        }
+        if (kbStatus) {
+          kbStatus.textContent = kbEnabled ? 'Active' : 'Inactive';
+          kbStatus.className = kbEnabled ? 'status-badge active' : 'status-badge';
+        }
+      }
+
+      // Clear tool calls from left sidebar
+      function clearToolCalls() {
+        if (toolCallsContainer) {
+          toolCallsContainer.innerHTML = '';
+        }
+      }
+
+      // Show tool call in LEFT SIDEBAR (not chat)
       function showToolCall(name, args) {
+        // Clear empty message if present
+        const emptyMsg = toolCallsContainer.querySelector('.tool-calls-empty');
+        if (emptyMsg) emptyMsg.remove();
+
         const toolEl = document.createElement('div');
-        toolEl.className = 'tool-call-indicator loading';
+        toolEl.className = 'tool-call-item loading';
         toolEl.innerHTML = `
-          <div class="tool-call-header">
-            <span>[Tool]</span>
+          <div class="tool-call-name">
             <span>${escapeHtml(name)}</span>
+            <span class="badge">Running</span>
           </div>
           <div class="tool-call-args">${escapeHtml(JSON.stringify(args, null, 2))}</div>
           <div class="tool-call-result"></div>
         `;
-        chatMessages.appendChild(toolEl);
-        chatMessages.scrollTop = chatMessages.scrollHeight;
+        toolCallsContainer.appendChild(toolEl);
+        toolCallsContainer.scrollTop = toolCallsContainer.scrollHeight;
         return toolEl;
       }
 
       function updateToolCallResult(toolEl, result, isError = false, toolName = '') {
         toolEl.classList.remove('loading');
+        toolEl.classList.add(isError ? 'error' : 'success');
+
+        // Update badge
+        const badge = toolEl.querySelector('.badge');
+        if (badge) {
+          badge.textContent = isError ? 'Error' : 'Done';
+          badge.style.background = isError ? 'var(--danger)' : 'var(--green)';
+        }
+
         const resultEl = toolEl.querySelector('.tool-call-result');
-        resultEl.className = `tool-call-result${isError ? ' error' : ''}`;
+        resultEl.className = `tool-call-result ${isError ? 'error' : 'success'}`;
 
         // Truncate long results
         let displayResult = result;
-        if (result.length > 500) {
-          displayResult = result.substring(0, 500) + '... (truncated)';
+        if (result.length > 300) {
+          displayResult = result.substring(0, 300) + '... (truncated)';
         }
         resultEl.textContent = displayResult;
 
@@ -1653,6 +1886,9 @@ To serve as a reliable "Single Source of Truth" for organizational policies and 
         if (welcomeMessage) {
           welcomeMessage.style.display = 'none';
         }
+
+        // Clear previous tool calls from left sidebar
+        clearToolCalls();
 
         // Show user message
         addMessage('user', message);
