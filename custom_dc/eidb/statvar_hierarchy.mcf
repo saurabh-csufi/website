@@ -30,3 +30,9 @@ Node: dcid:dc/g/EIDB_GrowthRates
 typeOf: dcs:StatVarGroup
 name: "Export Growth Rates"
 specializationOf: dcid:dc/g/EIDB
+
+# Sub-group for country-commodity exports (exports to specific countries by HS code)
+Node: dcid:dc/g/EIDB_CountryCommodityExports
+typeOf: dcs:StatVarGroup
+name: "Country-Commodity Exports"
+specializationOf: dcid:dc/g/EIDB

@@ -1,4 +1,4 @@
-# Auto-generated memberOf statements for EIDB variables
+# Auto-generated memberOf statements for all EIDB variables
 
 Node: dcid:Exports_EconomicActivity_AbrasivePowderOrGrainNaturalOrArtificialOnABas6805
 memberOf: dcid:dc/g/EIDB_CommodityExports
@@ -1841,6 +1841,1071 @@ memberOf: dcid:dc/g/EIDB_CommodityExports
 
 Node: dcid:Exports_EconomicActivity_CottonYarnOtherThanSewingThreadPutUpForRetailSale_AsAFractionOf_Exports_EconomicActivity
 memberOf: dcid:dc/g/EIDB_ExportPercentages
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode0105
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode0106
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode0207
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode0713
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode0806
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode1509
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode1516
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode2825
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode2844
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode2938
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode3401
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode3404
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode3604
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode3913
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode3914
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode4601
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode4803
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode4906
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode50
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode51
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode53
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode54
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode55
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode56
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode57
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode5703
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode58
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode5807
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode59
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode60
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode6002
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode6004
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode61
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode6103
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode62
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode6203
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode6204
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode63
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode64
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode65
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode66
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode6602
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode68
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode6801
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode6806
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode69
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode7015
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode7018
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode71
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode72
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode7203
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode73
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode74
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode75
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode76
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode78
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode79
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode80
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode81
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode82
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode8205
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode83
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode8305
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode84
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode8408
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode8430
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode8444
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode8456
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode8471
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode8472
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode8502
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode8515
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode8521
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode86
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode8604
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode87
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode8709
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode88
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode8802
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode8806
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode89
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode9021
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode91
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode9101
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode9104
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode92
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode93
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode9307
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode94
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode9402
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode9404
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode95
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode96
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode9608
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode97
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode98
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryARE_HSCode99
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode02
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode0210
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode0305
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode0306
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode0307
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode0402
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode0403
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode0404
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode0405
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode0406
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode0409
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode0507
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode0508
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode0510
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode0511
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode0601
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode0602
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode0603
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode0604
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode07
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode0701
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode0702
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode0703
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode0704
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode0706
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode0707
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode0708
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode0709
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode0710
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode0711
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode0712
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode0714
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode08
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode0801
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode0802
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode0803
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode0804
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode0805
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode0807
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode0809
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode0810
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode0811
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode0812
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode0814
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode09
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode0901
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode0902
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode0904
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode0905
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode0906
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode0907
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode0908
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode0909
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode0910
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode10
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode1002
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode1003
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode1004
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode1005
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode1006
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode1007
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode1008
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode11
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode1101
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode1102
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode1103
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode1104
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode1105
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode1107
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode1108
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode1109
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode12
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode1201
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode1202
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode1203
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode1204
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode1206
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode1207
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode1208
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode1209
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode1211
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode1212
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode13
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode1301
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode1302
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode14
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode1401
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode1404
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode15
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode1502
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode1504
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode1505
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode1506
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode1507
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode1508
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode1509
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode1511
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode1512
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode1513
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode1514
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode1515
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode1518
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode1520
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode1521
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode16
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode1604
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode1605
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode17
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode1701
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode1702
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode1703
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode1704
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode1801
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode1804
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode1805
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode1806
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode19
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode1901
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode1902
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode1903
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode1904
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode1905
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode20
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode2001
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode2002
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode2004
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode2005
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode2006
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode2007
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode2008
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode21
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode2101
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode2102
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode2103
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode2104
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode2105
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode2106
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode22
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode2201
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode2203
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode23
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode24
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode25
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode27
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode2844
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode29
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode2938
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode30
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode31
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode32
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode33
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode34
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode3401
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode3404
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode35
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode3604
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode37
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode38
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode39
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode3913
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode3914
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode40
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode41
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode42
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode43
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode44
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode45
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode46
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode4601
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode47
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode48
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode4803
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode49
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode4906
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode50
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode51
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode52
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode53
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode54
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode55
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode56
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode57
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode5703
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode58
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode5806
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode5807
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode59
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode60
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode6001
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode6002
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode6004
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode61
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode6103
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode62
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode6203
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode6204
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode63
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode64
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode65
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode66
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode6602
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode68
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode6801
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode69
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode70
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode7018
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode71
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode72
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode7203
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode73
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode74
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode75
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode76
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode78
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode79
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode80
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode81
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode82
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode8205
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode83
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode8305
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode84
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode8408
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode8430
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode8444
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode8456
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode8471
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode8472
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode85
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode8502
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode8515
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode8521
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode8549
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode86
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode8604
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode87
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode8709
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode88
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode8802
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode8806
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode89
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode90
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode9021
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode91
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode9101
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode9104
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode92
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode93
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode9307
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode94
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode9402
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode9404
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode95
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode96
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode9608
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode97
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode98
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
+
+Node: dcid:Exports_EconomicActivity_CountryAUS_HSCode99
+memberOf: dcid:dc/g/EIDB_CountryCommodityExports
 
 Node: dcid:Exports_EconomicActivity_CruiseShipsExcursionBoatsFerryBoatsCargoShips
 memberOf: dcid:dc/g/EIDB_CommodityExports
@@ -8914,6 +9979,807 @@ Node: dcid:GrowthRate_Exports_EconomicActivity_CottonYarnOtherThanSewingThreadCo
 memberOf: dcid:dc/g/EIDB_GrowthRates
 
 Node: dcid:GrowthRate_Exports_EconomicActivity_CottonYarnOtherThanSewingThreadPutUpForRetailSale
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryARE_HSCode0105
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryARE_HSCode0106
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryARE_HSCode0207
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryARE_HSCode0713
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryARE_HSCode0806
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryARE_HSCode15
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryARE_HSCode1509
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryARE_HSCode1516
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryARE_HSCode2825
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryARE_HSCode2938
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryARE_HSCode3401
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryARE_HSCode3404
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryARE_HSCode3604
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryARE_HSCode3913
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryARE_HSCode3914
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryARE_HSCode40
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryARE_HSCode4601
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryARE_HSCode4803
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryARE_HSCode6806
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryARE_HSCode99
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode0305
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode0306
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode0307
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode0402
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode0403
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode0404
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode0405
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode0406
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode0409
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode0507
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode0508
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode0510
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode0511
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode0601
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode0602
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode0603
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode0604
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode0701
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode0702
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode0703
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode0704
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode0706
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode0707
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode0708
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode0709
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode0710
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode0711
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode0712
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode0714
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode0801
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode0802
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode0803
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode0804
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode0805
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode0807
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode0809
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode0810
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode0811
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode0812
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode0814
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode0901
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode0902
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode0904
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode0905
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode0906
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode0907
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode0908
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode0909
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode0910
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode1002
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode1003
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode1004
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode1005
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode1006
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode1007
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode1008
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode1101
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode1102
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode1103
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode1104
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode1105
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode1107
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode1108
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode1109
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode12
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode1201
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode1202
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode1203
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode1204
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode1206
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode1207
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode1208
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode1209
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode1211
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode1212
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode13
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode1301
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode1302
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode14
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode1401
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode1404
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode15
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode1502
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode1504
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode1505
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode1506
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode1507
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode1508
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode1511
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode1512
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode1513
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode1514
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode1515
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode1518
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode1520
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode1521
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode16
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode1604
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode1605
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode17
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode1701
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode1702
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode1703
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode1704
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode1801
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode1804
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode1805
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode1806
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode19
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode1901
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode1902
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode1903
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode1904
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode1905
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode2001
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode2002
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode2004
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode2005
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode2006
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode2007
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode2008
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode2101
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode2103
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode2104
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode2105
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode2106
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode22
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode2201
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode2203
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode23
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode24
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode25
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode27
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode2825
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode2844
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode29
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode2938
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode30
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode31
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode32
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode33
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode34
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode3401
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode3404
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode35
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode36
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode3604
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode37
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode38
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode39
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode3913
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode3914
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode40
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode41
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode43
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode44
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode45
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode46
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode4601
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode47
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode48
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode4803
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode49
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode4906
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode50
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode51
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode52
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode53
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode54
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode55
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode56
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode57
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode5703
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode58
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode5807
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode59
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode60
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode6002
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode6004
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode61
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode6103
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode62
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode6203
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode6204
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode63
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode64
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode65
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode66
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode6602
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode67
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode68
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode6801
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode6806
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode69
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode70
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode7018
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode71
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode72
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode7203
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode73
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode74
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode75
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode76
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode78
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode79
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode80
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode81
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode82
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode8205
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode83
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode8305
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode84
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode8408
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode8430
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode8444
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode8456
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode8471
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode8472
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode85
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode8502
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode8515
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode8521
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode8549
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode86
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode8604
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode87
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode8709
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode88
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode8806
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode89
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode90
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode9021
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode91
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode9101
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode9104
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode92
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode93
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode9307
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode94
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode9402
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode9404
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode95
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode96
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode9608
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode97
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode98
+memberOf: dcid:dc/g/EIDB_GrowthRates
+
+Node: dcid:GrowthRate_Exports_EconomicActivity_CountryAUS_HSCode99
 memberOf: dcid:dc/g/EIDB_GrowthRates
 
 Node: dcid:GrowthRate_Exports_EconomicActivity_CruiseShipsExcursionBoatsFerryBoatsCargoShips
