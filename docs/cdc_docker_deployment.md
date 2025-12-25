@@ -332,7 +332,7 @@ cd /Users/saurabhgupta/Documents/2026/website
 # Step 2: Run data container
 docker run -it \
   --env-file custom_dc/env.list \
-  -v /Users/saurabhgupta/Documents/2026/website/custom_dc/sample/:/Users/saurabhgupta/Documents/2026/website/custom_dc/sample/ \
+  -v /Users/saurabhgupta/Documents/2026/website/custom_dc:/Users/saurabhgupta/Documents/2026/website/custom_dc \
   gcr.io/datcom-ci/datacommons-data:stable
 
 # Step 3: Run service container (in new terminal)

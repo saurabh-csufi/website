@@ -1,0 +1,32 @@
+# StatVarGroup hierarchy for EIDB Export Data
+# This connects the statistical variables to the sidebar hierarchy
+
+# Root group for EIDB data - connects to dc/g/Root (top level)
+Node: dcid:dc/g/EIDB
+typeOf: dcs:StatVarGroup
+name: "India Export Data (EIDB)"
+specializationOf: dcid:dc/g/Root
+
+# Sub-group for commodity-wise exports
+Node: dcid:dc/g/EIDB_CommodityExports
+typeOf: dcs:StatVarGroup
+name: "Commodity-wise Exports"
+specializationOf: dcid:dc/g/EIDB
+
+# Sub-group for country-wise exports
+Node: dcid:dc/g/EIDB_CountryExports
+typeOf: dcs:StatVarGroup
+name: "Country-wise Exports"
+specializationOf: dcid:dc/g/EIDB
+
+# Sub-group for export percentages
+Node: dcid:dc/g/EIDB_ExportPercentages
+typeOf: dcs:StatVarGroup
+name: "Export Percentages"
+specializationOf: dcid:dc/g/EIDB
+
+# Sub-group for growth rates
+Node: dcid:dc/g/EIDB_GrowthRates
+typeOf: dcs:StatVarGroup
+name: "Export Growth Rates"
+specializationOf: dcid:dc/g/EIDB

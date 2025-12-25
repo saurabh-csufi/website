@@ -1,5 +1,0 @@
-embeddings_path: /Users/saurabhgupta/Documents/2026/website/custom_dc/estonia_population/datacommons/nl/embeddings/embeddings.csv
-healthcheck_query: health
-model: ft-final-v20230717230459-all-MiniLM-L6-v2
-source_path: /Users/saurabhgupta/Documents/2026/website/custom_dc/estonia_population/datacommons/nl
-store_type: MEMORY

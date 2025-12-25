@@ -1,0 +1,24 @@
+Node: dcid:exportSource
+typeOf: Property
+name: "exportSource"
+domainIncludes: EconomicActivity
+rangeIncludes: Country, ExportSourceEnum
+
+Node: dcid:ExportSourceEnum
+typeOf: schema:Class
+name: "ExportSourceEnum"
+subClassOf: schema:Enumeration
+description: "An enumeration of different export sources"
+
+Node: dcid:InstallationInInternationalWater
+typeOf: dcs:ExportSourceEnum
+name: "Installation in international water"
+
+Node: dcid:INDTradeStat_Unspecified
+typeOf: dcs:ExportSourceEnum
+name: "India Trade Status Unspecified"
+
+Node: dcid:country/CWW
+typeOf: schema:Country
+name: "Curaçao"
+containedInPlace: Earth
