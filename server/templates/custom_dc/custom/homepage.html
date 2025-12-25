@@ -729,6 +729,70 @@
         padding: 6px 10px;
       }
     }
+
+    /* Data Commons Chart Styles */
+    .dc-chart-container {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 16px;
+      margin-top: 16px;
+      min-height: 300px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+
+    .dc-chart-container.loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+    }
+
+    .dc-chart-container.loading::after {
+      content: 'Loading visualization...';
+      animation: pulse 1.5s infinite;
+    }
+
+    .dc-chart-container datacommons-line,
+    .dc-chart-container datacommons-bar,
+    .dc-chart-container datacommons-map,
+    .dc-chart-container datacommons-highlight {
+      --dc-headings-font-family: inherit;
+      --dc-font-family: inherit;
+      width: 100%;
+      min-height: 280px;
+    }
+
+    .message-content .dc-chart-container {
+      max-width: 100%;
+      overflow-x: auto;
+    }
+
+    .dc-chart-error {
+      background: #fdf2f2;
+      border: 1px solid #fecaca;
+      border-radius: 8px;
+      padding: 16px;
+      margin-top: 16px;
+      color: var(--danger);
+      font-size: 0.9rem;
+    }
+
+    .dc-chart-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--gov-blue);
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid var(--saffron);
+    }
+
+    .dc-chart-unit {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 8px;
+      text-align: right;
+    }
   </style>
 {% endblock %}
 
@@ -837,6 +901,245 @@
       let mcpConnected = false;
       let conversationHistory = [];
       let isProcessing = false;
+      let lastChartAnalysis = null;
+
+      // Chart.js Script Loader
+      let chartJsLoaded = false;
+      let chartJsLoadPromise = null;
+
+      function loadChartJs() {
+        if (chartJsLoaded) return Promise.resolve();
+        if (chartJsLoadPromise) return chartJsLoadPromise;
+
+        chartJsLoadPromise = new Promise((resolve, reject) => {
+          const script = document.createElement('script');
+          script.src = 'https://cdn.jsdelivr.net/npm/chart.js';
+          script.onload = () => {
+            chartJsLoaded = true;
+            console.log('Chart.js loaded');
+            resolve();
+          };
+          script.onerror = () => reject(new Error('Failed to load Chart.js'));
+          document.head.appendChild(script);
+        });
+
+        return chartJsLoadPromise;
+      }
+
+      // Chart Data Analyzer - extracts actual data from tool results for Chart.js
+      function analyzeChartData(toolName, result) {
+        if (toolName !== 'get_observations') return null;
+
+        try {
+          console.log('Analyzing chart data for tool:', toolName);
+          console.log('Raw result:', result);
+
+          const data = typeof result === 'string' ? JSON.parse(result) : result;
+          console.log('Parsed data:', data);
+
+          // Must have variable and place_observations
+          if (!data.variable || !data.place_observations) {
+            console.log('Missing variable or place_observations');
+            return null;
+          }
+
+          const variableName = data.variable.name || data.variable.dcid;
+          const places = data.place_observations;
+
+          if (!places || places.length === 0) {
+            console.log('No places found');
+            return null;
+          }
+
+          // Extract time series data
+          const datasets = [];
+          let labels = [];
+
+          for (const placeData of places) {
+            const placeName = placeData.place?.name || placeData.place?.dcid || 'Unknown';
+            const timeSeries = placeData.time_series || [];
+
+            console.log(`Place: ${placeName}, Time series points: ${timeSeries.length}`);
+
+            if (timeSeries.length > 0) {
+              // Extract labels (dates) from first place
+              if (labels.length === 0) {
+                labels = timeSeries.map(point => point[0]);
+              }
+
+              // Extract values
+              const values = timeSeries.map(point => point[1]);
+
+              datasets.push({
+                label: placeName,
+                data: values,
+                borderColor: getChartColor(datasets.length),
+                backgroundColor: getChartColor(datasets.length, 0.2),
+                tension: 0.1,
+                fill: false
+              });
+            }
+          }
+
+          if (labels.length === 0 || datasets.length === 0) {
+            console.log('No valid data points found');
+            return null;
+          }
+
+          // Determine chart type
+          const hasTimeSeries = labels.length > 1;
+          const multiplePlaces = datasets.length > 1;
+          let chartType = hasTimeSeries ? 'line' : 'bar';
+
+          // Get unit from source metadata if available
+          const unit = data.source_metadata?.unit || '';
+
+          console.log('Chart analysis complete:', {
+            chartType,
+            variableName,
+            labels,
+            datasetsCount: datasets.length,
+            unit
+          });
+
+          return {
+            chartType,
+            variableName,
+            labels,
+            datasets,
+            unit
+          };
+        } catch (e) {
+          console.error('Error analyzing chart data:', e);
+          return null;
+        }
+      }
+
+      // Chart color palette
+      function getChartColor(index, alpha = 1) {
+        const colors = [
+          `rgba(0, 51, 102, ${alpha})`,   // Gov blue
+          `rgba(255, 153, 51, ${alpha})`, // Saffron
+          `rgba(19, 136, 8, ${alpha})`,   // Green
+          `rgba(66, 133, 244, ${alpha})`, // Google blue
+          `rgba(234, 67, 53, ${alpha})`,  // Google red
+          `rgba(251, 188, 5, ${alpha})`,  // Google yellow
+        ];
+        return colors[index % colors.length];
+      }
+
+      // Format large numbers for display
+      function formatNumber(num) {
+        if (num >= 1e12) return (num / 1e12).toFixed(2) + 'T';
+        if (num >= 1e9) return (num / 1e9).toFixed(2) + 'B';
+        if (num >= 1e7) return (num / 1e7).toFixed(2) + 'Cr';
+        if (num >= 1e5) return (num / 1e5).toFixed(2) + 'L';
+        if (num >= 1e3) return (num / 1e3).toFixed(1) + 'K';
+        return num.toLocaleString();
+      }
+
+      // Render chart using Chart.js
+      async function renderChart(chartData) {
+        if (!chartData) return '';
+
+        const chartId = `chart-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+        const { chartType, variableName, labels, datasets, unit } = chartData;
+
+        // Create chart container HTML
+        const containerHtml = `
+          <div class="dc-chart-container" id="${chartId}-container">
+            <div class="dc-chart-title">${escapeHtml(variableName)}</div>
+            <canvas id="${chartId}" style="max-height: 300px;"></canvas>
+            ${unit ? `<div class="dc-chart-unit">Unit: ${escapeHtml(unit)}</div>` : ''}
+          </div>
+        `;
+
+        return { html: containerHtml, chartId, chartType, labels, datasets, variableName };
+      }
+
+      // Inject chart into message after finalization
+      async function injectChartIntoMessage(messageEl, chartData) {
+        if (!chartData) return;
+
+        try {
+          console.log('Injecting chart with data:', chartData);
+
+          await loadChartJs();
+
+          const chartConfig = await renderChart(chartData);
+          if (!chartConfig) return;
+
+          const contentEl = messageEl.querySelector('.message-content');
+          if (!contentEl) return;
+
+          // Insert chart container
+          contentEl.insertAdjacentHTML('beforeend', chartConfig.html);
+          chatMessages.scrollTop = chatMessages.scrollHeight;
+
+          // Wait for DOM to update
+          await new Promise(r => setTimeout(r, 100));
+
+          // Create the chart
+          const canvas = document.getElementById(chartConfig.chartId);
+          if (!canvas) {
+            console.error('Canvas not found:', chartConfig.chartId);
+            return;
+          }
+
+          const ctx = canvas.getContext('2d');
+
+          new Chart(ctx, {
+            type: chartConfig.chartType,
+            data: {
+              labels: chartConfig.labels,
+              datasets: chartConfig.datasets
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: true,
+              plugins: {
+                legend: {
+                  display: chartConfig.datasets.length > 1,
+                  position: 'bottom'
+                },
+                title: {
+                  display: false
+                },
+                tooltip: {
+                  callbacks: {
+                    label: function(context) {
+                      const value = context.parsed.y;
+                      return `${context.dataset.label}: ${formatNumber(value)}`;
+                    }
+                  }
+                }
+              },
+              scales: {
+                y: {
+                  beginAtZero: false,
+                  ticks: {
+                    callback: function(value) {
+                      return formatNumber(value);
+                    }
+                  }
+                }
+              }
+            }
+          });
+
+          console.log('Chart rendered successfully');
+          chatMessages.scrollTop = chatMessages.scrollHeight;
+
+        } catch (err) {
+          console.error('Failed to inject chart:', err);
+          const contentEl = messageEl.querySelector('.message-content');
+          if (contentEl) {
+            contentEl.insertAdjacentHTML('beforeend',
+              `<div class="dc-chart-error">Unable to load visualization: ${err.message}</div>`
+            );
+          }
+        }
+      }
 
       // DOM Elements
       const chatMessages = document.getElementById('chat-messages');
@@ -1076,7 +1379,7 @@ To serve as a reliable "Single Source of Truth" for organizational policies and 
         return toolEl;
       }
 
-      function updateToolCallResult(toolEl, result, isError = false) {
+      function updateToolCallResult(toolEl, result, isError = false, toolName = '') {
         toolEl.classList.remove('loading');
         const resultEl = toolEl.querySelector('.tool-call-result');
         resultEl.className = `tool-call-result${isError ? ' error' : ''}`;
@@ -1087,6 +1390,19 @@ To serve as a reliable "Single Source of Truth" for organizational policies and 
           displayResult = result.substring(0, 500) + '... (truncated)';
         }
         resultEl.textContent = displayResult;
+
+        // Analyze for chart data if this is a get_observations call
+        if (!isError && toolName === 'get_observations') {
+          try {
+            const chartData = analyzeChartData(toolName, result);
+            if (chartData) {
+              lastChartAnalysis = chartData;
+              console.log('Chart data extracted:', chartData);
+            }
+          } catch (e) {
+            console.error('Chart analysis error:', e);
+          }
+        }
       }
 
       // ============================================================
@@ -1197,7 +1513,7 @@ To serve as a reliable "Single Source of Truth" for organizational policies and 
 
                 try {
                   const result = await executeMcpToolCall(fc.name, fc.args);
-                  updateToolCallResult(toolEl, result, false);
+                  updateToolCallResult(toolEl, result, false, fc.name);
                   functionResponses.push({
                     functionResponse: {
                       name: fc.name,
@@ -1205,7 +1521,7 @@ To serve as a reliable "Single Source of Truth" for organizational policies and 
                     }
                   });
                 } catch (err) {
-                  updateToolCallResult(toolEl, err.message, true);
+                  updateToolCallResult(toolEl, err.message, true, fc.name);
                   functionResponses.push({
                     functionResponse: {
                       name: fc.name,
@@ -1512,6 +1828,13 @@ Provide a natural, combined response that integrates both pieces of information 
 
           // Finalize the streaming message (remove cursor)
           streamingMessage.finalize();
+
+          // Inject chart visualization if we have chart data
+          if (lastChartAnalysis) {
+            console.log('Injecting chart with analysis:', lastChartAnalysis);
+            await injectChartIntoMessage(streamingMessage.element, lastChartAnalysis);
+            lastChartAnalysis = null;  // Reset for next query
+          }
 
           // Update conversation history
           conversationHistory.push({ role: 'user', parts: [{ text: userMessage }] });
