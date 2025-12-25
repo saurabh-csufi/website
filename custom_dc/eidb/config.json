@@ -1,0 +1,37 @@
+{
+  "inputFiles": {
+    "msme_commodity_inr.csv": {
+      "provenance": "Commodity Wise Export",
+      "format": "variablePerRow",
+      "columnMappings": {
+        "entity": "observationAbout",
+        "date": "observationDate",
+        "value": "value",
+        "variable": "variableMeasured",
+        "unit": "unit",
+        "measurementMethod": "measurementMethod"
+      }
+    },
+    "msme_country.csv": {
+      "provenance": "Country Wise Export",
+      "format": "variablePerRow",
+      "columnMappings": {
+        "entity": "observationAbout",
+        "date": "observationDate",
+        "variable": "variableMeasured",
+        "value": "value",
+        "unit": "unit",
+        "measurementMethod": "measurementMethod"
+      }
+    }
+  },
+  "sources": {
+    "India Ministry of Commerce and Industry": {
+      "url": "https://tradestat.commerce.gov.in/",
+      "provenances": {
+        "Commodity Wise Export": "https://tradestat.commerce.gov.in/eidb/commodity_wise_export",
+        "Country Wise Export": "https://tradestat.commerce.gov.in/eidb/country_wise_export"
+      }
+    }
+  }
+}

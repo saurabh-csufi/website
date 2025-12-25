@@ -1,0 +1,42 @@
+{
+  "status": "SUCCESS",
+  "startTime": "2025-12-24 10:07:20.483330",
+  "lastUpdate": "2025-12-24 10:07:23.363220",
+  "importFiles": {
+    "/Users/saurabhgupta/Documents/2026/website/custom_dc/eidb/msme_commodity_inr.csv": {
+      "status": "SUCCESS",
+      "startTime": "2025-12-24 10:07:20.485165",
+      "lastUpdate": "2025-12-24 10:07:21.360463"
+    },
+    "/Users/saurabhgupta/Documents/2026/website/custom_dc/eidb/msme_country.csv": {
+      "status": "SUCCESS",
+      "startTime": "2025-12-24 10:07:21.362108",
+      "lastUpdate": "2025-12-24 10:07:22.354273"
+    },
+    "/Users/saurabhgupta/Documents/2026/website/custom_dc/eidb/consolidated_statvars.mcf": {
+      "status": "SUCCESS",
+      "startTime": "2025-12-24 10:07:22.355434",
+      "lastUpdate": "2025-12-24 10:07:22.498236"
+    },
+    "/Users/saurabhgupta/Documents/2026/website/custom_dc/eidb/hscodes.mcf": {
+      "status": "SUCCESS",
+      "startTime": "2025-12-24 10:07:22.500008",
+      "lastUpdate": "2025-12-24 10:07:22.901066"
+    },
+    "/Users/saurabhgupta/Documents/2026/website/custom_dc/eidb/msme_schema.mcf": {
+      "status": "SUCCESS",
+      "startTime": "2025-12-24 10:07:22.904604",
+      "lastUpdate": "2025-12-24 10:07:22.905184"
+    },
+    "/Users/saurabhgupta/Documents/2026/website/custom_dc/eidb/statvar_hierarchy.mcf": {
+      "status": "SUCCESS",
+      "startTime": "2025-12-24 10:07:22.906048",
+      "lastUpdate": "2025-12-24 10:07:22.906466"
+    },
+    "/Users/saurabhgupta/Documents/2026/website/custom_dc/eidb/statvar_memberof.mcf": {
+      "status": "SUCCESS",
+      "startTime": "2025-12-24 10:07:22.907131",
+      "lastUpdate": "2025-12-24 10:07:22.933878"
+    }
+  }
+}
