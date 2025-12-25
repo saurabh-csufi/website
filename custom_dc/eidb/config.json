@@ -23,6 +23,18 @@
         "unit": "unit",
         "measurementMethod": "measurementMethod"
       }
+    },
+    "country_commodity_export.csv": {
+      "provenance": "Country Commodity Export",
+      "format": "variablePerRow",
+      "columnMappings": {
+        "entity": "observationAbout",
+        "date": "observationDate",
+        "value": "value",
+        "variable": "variableMeasured",
+        "unit": "unit",
+        "measurementMethod": "measurementMethod"
+      }
     }
   },
   "sources": {
@@ -30,7 +42,8 @@
       "url": "https://tradestat.commerce.gov.in/",
       "provenances": {
         "Commodity Wise Export": "https://tradestat.commerce.gov.in/eidb/commodity_wise_export",
-        "Country Wise Export": "https://tradestat.commerce.gov.in/eidb/country_wise_export"
+        "Country Wise Export": "https://tradestat.commerce.gov.in/eidb/country_wise_export",
+        "Country Commodity Export": "https://tradestat.commerce.gov.in/eidb/country_commodity_export"
       }
     }
   }
