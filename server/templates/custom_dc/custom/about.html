@@ -528,5 +528,197 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 });
+
+// Pie Chart Hover Tooltips
+const pieChartData = {
+  'Exports of mineral fuels mineral oils and products of': { value: 5659552900000, label: 'Petroleum Products' },
+  'Exports of electrical machinery and equipment and parts thereof': { value: 3735320900000, label: 'Electronics' },
+  'Exports of machinery and mechanical appliances boilers nuclear': { value: 2832594600000, label: 'Machinery' },
+  'Exports of natural cultured pearls precious semi precious stones': { value: 2536008800000, label: 'Gems & Jewellery' },
+  'Exports of pharmaceutical products': { value: 2081286200000, label: 'Pharmaceuticals' }
+};
+
+const totalTop5 = 16844763400000;
+
+function formatINR(value) {
+  const crore = value / 10000000;
+  if (crore >= 100000) {
+    return '₹' + (crore / 100000).toFixed(2) + ' Lakh Cr';
+  }
+  return '₹' + crore.toLocaleString('en-IN', {maximumFractionDigits: 0}) + ' Cr';
+}
+
+function addPieChartTooltips() {
+  const pieChart = document.querySelector('datacommons-pie');
+  if (!pieChart || !pieChart.shadowRoot) return false;
+
+  const shadowRoot = pieChart.shadowRoot;
+
+  // Look for SVG paths (pie slices) or legend items
+  const paths = shadowRoot.querySelectorAll('path');
+  const legendItems = shadowRoot.querySelectorAll('.legend-item, [class*="legend"] text, .series-label');
+
+  // Create tooltip element if not exists
+  let tooltip = document.getElementById('pie-tooltip');
+  if (!tooltip) {
+    tooltip = document.createElement('div');
+    tooltip.id = 'pie-tooltip';
+    tooltip.style.cssText = `
+      position: fixed;
+      background: rgba(0, 51, 102, 0.95);
+      color: white;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      pointer-events: none;
+      z-index: 10000;
+      display: none;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      max-width: 280px;
+      line-height: 1.4;
+    `;
+    document.body.appendChild(tooltip);
+  }
+
+  // Try to match paths with data by looking at nearby text or aria labels
+  paths.forEach((path, index) => {
+    if (path.hasAttribute('data-tooltip-added')) return;
+
+    // Get fill color to potentially match with legend
+    const fill = path.getAttribute('fill');
+
+    path.style.cursor = 'pointer';
+    path.setAttribute('data-tooltip-added', 'true');
+
+    path.addEventListener('mouseenter', function(e) {
+      // Try to find the label from legend or nearby elements
+      let label = '';
+      let dataKey = '';
+
+      // Look for title element inside path
+      const title = path.querySelector('title');
+      if (title) {
+        label = title.textContent;
+      }
+
+      // Try aria-label
+      if (!label) {
+        label = path.getAttribute('aria-label') || '';
+      }
+
+      // Match with our data
+      let matchedData = null;
+      for (const [key, data] of Object.entries(pieChartData)) {
+        if (label.toLowerCase().includes(key.toLowerCase().split(' ').slice(0, 3).join(' '))) {
+          matchedData = data;
+          dataKey = key;
+          break;
+        }
+      }
+
+      // If no match found, try to use index
+      if (!matchedData) {
+        const keys = Object.keys(pieChartData);
+        if (index < keys.length) {
+          dataKey = keys[index];
+          matchedData = pieChartData[dataKey];
+        }
+      }
+
+      if (matchedData) {
+        const percentage = ((matchedData.value / totalTop5) * 100).toFixed(1);
+        tooltip.innerHTML = `
+          <strong>${matchedData.label}</strong><br>
+          ${formatINR(matchedData.value)}<br>
+          <span style="opacity: 0.8">${percentage}% of Top 5</span>
+        `;
+        tooltip.style.display = 'block';
+      }
+    });
+
+    path.addEventListener('mousemove', function(e) {
+      tooltip.style.left = (e.clientX + 15) + 'px';
+      tooltip.style.top = (e.clientY + 15) + 'px';
+    });
+
+    path.addEventListener('mouseleave', function() {
+      tooltip.style.display = 'none';
+    });
+  });
+
+  // Also add tooltips to legend text items
+  const textElements = shadowRoot.querySelectorAll('text');
+  textElements.forEach(text => {
+    if (text.hasAttribute('data-tooltip-added')) return;
+
+    const content = text.textContent.toLowerCase();
+    let matchedData = null;
+
+    for (const [key, data] of Object.entries(pieChartData)) {
+      if (content.includes('mineral fuel') || content.includes('petroleum')) {
+        matchedData = pieChartData['Exports of mineral fuels mineral oils and products of'];
+        break;
+      } else if (content.includes('electrical')) {
+        matchedData = pieChartData['Exports of electrical machinery and equipment and parts thereof'];
+        break;
+      } else if (content.includes('mechanical') || content.includes('machinery')) {
+        matchedData = pieChartData['Exports of machinery and mechanical appliances boilers nuclear'];
+        break;
+      } else if (content.includes('pearl') || content.includes('precious')) {
+        matchedData = pieChartData['Exports of natural cultured pearls precious semi precious stones'];
+        break;
+      } else if (content.includes('pharma')) {
+        matchedData = pieChartData['Exports of pharmaceutical products'];
+        break;
+      }
+    }
+
+    if (matchedData) {
+      text.style.cursor = 'pointer';
+      text.setAttribute('data-tooltip-added', 'true');
+
+      text.addEventListener('mouseenter', function(e) {
+        const percentage = ((matchedData.value / totalTop5) * 100).toFixed(1);
+        tooltip.innerHTML = `
+          <strong>${matchedData.label}</strong><br>
+          ${formatINR(matchedData.value)}<br>
+          <span style="opacity: 0.8">${percentage}% of Top 5</span>
+        `;
+        tooltip.style.display = 'block';
+        tooltip.style.left = (e.clientX + 15) + 'px';
+        tooltip.style.top = (e.clientY + 15) + 'px';
+      });
+
+      text.addEventListener('mousemove', function(e) {
+        tooltip.style.left = (e.clientX + 15) + 'px';
+        tooltip.style.top = (e.clientY + 15) + 'px';
+      });
+
+      text.addEventListener('mouseleave', function() {
+        tooltip.style.display = 'none';
+      });
+    }
+  });
+
+  return paths.length > 0;
+}
+
+// Initialize pie chart tooltips with retry
+function initPieTooltips() {
+  let attempts = 0;
+  const maxAttempts = 10;
+
+  const tryAdd = () => {
+    attempts++;
+    const success = addPieChartTooltips();
+    if (!success && attempts < maxAttempts) {
+      setTimeout(tryAdd, 1000);
+    }
+  };
+
+  setTimeout(tryAdd, 2000);
+}
+
+document.addEventListener('DOMContentLoaded', initPieTooltips);
 </script>
 {% endblock %}
