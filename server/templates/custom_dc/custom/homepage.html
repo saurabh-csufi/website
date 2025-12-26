@@ -73,6 +73,18 @@
       display: flex;
       flex-direction: column;
       flex-shrink: 0;
+      transform: translateX(0);
+      transition: transform 0.3s ease, width 0.3s ease;
+    }
+
+    .left-sidebar.hidden {
+      transform: translateX(-100%);
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      z-index: 100;
+      box-shadow: 4px 0 20px rgba(0,0,0,0.1);
     }
 
     .sidebar-header {
@@ -406,6 +418,35 @@
     }
 
     .settings-fab.visible {
+      display: flex;
+    }
+
+    /* Tools FAB */
+    .tools-fab {
+      display: none;
+      position: fixed;
+      bottom: 24px;
+      left: 24px;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: var(--gov-blue);
+      color: white;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      z-index: 99;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .tools-fab:hover {
+      transform: scale(1.05);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.25);
+    }
+
+    .tools-fab.visible {
       display: flex;
     }
 
@@ -1052,6 +1093,7 @@
           <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
         </svg>
         <span>Tool Activity</span>
+        <button class="sidebar-close" id="close-tools">×</button>
       </div>
       <div class="tool-calls-container" id="tool-calls-container">
         <div class="tool-calls-empty">
@@ -1172,6 +1214,13 @@
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
       <circle cx="12" cy="12" r="3"></circle>
       <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+    </svg>
+  </button>
+
+  <!-- Tools Toggle Button (floating) -->
+  <button class="tools-fab" id="tools-fab" title="Open Tool Activity">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
     </svg>
   </button>
 
@@ -1470,6 +1519,8 @@
       const toolCallsContainer = document.getElementById('tool-calls-container');
       const settingsFab = document.getElementById('settings-fab');
       const closeSettings = document.getElementById('close-settings');
+      const toolsFab = document.getElementById('tools-fab');
+      const closeTools = document.getElementById('close-tools');
       const mcpStatus = document.getElementById('mcp-status');
       const kbStatus = document.getElementById('kb-status');
       const brandingHeader = document.getElementById('branding-header');
@@ -1555,6 +1606,21 @@ To serve as a reliable "Single Source of Truth" for organizational policies and 
           settingsFab.addEventListener('click', () => {
             rightSidebar.classList.remove('hidden');
             settingsFab.classList.remove('visible');
+          });
+        }
+
+        // Tools sidebar toggle
+        if (closeTools) {
+          closeTools.addEventListener('click', () => {
+            leftSidebar.classList.add('hidden');
+            toolsFab.classList.add('visible');
+          });
+        }
+
+        if (toolsFab) {
+          toolsFab.addEventListener('click', () => {
+            leftSidebar.classList.remove('hidden');
+            toolsFab.classList.remove('visible');
           });
         }
 
