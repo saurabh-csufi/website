@@ -45,11 +45,13 @@
     }
 
     /* Full Page Layout - 3 Column */
-    #homepage {
+    #homepage,
+    #homepage.main-content {
       display: flex;
       flex-direction: column;
-      height: calc(100vh - 70px);
-      padding: 0;
+      height: calc(100vh - 56px);
+      padding: 0 !important;
+      margin: 0 !important;
       overflow: hidden;
     }
 
@@ -58,6 +60,9 @@
       display: flex;
       flex: 1;
       overflow: hidden;
+      height: 100%;
+      margin: 0;
+      padding: 0;
     }
 
     /* Left Sidebar - Tool Calls */
@@ -183,7 +188,9 @@
       display: flex;
       flex-direction: column;
       min-width: 0;
+      min-height: 0;
       overflow: hidden;
+      height: 100%;
     }
 
     /* Right Sidebar - Settings */
@@ -408,10 +415,12 @@
       display: flex;
       flex-direction: column;
       background: white;
-      border-radius: 8px;
-      border: 1px solid var(--border-color);
+      border-radius: 0;
+      border: none;
+      border-left: 1px solid var(--border-color);
+      border-right: 1px solid var(--border-color);
       overflow: hidden;
-      min-height: 400px;
+      min-height: 0;
     }
 
     .chat-messages {
@@ -419,7 +428,7 @@
       overflow-y: auto;
       padding: 24px;
       background: linear-gradient(180deg, #f8f9fa 0%, #ffffff 100%);
-      min-height: 300px;
+      min-height: 0;
     }
 
     .message {
@@ -517,38 +526,85 @@
       50% { opacity: 0.7; }
     }
 
-    /* Welcome Message */
-    .welcome-message {
-      text-align: center;
-      padding: 60px 40px;
+    /* Static Branding Header - Compact Horizontal */
+    .branding-header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 10px 20px;
+      background: white;
+      border-bottom: 1px solid var(--border-color);
+      flex-shrink: 0;
+      transition: opacity 0.3s ease, filter 0.3s ease;
     }
 
-    .welcome-icon {
-      width: 80px;
-      height: 80px;
+    .branding-header.inactive {
+      opacity: 0.4;
+      filter: grayscale(50%);
+      pointer-events: none;
+    }
+
+    .branding-header .branding-icon {
+      width: 40px;
+      height: 40px;
       background: linear-gradient(135deg, var(--saffron) 0%, var(--green) 100%);
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      margin: 0 auto 24px;
-      font-size: 36px;
+      font-size: 18px;
+      font-weight: 700;
+      color: white;
+      text-decoration: none;
+      transition: transform 0.2s, box-shadow 0.2s;
+      flex-shrink: 0;
     }
 
-    .welcome-message h2 {
+    .branding-header:not(.inactive) .branding-icon:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .branding-header .branding-text {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.3;
+    }
+
+    .branding-header h2 {
       color: var(--gov-blue);
-      margin: 0 0 12px 0;
-      font-size: 1.5rem;
+      margin: 0;
+      font-size: 1.1rem;
       font-weight: 600;
     }
 
-    .welcome-message p {
+    .branding-header .branding-tagline {
       color: var(--text-muted);
-      margin: 0 0 28px 0;
-      font-size: 1rem;
-      max-width: 500px;
-      margin-left: auto;
-      margin-right: auto;
+      margin: 0;
+      font-size: 0.75rem;
+    }
+
+    .branding-status {
+      display: none;
+      font-size: 0.7rem;
+      color: var(--warning);
+      margin-left: 8px;
+    }
+
+    .branding-header.inactive .branding-status {
+      display: inline;
+    }
+
+    /* Welcome Message - Suggestions Only */
+    .welcome-message {
+      text-align: center;
+      padding: 30px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      flex: 1;
     }
 
     .welcome-message .suggestions {
@@ -556,6 +612,7 @@
       flex-wrap: wrap;
       gap: 10px;
       justify-content: center;
+      max-width: 700px;
     }
 
     .welcome-message .suggestion {
@@ -585,6 +642,7 @@
       background: white;
       border-top: 1px solid var(--border-color);
       padding: 16px 24px;
+      flex-shrink: 0;
     }
 
     .chat-input-row {
@@ -706,7 +764,7 @@
       border-top: 1px solid var(--border-color);
       padding: 16px 24px;
       text-align: center;
-      margin-top: auto;
+      flex-shrink: 0;
     }
 
     .google-footer-content {
@@ -763,7 +821,7 @@
 
     @media (max-width: 768px) {
       #homepage {
-        height: calc(100vh - 60px);
+        height: calc(100vh - 50px);
       }
 
       /* Hide both sidebars on mobile */
@@ -773,6 +831,30 @@
 
       .right-sidebar {
         display: none;
+      }
+
+      /* Smaller branding header on mobile */
+      .branding-header {
+        padding: 8px 12px;
+        gap: 10px;
+      }
+
+      .branding-header .branding-icon {
+        width: 36px;
+        height: 36px;
+        font-size: 16px;
+      }
+
+      .branding-header h2 {
+        font-size: 0.95rem;
+      }
+
+      .branding-header .branding-tagline {
+        font-size: 0.7rem;
+      }
+
+      .branding-status {
+        display: none !important;
       }
 
       .right-sidebar.visible {
@@ -980,20 +1062,23 @@
 
     <!-- Main Chat Area -->
     <main class="main-content">
+      <!-- Static Branding Header -->
+      <div class="branding-header inactive" id="branding-header">
+        <a href="/" class="branding-icon">VS</a>
+        <div class="branding-text">
+          <h2>VYAPAR SAH<span style="color: var(--saffron);">(AI)</span></h2>
+          <p class="branding-tagline">Your Intelligent Business Companion | आपका बुद्धिमान व्यापार सहायक</p>
+        </div>
+        <span class="branding-status">• Configure settings</span>
+      </div>
+
       <div class="chat-area">
         <div class="chat-messages" id="chat-messages">
           <div class="welcome-message" id="welcome-message">
-            <div class="welcome-icon">VS</div>
-            <h2>VYAPAR SAH<span style="color: var(--saffron);">(AI)</span></h2>
-            <p>Your Intelligent Business Companion | आपका बुद्धिमान व्यापार सहायक</p>
             <div class="suggestions">
               <button class="suggestion" data-text="What are the export trends for fish products from India?" disabled>What are the export trends for fish products from India?</button>
-              <button class="suggestion" data-text="What financial assistance is available under the PMEGP scheme for MSMEs?
-              " disabled>What financial assistance is available under the PMEGP scheme for MSMEs?
-            </button>
-            <button class="suggestion" data-text="How can MSMEs avail duty-free import of capital goods?
-            " disabled>How can MSMEs avail duty-free import of capital goods?
-            </button>
+              <button class="suggestion" data-text="What financial assistance is available under the PMEGP scheme for MSMEs?" disabled>What financial assistance is available under the PMEGP scheme for MSMEs?</button>
+              <button class="suggestion" data-text="How can MSMEs avail duty-free import of capital goods?" disabled>How can MSMEs avail duty-free import of capital goods?</button>
             </div>
           </div>
         </div>
@@ -1387,6 +1472,7 @@
       const closeSettings = document.getElementById('close-settings');
       const mcpStatus = document.getElementById('mcp-status');
       const kbStatus = document.getElementById('kb-status');
+      const brandingHeader = document.getElementById('branding-header');
 
       // Models - use different models for different purposes
       const MCP_MODEL = 'gemini-2.0-flash';  // For MCP function calling (proven to work)
@@ -1593,6 +1679,10 @@ To serve as a reliable "Single Source of Truth" for organizational policies and 
         document.querySelectorAll('.suggestion').forEach(btn => {
           btn.disabled = false;
         });
+        // Activate branding header when connected
+        if (brandingHeader) {
+          brandingHeader.classList.remove('inactive');
+        }
       }
 
       // Auto-resize textarea
