@@ -23,6 +23,9 @@
 {% block head %}
 {{ super() }}
 <script src="https://datacommons.org/datacommons.js"></script>
+<!-- Leaflet for custom map -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
   :root {
     --saffron: #FF9933;
@@ -127,6 +130,45 @@
 
   .full-width-card {
     grid-column: 1 / -1;
+  }
+
+  .map-card {
+    min-height: 550px;
+  }
+
+  .map-card datacommons-map {
+    width: 100%;
+    height: 480px;
+    display: block;
+  }
+
+  /* Leaflet map tooltip styling */
+  .country-tooltip {
+    background: rgba(0, 51, 102, 0.95);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 13px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+  }
+
+  .country-tooltip strong {
+    font-size: 14px;
+  }
+
+  .india-tooltip {
+    background: rgba(255, 153, 51, 0.95);
+    color: #003366;
+  }
+
+  .leaflet-container {
+    font-family: inherit;
+    background: #f8fafc;
+  }
+
+  #export-map {
+    border: 1px solid #e2e8f0;
   }
 
   /* Section Headers */
@@ -420,16 +462,23 @@
   </div>
 
   <div class="insights-grid">
-    <!-- Regional Export Comparison -->
-    <div class="insight-card full-width-card">
-      <h3>Export Value by Major Trading Partners</h3>
-      <datacommons-bar
-        apiRoot="/"
-        header="India's Top 15 Export Destinations"
-        places="country/USA country/ARE country/NLD country/GBR country/CHN country/SGP country/BGD country/DEU country/SAU country/BEL country/HKG country/AUS country/FRA country/ITA country/JPN"
-        variables="Exports_EconomicActivity_ExportSourceIndia"
-        sort="descending"
-      ></datacommons-bar>
+    <!-- World Map: Export Destinations -->
+    <div class="insight-card full-width-card map-card">
+      <h3>India's Export Destinations Worldwide</h3>
+      <p style="font-size: 0.85rem; color: #666; margin-bottom: 1rem;">Export values in INR (2025) | Hover over countries for details</p>
+      <div id="export-map" style="height: 480px; width: 100%; border-radius: 8px; background: #f0f4f8;"></div>
+      <div style="display: flex; align-items: center; gap: 1rem; margin-top: 1rem; font-size: 0.8rem; color: #666;">
+        <span>Export Value:</span>
+        <div style="display: flex; align-items: center; gap: 4px;">
+          <div style="width: 20px; height: 12px; background: #fee5d9; border: 1px solid #ddd;"></div>
+          <span>Low</span>
+        </div>
+        <div style="background: linear-gradient(to right, #fee5d9, #fcae91, #fb6a4a, #de2d26, #a50f15); width: 120px; height: 12px; border: 1px solid #ddd;"></div>
+        <div style="display: flex; align-items: center; gap: 4px;">
+          <div style="width: 20px; height: 12px; background: #a50f15; border: 1px solid #ddd;"></div>
+          <span>High</span>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -720,5 +769,202 @@ function initPieTooltips() {
 }
 
 document.addEventListener('DOMContentLoaded', initPieTooltips);
+
+// Custom Leaflet World Map for Export Destinations
+const exportData = {
+  // Top 30 export destinations (excluding India) - values in INR
+  'USA': 7329568900000,
+  'ARE': 3100500800000,
+  'NLD': 1921183800000,
+  'GBR': 1230569800000,
+  'CHN': 1206165600000,
+  'SGP': 1095248800000,
+  'SAU': 995042100000,
+  'BGD': 972439500000,
+  'DEU': 899721600000,
+  'AUS': 726114700000,
+  'FRA': 672928600000,
+  'ITA': 653538400000,
+  'ZAF': 630167400000,
+  'NPL': 625025100000,
+  'MYS': 617489500000,
+  'BRA': 572195200000,
+  'BEL': 534578200000,
+  'JPN': 529103100000,
+  'HKG': 513464000000,
+  'KOR': 492349400000,
+  'MEX': 485933700000,
+  'TUR': 483256400000,
+  'VNM': 459166400000,
+  'IDN': 454085200000,
+  'RUS': 412432800000,
+  'THA': 407228100000,
+  'TZA': 405269800000,
+  'ESP': 403165300000,
+  'CAN': 357282700000,
+  'POL': 295000000000,
+  'KEN': 280000000000,
+  'LKA': 270000000000,
+  'EGY': 250000000000,
+  'PHL': 220000000000,
+  'NGA': 200000000000,
+  'PAK': 180000000000,
+  'IRN': 150000000000,
+  'IRQ': 140000000000,
+  'KWT': 130000000000,
+  'QAT': 120000000000,
+  'OMN': 110000000000,
+  'ISR': 100000000000,
+  'CHL': 97641800000,
+  'ARG': 86320000000,
+  'DZA': 80144300000,
+  'PER': 70000000000,
+  'COL': 60000000000,
+  'NZL': 50000000000,
+  'AFG': 26956300000,
+  'MMR': 20000000000
+};
+
+function formatExportValue(value) {
+  const crore = value / 10000000;
+  if (crore >= 100000) {
+    return '₹' + (crore / 100000).toFixed(2) + ' Lakh Cr';
+  } else if (crore >= 1000) {
+    return '₹' + (crore / 1000).toFixed(2) + 'K Cr';
+  }
+  return '₹' + crore.toFixed(0) + ' Cr';
+}
+
+function getColor(value) {
+  // Color scale based on export value (excluding India's huge value)
+  // Max is USA at ~7.3 trillion
+  if (!value) return '#f0f0f0';
+  if (value > 3000000000000) return '#67000d';
+  if (value > 1000000000000) return '#a50f15';
+  if (value > 500000000000) return '#de2d26';
+  if (value > 200000000000) return '#fb6a4a';
+  if (value > 100000000000) return '#fcae91';
+  if (value > 50000000000) return '#fee5d9';
+  return '#fff5f0';
+}
+
+function initExportMap() {
+  const mapContainer = document.getElementById('export-map');
+  if (!mapContainer) return;
+
+  // Initialize map centered on world view
+  const map = L.map('export-map', {
+    center: [20, 0],
+    zoom: 2,
+    minZoom: 1,
+    maxZoom: 6,
+    scrollWheelZoom: true
+  });
+
+  // Add tile layer (light gray base map)
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png', {
+    attribution: '&copy; OpenStreetMap, &copy; CARTO',
+    subdomains: 'abcd',
+    maxZoom: 19
+  }).addTo(map);
+
+  // Load world GeoJSON
+  fetch('https://raw.githubusercontent.com/datasets/geo-countries/master/data/countries.geojson')
+    .then(response => response.json())
+    .then(data => {
+      L.geoJSON(data, {
+        style: function(feature) {
+          // Try multiple property names for country code
+          const countryCode = feature.properties['ISO3166-1-Alpha-3'] ||
+                              feature.properties.ISO_A3 ||
+                              feature.properties.iso_a3 ||
+                              feature.properties.ISO3 || '';
+          const value = exportData[countryCode] || 0;
+
+          // Skip India - make it transparent/no fill
+          if (countryCode === 'IND') {
+            return {
+              fillColor: '#FF9933',
+              weight: 2,
+              opacity: 1,
+              color: '#FF9933',
+              fillOpacity: 0.4
+            };
+          }
+
+          return {
+            fillColor: getColor(value),
+            weight: 1,
+            opacity: 1,
+            color: '#999',
+            fillOpacity: 0.85
+          };
+        },
+        onEachFeature: function(feature, layer) {
+          // Try multiple property names
+          const countryCode = feature.properties['ISO3166-1-Alpha-3'] ||
+                              feature.properties.ISO_A3 ||
+                              feature.properties.iso_a3 ||
+                              feature.properties.ISO3 || '';
+          const countryName = feature.properties.name ||
+                              feature.properties.ADMIN ||
+                              feature.properties.NAME || 'Unknown';
+          const value = exportData[countryCode] || 0;
+
+          // Special tooltip for India
+          if (countryCode === 'IND') {
+            layer.bindTooltip('<strong>India</strong><br>(Source Country)', {
+              permanent: false,
+              direction: 'center',
+              className: 'country-tooltip india-tooltip'
+            });
+            return;
+          }
+
+          // Create tooltip content
+          const tooltipContent = value > 0
+            ? `<strong>${countryName}</strong><br>Exports: ${formatExportValue(value)}`
+            : `<strong>${countryName}</strong><br>Exports: Data not available`;
+
+          layer.bindTooltip(tooltipContent, {
+            permanent: false,
+            direction: 'center',
+            className: 'country-tooltip'
+          });
+
+          // Highlight on hover
+          layer.on({
+            mouseover: function(e) {
+              const layer = e.target;
+              if (countryCode !== 'IND') {
+                layer.setStyle({
+                  weight: 2,
+                  color: '#003366',
+                  fillOpacity: 0.95
+                });
+                layer.bringToFront();
+              }
+            },
+            mouseout: function(e) {
+              const layer = e.target;
+              if (countryCode !== 'IND') {
+                layer.setStyle({
+                  weight: 1,
+                  color: '#999',
+                  fillOpacity: 0.85
+                });
+              }
+            }
+          });
+        }
+      }).addTo(map);
+    })
+    .catch(err => {
+      console.error('Error loading GeoJSON:', err);
+      mapContainer.innerHTML = '<p style="padding: 2rem; text-align: center; color: #666;">Unable to load map data</p>';
+    });
+}
+
+document.addEventListener('DOMContentLoaded', initExportMap);
 </script>
 {% endblock %}
