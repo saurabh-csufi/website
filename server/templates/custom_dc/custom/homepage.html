@@ -926,11 +926,36 @@
       border-bottom: 2px solid var(--saffron);
     }
 
+    .dc-chart-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 12px;
+      padding-top: 8px;
+      border-top: 1px solid var(--border-color);
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
     .dc-chart-unit {
       font-size: 0.8rem;
       color: var(--text-muted);
-      margin-top: 8px;
-      text-align: right;
+    }
+
+    .dc-chart-source {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .dc-chart-source a {
+      color: var(--gov-blue);
+      text-decoration: none;
+    }
+
+    .dc-chart-source a:hover {
+      text-decoration: underline;
     }
   </style>
 {% endblock %}
@@ -962,7 +987,6 @@
             <h2>VYAPAR SAH<span style="color: var(--saffron);">(AI)</span></h2>
             <p>Your Intelligent Business Companion | आपका बुद्धिमान व्यापार सहायक</p>
             <div class="suggestions">
-              <button class="suggestion" data-text="what are rate of exports in India for the past 5 years?" disabled>what are rate of exports in India for the past 5 years?</button>
               <button class="suggestion" data-text="What are the export trends for fish products from India?" disabled>What are the export trends for fish products from India?</button>
               <button class="suggestion" data-text="What financial assistance is available under the PMEGP scheme for MSMEs?
               " disabled>What financial assistance is available under the PMEGP scheme for MSMEs?
@@ -1082,6 +1106,7 @@
       let conversationHistory = [];
       let isProcessing = false;
       let lastChartAnalysis = null;
+      let lastDataSource = null;  // Track the data source from MCP responses
 
       // Chart.js Script Loader
       let chartJsLoaded = false;
@@ -1171,15 +1196,20 @@
           const multiplePlaces = datasets.length > 1;
           let chartType = hasTimeSeries ? 'line' : 'bar';
 
-          // Get unit from source metadata if available
-          const unit = data.source_metadata?.unit || '';
+          // Extract source metadata - fields from Data Commons MCP
+          const sourceMetadata = data.source_metadata || {};
+          const unit = sourceMetadata.unit || '';
+          const sourceName = sourceMetadata.import_name || sourceMetadata.source_name || 'Data Commons';
+          const sourceUrl = sourceMetadata.provenance_url || sourceMetadata.source_url || '';
 
           console.log('Chart analysis complete:', {
             chartType,
             variableName,
             labels,
             datasetsCount: datasets.length,
-            unit
+            unit,
+            sourceName,
+            sourceUrl
           });
 
           return {
@@ -1187,7 +1217,9 @@
             variableName,
             labels,
             datasets,
-            unit
+            unit,
+            sourceName,
+            sourceUrl
           };
         } catch (e) {
           console.error('Error analyzing chart data:', e);
@@ -1223,14 +1255,27 @@
         if (!chartData) return '';
 
         const chartId = `chart-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-        const { chartType, variableName, labels, datasets, unit } = chartData;
+        const { chartType, variableName, labels, datasets, unit, sourceName, sourceUrl } = chartData;
+
+        // Build source attribution HTML
+        let sourceHtml = '';
+        if (sourceName || sourceUrl) {
+          if (sourceUrl) {
+            sourceHtml = `<div class="dc-chart-source">Source: <a href="${escapeHtml(sourceUrl)}" target="_blank" rel="noopener">${escapeHtml(sourceName || sourceUrl)}</a></div>`;
+          } else {
+            sourceHtml = `<div class="dc-chart-source">Source: ${escapeHtml(sourceName)}</div>`;
+          }
+        }
 
         // Create chart container HTML
         const containerHtml = `
           <div class="dc-chart-container" id="${chartId}-container">
             <div class="dc-chart-title">${escapeHtml(variableName)}</div>
             <canvas id="${chartId}" style="max-height: 300px;"></canvas>
-            ${unit ? `<div class="dc-chart-unit">Unit: ${escapeHtml(unit)}</div>` : ''}
+            <div class="dc-chart-footer">
+              ${unit ? `<span class="dc-chart-unit">Unit: ${escapeHtml(unit)}</span>` : ''}
+              ${sourceHtml}
+            </div>
           </div>
         `;
 
@@ -1624,16 +1669,41 @@ To serve as a reliable "Single Source of Truth" for organizational policies and 
         }
         resultEl.textContent = displayResult;
 
-        // Analyze for chart data if this is a get_observations call
+        // Analyze for chart data and extract source if this is a get_observations call
         if (!isError && toolName === 'get_observations') {
           try {
             const chartData = analyzeChartData(toolName, result);
             if (chartData) {
               lastChartAnalysis = chartData;
               console.log('Chart data extracted:', chartData);
+
+              // Also store source info for text responses
+              if (chartData.sourceName || chartData.sourceUrl) {
+                lastDataSource = {
+                  name: chartData.sourceName,
+                  url: chartData.sourceUrl
+                };
+                console.log('Data source stored:', lastDataSource);
+              }
             }
           } catch (e) {
             console.error('Chart analysis error:', e);
+          }
+        }
+
+        // Also try to extract source from search_indicators results
+        if (!isError && toolName === 'search_indicators') {
+          try {
+            const data = typeof result === 'string' ? JSON.parse(result) : result;
+            // search_indicators doesn't return source directly, but we note it's from Data Commons
+            if (data.variables || data.topics) {
+              lastDataSource = {
+                name: 'Data Commons',
+                url: 'https://datacommons.org'
+              };
+            }
+          } catch (e) {
+            // Ignore parse errors
           }
         }
       }
@@ -1680,18 +1750,18 @@ To serve as a reliable "Single Source of Truth" for organizational policies and 
             };
 
             // Add tools if MCP is connected
-            const dataKeywords = /population|gdp|unemployment|rate|statistics|data|how many|what is the|number of|percent|average|median|income|health|economy|demographics|emissions|climate|crime|education/i;
+            const dataKeywords = /population|gdp|unemployment|rate|statistics|data|how many|what is the|number of|percent|average|median|income|health|economy|demographics|emissions|climate|crime|education|exports|imports|export|import|trade|dairy|agriculture|production|manufacturing|industry|growth|trend|value|amount|total/i;
             const isDataQuery = dataKeywords.test(userMessage);
 
             if (iteration >= 3) {
               // Don't include tools - force pure text response
               console.log(`MCP Iteration ${iteration}: Forcing text response (no tools)`);
             } else {
-              // Simplify tool descriptions for Gemini
+              // Simplify tool descriptions for Gemini - use longer limit for better understanding
               const simplifiedTools = mcpTools.map(t => ({
                 name: t.name,
-                description: t.description.length > 500
-                  ? t.description.substring(0, 500) + '...'
+                description: t.description.length > 2000
+                  ? t.description.substring(0, 2000) + '...'
                   : t.description,
                 parameters: t.parameters
               }));
@@ -1890,6 +1960,9 @@ To serve as a reliable "Single Source of Truth" for organizational policies and 
         // Clear previous tool calls from left sidebar
         clearToolCalls();
 
+        // Reset data source tracking for new query
+        lastDataSource = null;
+
         // Show user message
         addMessage('user', message);
 
@@ -2057,8 +2130,24 @@ Provide a natural, combined response that integrates both pieces of information 
           }
 
           // Add sources at the end if available
+          const allSources = [];
+
+          // Add MCP/Data Commons source
+          if (lastDataSource) {
+            if (lastDataSource.url) {
+              allSources.push(`[${lastDataSource.name || 'Data Commons'}](${lastDataSource.url})`);
+            } else if (lastDataSource.name) {
+              allSources.push(lastDataSource.name);
+            }
+          }
+
+          // Add KB sources
           if (sources.length > 0) {
-            finalResponse += '\n\n**Sources:** ' + sources.join(', ');
+            allSources.push(...sources);
+          }
+
+          if (allSources.length > 0) {
+            finalResponse += '\n\n**Data Sources:** ' + allSources.join(' | ');
             streamingMessage.setText(finalResponse);
           }
 
@@ -2071,6 +2160,9 @@ Provide a natural, combined response that integrates both pieces of information 
             await injectChartIntoMessage(streamingMessage.element, lastChartAnalysis);
             lastChartAnalysis = null;  // Reset for next query
           }
+
+          // Reset data source
+          lastDataSource = null;
 
           // Update conversation history
           conversationHistory.push({ role: 'user', parts: [{ text: userMessage }] });
@@ -2211,7 +2303,24 @@ Provide a natural, combined response that integrates both pieces of information 
       }
 
       function formatMessage(content) {
-        let formatted = escapeHtml(content);
+        // First extract and preserve markdown links before escaping
+        const linkPlaceholders = [];
+        let processed = content.replace(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g, (match, text, url) => {
+          const placeholder = `__LINK_${linkPlaceholders.length}__`;
+          linkPlaceholders.push({ text, url });
+          return placeholder;
+        });
+
+        // Now escape HTML
+        let formatted = escapeHtml(processed);
+
+        // Restore links as proper HTML anchors
+        linkPlaceholders.forEach((link, i) => {
+          formatted = formatted.replace(`__LINK_${i}__`,
+            `<a href="${escapeHtml(link.url)}" target="_blank" rel="noopener" style="color: var(--gov-blue);">${escapeHtml(link.text)}</a>`);
+        });
+
+        // Apply other markdown formatting
         formatted = formatted.replace(/```(\w*)\n([\s\S]*?)```/g, '<pre><code>$2</code></pre>');
         formatted = formatted.replace(/`([^`]+)`/g, '<code>$1</code>');
         formatted = formatted.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
