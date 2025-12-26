@@ -203,7 +203,7 @@
   /* Small Cards Grid for Gauge/Pie */
   .small-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
     gap: 1.5rem;
     margin-bottom: 2rem;
   }
@@ -258,6 +258,12 @@
   @media (max-width: 1200px) {
     .highlight-section {
       grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  @media (max-width: 1024px) {
+    .small-grid {
+      grid-template-columns: repeat(2, 1fr);
     }
   }
 
@@ -352,59 +358,15 @@
   </div>
 
   <div class="insights-grid">
-    <!-- Line Chart: Commodity Export Trends -->
-    <div class="insight-card">
-      <h3>Top Export Trends (2020-2025)</h3>
+    <!-- Line Chart: Commodity Export Trends - Full Width -->
+    <div class="insight-card full-width-card">
+      <h3>Top 5 Export Trends (2020-2025)</h3>
       <datacommons-line
         apiRoot="/"
         header="Export Values Over Time"
         places="country/IND"
-        variables="Exports_EconomicActivity_MineralFuelsMineralOilsAndProductsOfTheir Exports_EconomicActivity_ElectricalMachineryAndEquipmentAndPartsThereof Exports_EconomicActivity_PharmaceuticalProducts"
-      ></datacommons-line>
-    </div>
-
-    <!-- Bar Chart: Top Commodities -->
-    <div class="insight-card saffron-border">
-      <h3>Top 5 Export Categories Comparison</h3>
-      <datacommons-bar
-        apiRoot="/"
-        header="Export Values by Category"
-        places="country/IND"
         variables="Exports_EconomicActivity_MineralFuelsMineralOilsAndProductsOfTheir Exports_EconomicActivity_ElectricalMachineryAndEquipmentAndPartsThereof Exports_EconomicActivity_MachineryAndMechanicalAppliancesBoilersNuclear Exports_EconomicActivity_NaturalCulturedPearlsPreciousSemiPreciousStones Exports_EconomicActivity_PharmaceuticalProducts"
-        sort="descending"
-      ></datacommons-bar>
-    </div>
-  </div>
-
-  <!-- Country-wise Exports Section -->
-  <div class="section-header">
-    <div class="icon">W</div>
-    <h2>Country-wise Export Destinations</h2>
-  </div>
-
-  <div class="insights-grid">
-    <!-- Bar Chart: Top Export Destinations -->
-    <div class="insight-card green-border">
-      <h3>Top Export Destination Countries</h3>
-      <datacommons-bar
-        apiRoot="/"
-        header="India's Exports by Destination"
-        places="country/USA country/ARE country/GBR country/DEU country/AUS country/CHN"
-        variables="Exports_EconomicActivity_ExportSourceIndia"
-        sort="descending"
-      ></datacommons-bar>
-    </div>
-
-    <!-- Ranking Chart: Top Destinations -->
-    <div class="insight-card">
-      <h3>Ranking: Top Export Destinations</h3>
-      <datacommons-bar
-        apiRoot="/"
-        header="Countries by Export Value from India"
-        places="country/USA country/ARE country/NLD country/GBR country/CHN country/SGP country/BGD country/DEU country/SAU country/BEL"
-        variables="Exports_EconomicActivity_ExportSourceIndia"
-        sort="descending"
-      ></datacommons-bar>
+      ></datacommons-line>
     </div>
   </div>
 
@@ -428,12 +390,12 @@
       ></datacommons-pie>
     </div>
 
-    <!-- Gauge: Petroleum Growth Rate -->
+    <!-- Gauge: Petroleum Growth Rate (-22%) -->
     <div class="small-card">
-      <h3>Petroleum Exports Growth Rate</h3>
+      <h3>Petroleum Growth Rate</h3>
       <datacommons-gauge
         apiRoot="/"
-        header="Year-over-Year Growth (%)"
+        header="YoY Growth (%)"
         place="country/IND"
         variable="GrowthRate_Exports_EconomicActivity_MineralFuelsMineralOilsAndProductsOfTheir"
         min="-50"
@@ -441,12 +403,51 @@
       ></datacommons-gauge>
     </div>
 
-    <!-- Gauge: Pharma Growth Rate -->
+    <!-- Gauge: Electronics Growth Rate (+31%) -->
     <div class="small-card">
-      <h3>Pharma Exports Growth Rate</h3>
+      <h3>Electronics Growth Rate</h3>
       <datacommons-gauge
         apiRoot="/"
-        header="Year-over-Year Growth (%)"
+        header="YoY Growth (%)"
+        place="country/IND"
+        variable="GrowthRate_Exports_EconomicActivity_ElectricalMachineryAndEquipmentAndPartsThereof"
+        min="-50"
+        max="50"
+      ></datacommons-gauge>
+    </div>
+
+    <!-- Gauge: Machinery Growth Rate (+14%) -->
+    <div class="small-card">
+      <h3>Machinery Growth Rate</h3>
+      <datacommons-gauge
+        apiRoot="/"
+        header="YoY Growth (%)"
+        place="country/IND"
+        variable="GrowthRate_Exports_EconomicActivity_MachineryAndMechanicalAppliancesBoilersNuclear"
+        min="-50"
+        max="50"
+      ></datacommons-gauge>
+    </div>
+
+    <!-- Gauge: Gems Growth Rate (-7%) -->
+    <div class="small-card">
+      <h3>Gems & Jewellery Growth Rate</h3>
+      <datacommons-gauge
+        apiRoot="/"
+        header="YoY Growth (%)"
+        place="country/IND"
+        variable="GrowthRate_Exports_EconomicActivity_NaturalCulturedPearlsPreciousSemiPreciousStones"
+        min="-50"
+        max="50"
+      ></datacommons-gauge>
+    </div>
+
+    <!-- Gauge: Pharma Growth Rate (+14%) -->
+    <div class="small-card">
+      <h3>Pharma Growth Rate</h3>
+      <datacommons-gauge
+        apiRoot="/"
+        header="YoY Growth (%)"
         place="country/IND"
         variable="GrowthRate_Exports_EconomicActivity_PharmaceuticalProducts"
         min="-50"
@@ -501,81 +502,102 @@
 <script>
 // Convert Billion/Trillion display to Crore (Indian numbering system)
 // 1 Billion = 100 Crore, 1 Trillion = 1,00,000 Crore (1 Lakh Crore)
-function convertToCrore(text) {
-  // Match patterns like "5.66T", "532B", "2.08T", etc.
-  const match = text.match(/^([\d.]+)([BTM])?$/i);
-  if (!match) return text;
+function convertToIndianFormat(text) {
+  if (!text) return text;
+
+  // Match patterns like "5.66T", "532B", "2.08T", "10T INR", "8T INR" etc.
+  const match = text.match(/([\d.]+)\s*([TBM])\s*(INR)?/i);
+  if (!match) return null;
 
   let value = parseFloat(match[1]);
-  const suffix = (match[2] || '').toUpperCase();
+  const suffix = match[2].toUpperCase();
 
-  // Convert to Crore
-  let croreValue;
+  // Convert to Lakh Crore
+  let lakhCrore;
   if (suffix === 'T') {
-    // Trillion to Crore: 1T = 1,00,000 Crore
-    croreValue = value * 100000;
+    // Trillion to Lakh Crore: 1T = 1 Lakh Crore
+    lakhCrore = value;
   } else if (suffix === 'B') {
-    // Billion to Crore: 1B = 100 Crore
-    croreValue = value * 100;
+    // Billion to Lakh Crore: 1B = 0.01 Lakh Crore
+    lakhCrore = value / 100;
   } else if (suffix === 'M') {
-    // Million to Crore: 1M = 0.1 Crore
-    croreValue = value * 0.1;
+    // Million to Lakh Crore
+    lakhCrore = value / 100000;
   } else {
-    return text;
+    return null;
   }
 
-  // Format in Indian style with Lakh Crore if needed
-  if (croreValue >= 100000) {
-    // Show as Lakh Crore
-    const lakhCrore = croreValue / 100000;
-    return lakhCrore.toFixed(2) + ' L Cr';
-  } else if (croreValue >= 1000) {
-    // Show in thousands of crore with comma
-    return croreValue.toLocaleString('en-IN', {maximumFractionDigits: 0}) + ' Cr';
+  // Format output
+  if (lakhCrore >= 1) {
+    return '₹' + lakhCrore.toFixed(2) + ' L Cr';
   } else {
-    return croreValue.toFixed(0) + ' Cr';
+    const crore = lakhCrore * 100000;
+    if (crore >= 1000) {
+      return '₹' + (crore / 1000).toFixed(1) + 'K Cr';
+    }
+    return '₹' + crore.toFixed(0) + ' Cr';
   }
 }
 
-function updateHighlightValues() {
-  // Find all highlight cards and update their displayed values
+function convertAllValues() {
+  // Convert highlight card values
   const highlights = document.querySelectorAll('datacommons-highlight');
   highlights.forEach(highlight => {
-    const shadowRoot = highlight.shadowRoot;
-    if (shadowRoot) {
-      // Look for the big number display
-      const bigNum = shadowRoot.querySelector('.big-num, .highlight-value, [class*="value"]');
-      if (bigNum && bigNum.textContent) {
-        const original = bigNum.textContent.trim();
-        const converted = convertToCrore(original);
-        if (converted !== original) {
-          bigNum.textContent = converted;
+    if (!highlight.shadowRoot) return;
+
+    // Find all text elements that might contain values
+    const allElements = highlight.shadowRoot.querySelectorAll('*');
+    allElements.forEach(el => {
+      if (el.children.length === 0 && el.textContent) {
+        const text = el.textContent.trim();
+        if (/^\d+\.?\d*[TBM]\s*(INR)?$/i.test(text)) {
+          const converted = convertToIndianFormat(text);
+          if (converted && !el.dataset.converted) {
+            el.textContent = converted;
+            el.dataset.converted = 'true';
+          }
         }
       }
-    }
+    });
+  });
+
+  // Convert chart axis labels (line, bar charts)
+  const charts = document.querySelectorAll('datacommons-line, datacommons-bar');
+  charts.forEach(chart => {
+    if (!chart.shadowRoot) return;
+
+    // Find SVG text elements (axis labels)
+    const textElements = chart.shadowRoot.querySelectorAll('text');
+    textElements.forEach(text => {
+      const content = text.textContent.trim();
+      // Match axis labels like "10T INR", "8T INR", "6T INR"
+      if (/^\d+\.?\d*[TBM]\s*INR$/i.test(content)) {
+        const converted = convertToIndianFormat(content);
+        if (converted && !text.dataset.converted) {
+          text.textContent = converted;
+          text.dataset.converted = 'true';
+        }
+      }
+    });
   });
 }
 
-// Use MutationObserver to detect when highlight values are rendered
+// Run conversion multiple times as components load
 document.addEventListener('DOMContentLoaded', function() {
-  // Initial check after a delay for components to load
-  setTimeout(updateHighlightValues, 2000);
-  setTimeout(updateHighlightValues, 4000);
-
-  // Also observe for changes
-  const observer = new MutationObserver(function(mutations) {
-    updateHighlightValues();
+  // Run at various intervals to catch when components render
+  [1000, 2000, 3000, 4000, 5000, 7000, 10000].forEach(delay => {
+    setTimeout(convertAllValues, delay);
   });
 
-  // Observe the highlight section
-  const highlightSection = document.querySelector('.highlight-section');
-  if (highlightSection) {
-    observer.observe(highlightSection, {
-      childList: true,
-      subtree: true,
-      characterData: true
-    });
-  }
+  // Also use MutationObserver
+  const observer = new MutationObserver(() => {
+    setTimeout(convertAllValues, 500);
+  });
+
+  observer.observe(document.body, {
+    childList: true,
+    subtree: true
+  });
 });
 
 // Pie Chart Hover Tooltips
