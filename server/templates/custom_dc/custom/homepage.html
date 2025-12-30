@@ -22,22 +22,31 @@
 {% block head %}
   {{ super() }}
   <style>
-    /* Government of India - MSME Portal Styles */
+    /* Google Brand Colors + MSME Portal Styles */
     :root {
-      --gov-blue: #003366;
-      --gov-blue-light: #004080;
-      --gov-blue-dark: #001a33;
-      --saffron: #FF9933;
+      /* Google Brand Colors */
+      --google-blue: #4285F4;
+      --google-red: #EA4335;
+      --google-yellow: #FBBC04;
+      --google-green: #34A853;
+      --google-grey: #3C4043;
+      --google-grey-500: #9AA0A6;
+
+      /* Primary UI Colors (using Google palette) */
+      --gov-blue: #4285F4;
+      --gov-blue-light: #5a95f5;
+      --gov-blue-dark: #3367d6;
+      --saffron: #FBBC04;
       --white: #FFFFFF;
-      --green: #138808;
-      --chakra-blue: #000080;
-      --text-dark: #1a1a2e;
-      --text-muted: #5f6368;
-      --bg-light: #f5f7fa;
-      --border-color: #dee2e6;
-      --success: #28a745;
-      --warning: #ffc107;
-      --danger: #dc3545;
+      --green: #34A853;
+      --chakra-blue: #4285F4;
+      --text-dark: #3C4043;
+      --text-muted: #9AA0A6;
+      --bg-light: #f8f9fa;
+      --border-color: #dadce0;
+      --success: #34A853;
+      --warning: #FBBC04;
+      --danger: #EA4335;
     }
 
     * {
