@@ -28,11 +28,20 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
   :root {
-    --saffron: #FF9933;
+    /* Google Brand Colors */
+    --google-blue: #4285F4;
+    --google-red: #EA4335;
+    --google-yellow: #FBBC04;
+    --google-green: #34A853;
+    --google-grey: #3C4043;
+    --google-grey-500: #9AA0A6;
+
+    /* Primary UI Colors (using Google palette) */
+    --saffron: #FBBC04;
     --white: #FFFFFF;
-    --green: #138808;
-    --navy: #003366;
-    --chakra-blue: #000080;
+    --green: #34A853;
+    --navy: #4285F4;
+    --chakra-blue: #4285F4;
   }
 
   .insights-container {
@@ -223,6 +232,84 @@
     font-weight: 600;
   }
 
+  /* Custom Gauge Styles - Clean Design */
+  .custom-gauge-container {
+    position: relative;
+    width: 100%;
+    height: 200px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding-top: 20px;
+  }
+
+  .gauge-canvas-wrapper {
+    position: relative;
+    width: 180px;
+    height: 100px;
+  }
+
+  .gauge-canvas {
+    display: block;
+  }
+
+  .gauge-value {
+    text-align: center;
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: var(--google-grey);
+    margin-top: 4px;
+    line-height: 1;
+  }
+
+  .gauge-value.positive {
+    color: #34A853;  /* Google Green */
+  }
+
+  .gauge-value.negative {
+    color: #EA4335;  /* Google Red */
+  }
+
+  .gauge-value.positive.small {
+    color: #4285F4;  /* Google Blue for small positive */
+  }
+
+  .gauge-value.negative.small {
+    color: #F9AB00;  /* Orange for small negative */
+  }
+
+  .gauge-label {
+    font-size: 0.8rem;
+    color: var(--google-grey-500);
+    margin-top: 6px;
+    text-align: center;
+  }
+
+  .gauge-range {
+    display: flex;
+    justify-content: space-between;
+    width: 180px;
+    font-size: 0.65rem;
+    color: var(--google-grey-500);
+    margin-top: 2px;
+  }
+
+  .gauge-source {
+    font-size: 0.75rem;
+    color: var(--google-grey-500);
+    margin-top: 10px;
+  }
+
+  .gauge-source a {
+    color: var(--navy);
+    text-decoration: none;
+  }
+
+  .gauge-source a:hover {
+    text-decoration: underline;
+  }
+
   /* Footer */
   .insights-footer {
     text-align: center;
@@ -393,66 +480,71 @@
     <!-- Gauge: Petroleum Growth Rate (-22%) -->
     <div class="small-card">
       <h3>Petroleum Growth Rate</h3>
-      <datacommons-gauge
-        apiRoot="/"
-        header="YoY Growth (%)"
-        place="country/IND"
-        variable="GrowthRate_Exports_EconomicActivity_MineralFuelsMineralOilsAndProductsOfTheir"
-        min="-50"
-        max="50"
-      ></datacommons-gauge>
+      <div class="custom-gauge-container" id="gauge-petroleum" data-value="-22" data-label="Petroleum Products">
+        <div class="gauge-canvas-wrapper">
+          <canvas class="gauge-canvas" width="180" height="100"></canvas>
+        </div>
+        <div class="gauge-value">--</div>
+        <div class="gauge-label">YoY Growth (%)</div>
+        <div class="gauge-range"><span>-100%</span><span>0%</span><span>+100%</span></div>
+        <div class="gauge-source">Source: <a href="https://tradestat.commerce.gov.in" target="_blank">tradestat.commerce.gov.in</a></div>
+      </div>
     </div>
 
     <!-- Gauge: Electronics Growth Rate (+31%) -->
     <div class="small-card">
       <h3>Electronics Growth Rate</h3>
-      <datacommons-gauge
-        apiRoot="/"
-        header="YoY Growth (%)"
-        place="country/IND"
-        variable="GrowthRate_Exports_EconomicActivity_ElectricalMachineryAndEquipmentAndPartsThereof"
-        min="-50"
-        max="50"
-      ></datacommons-gauge>
+      <div class="custom-gauge-container" id="gauge-electronics" data-value="31.1" data-label="Electronics">
+        <div class="gauge-canvas-wrapper">
+          <canvas class="gauge-canvas" width="180" height="100"></canvas>
+        </div>
+        <div class="gauge-value">--</div>
+        <div class="gauge-label">YoY Growth (%)</div>
+        <div class="gauge-range"><span>-100%</span><span>0%</span><span>+100%</span></div>
+        <div class="gauge-source">Source: <a href="https://tradestat.commerce.gov.in" target="_blank">tradestat.commerce.gov.in</a></div>
+      </div>
     </div>
 
     <!-- Gauge: Machinery Growth Rate (+14%) -->
     <div class="small-card">
       <h3>Machinery Growth Rate</h3>
-      <datacommons-gauge
-        apiRoot="/"
-        header="YoY Growth (%)"
-        place="country/IND"
-        variable="GrowthRate_Exports_EconomicActivity_MachineryAndMechanicalAppliancesBoilersNuclear"
-        min="-50"
-        max="50"
-      ></datacommons-gauge>
+      <div class="custom-gauge-container" id="gauge-machinery" data-value="13.8" data-label="Machinery">
+        <div class="gauge-canvas-wrapper">
+          <canvas class="gauge-canvas" width="180" height="100"></canvas>
+        </div>
+        <div class="gauge-value">--</div>
+        <div class="gauge-label">YoY Growth (%)</div>
+        <div class="gauge-range"><span>-100%</span><span>0%</span><span>+100%</span></div>
+        <div class="gauge-source">Source: <a href="https://tradestat.commerce.gov.in" target="_blank">tradestat.commerce.gov.in</a></div>
+      </div>
     </div>
 
     <!-- Gauge: Gems Growth Rate (-7%) -->
     <div class="small-card">
       <h3>Gems & Jewellery Growth Rate</h3>
-      <datacommons-gauge
-        apiRoot="/"
-        header="YoY Growth (%)"
-        place="country/IND"
-        variable="GrowthRate_Exports_EconomicActivity_NaturalCulturedPearlsPreciousSemiPreciousStones"
-        min="-50"
-        max="50"
-      ></datacommons-gauge>
+      <div class="custom-gauge-container" id="gauge-gems" data-value="-6.8" data-label="Gems & Jewellery">
+        <div class="gauge-canvas-wrapper">
+          <canvas class="gauge-canvas" width="180" height="100"></canvas>
+        </div>
+        <div class="gauge-value">--</div>
+        <div class="gauge-label">YoY Growth (%)</div>
+        <div class="gauge-range"><span>-100%</span><span>0%</span><span>+100%</span></div>
+        <div class="gauge-source">Source: <a href="https://tradestat.commerce.gov.in" target="_blank">tradestat.commerce.gov.in</a></div>
+      </div>
     </div>
 
     <!-- Gauge: Pharma Growth Rate (+14%) -->
     <div class="small-card">
       <h3>Pharma Growth Rate</h3>
-      <datacommons-gauge
-        apiRoot="/"
-        header="YoY Growth (%)"
-        place="country/IND"
-        variable="GrowthRate_Exports_EconomicActivity_PharmaceuticalProducts"
-        min="-50"
-        max="50"
-      ></datacommons-gauge>
+      <div class="custom-gauge-container" id="gauge-pharma" data-value="13.7" data-label="Pharmaceuticals">
+        <div class="gauge-canvas-wrapper">
+          <canvas class="gauge-canvas" width="180" height="100"></canvas>
+        </div>
+        <div class="gauge-value">--</div>
+        <div class="gauge-label">YoY Growth (%)</div>
+        <div class="gauge-range"><span>-100%</span><span>0%</span><span>+100%</span></div>
+        <div class="gauge-source">Source: <a href="https://tradestat.commerce.gov.in" target="_blank">tradestat.commerce.gov.in</a></div>
+      </div>
     </div>
   </div>
 
@@ -874,20 +966,31 @@ function initExportMap() {
   const mapContainer = document.getElementById('export-map');
   if (!mapContainer) return;
 
-  // Initialize map centered on world view
+  // Define world bounds to prevent map repetition
+  const worldBounds = L.latLngBounds(
+    L.latLng(-85, -180),  // Southwest corner
+    L.latLng(85, 180)     // Northeast corner
+  );
+
+  // Initialize map centered on world view with bounds to prevent repetition
   const map = L.map('export-map', {
     center: [20, 0],
     zoom: 2,
-    minZoom: 1,
+    minZoom: 2,           // Prevent zooming out too far
     maxZoom: 6,
-    scrollWheelZoom: true
+    scrollWheelZoom: true,
+    worldCopyJump: false, // Prevent world copy jumping
+    maxBounds: worldBounds,
+    maxBoundsViscosity: 1.0  // Strict bounds enforcement
   });
 
-  // Add tile layer (light gray base map)
+  // Add tile layer (light gray base map) with noWrap to prevent repetition
   L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png', {
     attribution: '&copy; OpenStreetMap, &copy; CARTO',
     subdomains: 'abcd',
-    maxZoom: 19
+    maxZoom: 19,
+    noWrap: true,         // Prevent tile wrapping/repetition
+    bounds: worldBounds   // Limit tiles to world bounds
   }).addTo(map);
 
   // Load world GeoJSON
@@ -988,5 +1091,131 @@ function initExportMap() {
 }
 
 document.addEventListener('DOMContentLoaded', initExportMap);
+
+// Custom Gauge Chart Rendering - Clean Design
+// Range: -100 to +100, with proper proportional fill
+// Full gray background, colored fill for percentage only
+// Warm colors (red/orange) for negative, cool colors (green/blue) for positive
+
+function drawGauge(container) {
+  const canvas = container.querySelector('.gauge-canvas');
+  const valueEl = container.querySelector('.gauge-value');
+  const value = parseFloat(container.dataset.value) || 0;
+
+  if (!canvas) return;
+
+  const ctx = canvas.getContext('2d');
+  const width = canvas.width;   // 180
+  const height = canvas.height; // 100
+
+  // Center at bottom of canvas, arc curves upward
+  const centerX = width / 2;    // 90
+  const centerY = height;       // 100
+  const radius = 75;
+  const lineWidth = 14;
+
+  // Clear canvas
+  ctx.clearRect(0, 0, width, height);
+
+  // === ANGLE REFERENCE ===
+  // Canvas angles: 0=RIGHT, π/2=DOWN, π=LEFT, -π/2=UP
+  // Our semicircle: LEFT(π) --through TOP(-π/2)-- to RIGHT(0)
+  const LEFT = Math.PI;         // π = 3.14159 (left edge)
+  const TOP = -Math.PI / 2;     // -π/2 = -1.5708 (top center, the 0% mark)
+  const RIGHT = 0;              // 0 (right edge)
+
+  // Normalize value to -100 to +100 range
+  const clampedValue = Math.max(-100, Math.min(100, value));
+  const absValue = Math.abs(clampedValue);
+
+  // Calculate fill angle: 100% = π/2 radians (90°, half the semicircle)
+  const fillAngle = (absValue / 100) * (Math.PI / 2);
+
+  // === STEP 1: Draw gray background arc ===
+  // Semicircle from LEFT to RIGHT, going COUNTER-CLOCKWISE (through TOP)
+  ctx.beginPath();
+  ctx.arc(centerX, centerY, radius, LEFT, RIGHT, true);  // true = counter-clockwise
+  ctx.strokeStyle = '#E0E0E0';
+  ctx.lineWidth = lineWidth;
+  ctx.lineCap = 'round';
+  ctx.stroke();
+
+  // === STEP 2: Determine fill color ===
+  let fillColor = null;
+  if (clampedValue < 0) {
+    // Warm colors for negative
+    if (clampedValue <= -50) fillColor = '#C53929';      // Dark red
+    else if (clampedValue <= -20) fillColor = '#EA4335'; // Google Red
+    else fillColor = '#F9AB00';                          // Orange
+  } else if (clampedValue > 0) {
+    // Cool colors for positive
+    if (clampedValue >= 50) fillColor = '#1E8E3E';       // Dark green
+    else if (clampedValue >= 20) fillColor = '#34A853';  // Google Green
+    else fillColor = '#4285F4';                          // Google Blue
+  }
+
+  // === STEP 3: Draw colored fill arc ===
+  if (clampedValue !== 0 && fillColor) {
+    ctx.beginPath();
+
+    if (clampedValue < 0) {
+      // NEGATIVE: Fill from TOP toward LEFT
+      // From TOP(-π/2) toward LEFT(π), we go COUNTER-CLOCKWISE
+      // In angle terms: -π/2 → -π (which wraps to π)
+      // So we SUBTRACT from TOP to move toward LEFT
+      const startAngle = TOP;
+      const endAngle = TOP - fillAngle;  // Goes toward -π (same as π, the left side)
+      ctx.arc(centerX, centerY, radius, startAngle, endAngle, true);  // true = CCW toward left
+    } else {
+      // POSITIVE: Fill from TOP toward RIGHT
+      // From TOP(-π/2) toward RIGHT(0), we go CLOCKWISE
+      // In angle terms: -π/2 → 0
+      // So we ADD to TOP to move toward RIGHT
+      const startAngle = TOP;
+      const endAngle = TOP + fillAngle;  // Goes toward 0 (the right side)
+      ctx.arc(centerX, centerY, radius, startAngle, endAngle, false);  // false = CW toward right
+    }
+
+    ctx.strokeStyle = fillColor;
+    ctx.lineWidth = lineWidth;
+    ctx.lineCap = 'round';
+    ctx.stroke();
+  }
+
+  // === STEP 4: Draw center tick mark at 0% (top) ===
+  const tickY1 = centerY - radius + lineWidth/2 + 2;
+  const tickY2 = centerY - radius - lineWidth/2 - 4;
+  ctx.beginPath();
+  ctx.moveTo(centerX, tickY1);
+  ctx.lineTo(centerX, tickY2);
+  ctx.strokeStyle = '#9E9E9E';
+  ctx.lineWidth = 2;
+  ctx.lineCap = 'round';
+  ctx.stroke();
+
+  // Update value display with appropriate color class
+  const displayValue = value >= 0 ? '+' + value.toFixed(1) + '%' : value.toFixed(1) + '%';
+  valueEl.textContent = displayValue;
+
+  // Set color class based on value
+  let colorClass = 'gauge-value';
+  if (value >= 0) {
+    colorClass += ' positive';
+    if (value < 20) colorClass += ' small';
+  } else {
+    colorClass += ' negative';
+    if (value > -20) colorClass += ' small';
+  }
+  valueEl.className = colorClass;
+}
+
+function initCustomGauges() {
+  const gaugeContainers = document.querySelectorAll('.custom-gauge-container');
+  gaugeContainers.forEach(container => {
+    drawGauge(container);
+  });
+}
+
+document.addEventListener('DOMContentLoaded', initCustomGauges);
 </script>
 {% endblock %}
