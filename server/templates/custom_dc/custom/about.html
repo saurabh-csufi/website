@@ -563,12 +563,12 @@
       <div style="display: flex; align-items: center; gap: 1rem; margin-top: 1rem; font-size: 0.8rem; color: #666;">
         <span>Export Value:</span>
         <div style="display: flex; align-items: center; gap: 4px;">
-          <div style="width: 20px; height: 12px; background: #fee5d9; border: 1px solid #ddd;"></div>
+          <div style="width: 20px; height: 12px; background: #EA4335; border: 1px solid #ddd; border-radius: 2px;"></div>
           <span>Low</span>
         </div>
-        <div style="background: linear-gradient(to right, #fee5d9, #fcae91, #fb6a4a, #de2d26, #a50f15); width: 120px; height: 12px; border: 1px solid #ddd;"></div>
+        <div style="background: linear-gradient(to right, #EA4335, #F9AB00, #FBBC04, #7BAAF7, #4285F4, #34A853, #1E8E3E); width: 140px; height: 12px; border: 1px solid #ddd; border-radius: 2px;"></div>
         <div style="display: flex; align-items: center; gap: 4px;">
-          <div style="width: 20px; height: 12px; background: #a50f15; border: 1px solid #ddd;"></div>
+          <div style="width: 20px; height: 12px; background: #1E8E3E; border: 1px solid #ddd; border-radius: 2px;"></div>
           <span>High</span>
         </div>
       </div>
@@ -950,16 +950,17 @@ function formatExportValue(value) {
 }
 
 function getColor(value) {
-  // Color scale based on export value (excluding India's huge value)
+  // Color scale: warm (red/orange) for LOW values, cool (green/blue) for HIGH values
+  // Uses Google brand colors
   // Max is USA at ~7.3 trillion
-  if (!value) return '#f0f0f0';
-  if (value > 3000000000000) return '#67000d';
-  if (value > 1000000000000) return '#a50f15';
-  if (value > 500000000000) return '#de2d26';
-  if (value > 200000000000) return '#fb6a4a';
-  if (value > 100000000000) return '#fcae91';
-  if (value > 50000000000) return '#fee5d9';
-  return '#fff5f0';
+  if (!value) return '#F5F5F5';                    // No data - light gray
+  if (value > 3000000000000) return '#1E8E3E';     // Very high - Dark green
+  if (value > 1000000000000) return '#34A853';     // High - Google Green
+  if (value > 500000000000) return '#4285F4';      // Medium-high - Google Blue
+  if (value > 200000000000) return '#7BAAF7';      // Medium - Light blue
+  if (value > 100000000000) return '#FBBC04';      // Medium-low - Google Yellow
+  if (value > 50000000000) return '#F9AB00';       // Low - Orange
+  return '#EA4335';                                 // Very low - Google Red
 }
 
 function initExportMap() {
