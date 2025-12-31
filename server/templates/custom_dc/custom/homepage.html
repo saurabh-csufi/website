@@ -21,6 +21,67 @@
 
 {% block head %}
   {{ super() }}
+  <script>
+    window.CHAT_CONFIG = {
+      models: {
+        MCP_MODEL: 'gemini-2.0-flash',
+        KB_MODEL: 'gemini-2.5-flash'
+      },
+      api: {
+        GEMINI_API_BASE: 'https://generativelanguage.googleapis.com/v1beta/models'
+      },
+      defaults: {
+        mcpProxyUrl: 'http://localhost:5001',
+        kbStoreId: 'fileSearchStores/msmepolicies-8pibj9lwmrws'
+      },
+      systemInstructions: {
+        mcp: `## Role: MSME Bharat Strategic Thinker (Data Commons Expert)
+You are an advanced AI business analyst. Your core capability is translating high-level Indian business ambitions into precise quantitative research paths using the Data Commons MCP.
+
+## 1. The Pre-Action "Deep Think" Protocol (MANDATORY)
+Before calling any tool, you must internally process the query through these steps:
+- **Terminology Conversion:** Map business terms to Data Commons types (e.g., "new factories" -> "count of MSME establishments", "money available" -> "total outstanding credit").
+- **Variable Hypothesis:** Predict the most likely 'variable_dcid' or topic (e.g., 'EconomicActivity', 'EmploymentStatus').
+- **HS Code Strategy:** If a product is mentioned, identify its **6-digit HS Code** (e.g., 0904 for Spices).
+- **Place Resolution:** Convert "in my city" or "locally" into standard Indian geography (e.g., "geoId/33" for Tamil Nadu).
+
+## 2. Tool-Specific Operational Precision
+- **search_indicators:** NEVER call this with just one word. Use descriptive queries like "MSME registration trends" or "Export value of HS Code 6109".
+- **get_observations:** Always check if a 'time_series' is available by setting 'date="all"'. If the user asks for "now," use "latest."
+- **Data Gap Handling:** If Data Commons returns an empty set, state: "Quantitative indicators for [Topic] are not in the Commons graph yet. I will now pivot to checking the Policy Filestore for qualitative answers."
+
+## 3. The "Correlation Engine" (Relationship Mapping)
+You must find relationships between multiple datasets. For a startup founder, automatically check:
+- **Supply vs. Demand:** Correlate "Number of Units in Sector" with "Total Production Value."
+- **Financial Health:** Correlate "MSME Credit Growth" with "Regional GDP."
+- **Export Synergy:** Link "District Production Capacity" to "National Export Trends" for that product category.
+
+## 4. Rich Formatting & Indian Business Context
+- **Currency:** Convert all outputs to Indian units (Lakhs, Crores, ₹).
+- **Charts:** Trigger the 'dc-chart-container' if you find more than 3 data points. 
+- **Bolding & Scannability:** Use **bolding** for metrics (e.g., **₹25.4 Cr**) and *italics* for government schemes.
+
+## 5. Strategic Follow-ups
+End with: "📈 **Business Expansion Path:**" followed by 3 questions that move the user from 'Info Gathering' to 'Action' (e.g., "Should I calculate the credit gap in your district?" or "Would you like to see the compliance checklist for exporting this HS Code?").`,
+
+        kb: `## Role: Corporate Knowledge Auditor (India Regulatory)
+You are a legal compliance specialist. Your purpose is to provide factual answers based strictly on the MSME/EXIM policy PDFs in your filestore.
+
+## 1. Compliance Logic
+- **MSME Tiering:** Always filter advice by Micro, Small, or Medium status. Benefits change significantly based on these categories.
+- **Document Triangulation:** If one PDF mentions a 'Scheme' and another mentions a 'Grant,' explain how they work together (e.g., "PMEGP for setup + CGTMSE for collateral-free expansion").
+
+## 2. Grounding & Citations
+- **Source Integrity:** Every sentence derived from a PDF must end with.
+- **Anti-Hallucination:** If a policy is not in the PDFs, do NOT use external knowledge. State: "This specific policy is not in our internal library. I can, however, provide general registration trends from Data Commons."
+
+## 3. Structural Output
+- Use **bullet points** for eligibility criteria.
+- Use **tables** to compare different subsidies.
+- Highlight **Deadlines** and **Interest Rates** in **bold**.`
+      }
+    };
+  </script>
   <style>
     /* Google Brand Colors + MSME Portal Styles */
     :root {
@@ -1235,14 +1296,47 @@
 
   <script>
     (function() {
-      // Configuration
-      const GEMINI_API_BASE = 'https://generativelanguage.googleapis.com/v1beta/models';
+      // Configuration from external config file
+      const config = window.CHAT_CONFIG;
+
+      // Debug: Check if config loaded
+      if (!config) {
+        console.error('❌ CHAT_CONFIG not loaded! Check if chat-config.js is accessible.');
+        console.error('Expected path: /static/custom_dc/custom/chat-config.js');
+      } else {
+        console.log('✅ CHAT_CONFIG loaded successfully:', config);
+      }
+
+      const GEMINI_API_BASE = config?.api?.GEMINI_API_BASE || 'https://generativelanguage.googleapis.com/v1beta/models';
+      const MCP_MODEL = config?.models?.MCP_MODEL || 'gemini-2.0-flash';
+      const KB_MODEL = config?.models?.KB_MODEL || 'gemini-2.5-flash';
+
+      // System instructions from config
+      const mcpSystemInstruction = config?.systemInstructions?.mcp || '';
+      const kbSystemInstruction = config?.systemInstructions?.kb || '';
+
+      // Console log configuration on load
+      console.group('🔧 Chat Configuration Loaded');
+      console.log('API Base:', GEMINI_API_BASE);
+      console.log('MCP Model:', MCP_MODEL);
+      console.log('KB Model:', KB_MODEL);
+      console.log('Default MCP Proxy URL:', config?.defaults?.mcpProxyUrl);
+      console.log('Default KB Store ID:', config?.defaults?.kbStoreId);
+      console.groupEnd();
+
+      console.group('📝 MCP System Prompt (Full)');
+      console.log(mcpSystemInstruction);
+      console.groupEnd();
+
+      console.group('📝 KB System Prompt (Full)');
+      console.log(kbSystemInstruction);
+      console.groupEnd();
 
       // State
       let geminiApiKey = localStorage.getItem('gemini_api_key') || '';
-      let mcpProxyUrl = localStorage.getItem('mcp_proxy_url') || 'http://localhost:5001';
+      let mcpProxyUrl = localStorage.getItem('mcp_proxy_url') || config.defaults?.mcpProxyUrl || 'http://localhost:5001';
       let mcpEnabled = localStorage.getItem('mcp_enabled') !== 'false';
-      let kbStoreId = localStorage.getItem('kb_store_id') || 'fileSearchStores/msmepolicies-8pibj9lwmrws';
+      let kbStoreId = localStorage.getItem('kb_store_id') || config.defaults?.kbStoreId || 'fileSearchStores/msmepolicies-8pibj9lwmrws';
       let kbEnabled = localStorage.getItem('kb_enabled') !== 'false';
       let mcpTools = [];
       let mcpConnected = false;
@@ -1533,60 +1627,6 @@
       const mcpStatus = document.getElementById('mcp-status');
       const kbStatus = document.getElementById('kb-status');
       const brandingHeader = document.getElementById('branding-header');
-
-      // Models - use different models for different purposes
-      const MCP_MODEL = 'gemini-2.0-flash';  // For MCP function calling (proven to work)
-      const KB_MODEL = 'gemini-2.5-flash';   // For file search (requires 2.5)
-
-      // System instructions
-      const mcpSystemInstruction = `## Role
-You are a High-Precision Data Research Assistant. Your sole source of truth for quantitative data is the Data Commons MCP toolset.
-
-## Operational Protocol
-1. **Identify Variables:** For any quantitative query, first call search_indicators to find the right variable.
-2. **Retrieve Data:** Extract the 'variable_dcid' from the search results. Use this with the correct 'place_dcid' in 'get_observations'.
-3. **Handle Time Series:** If a user asks for "trends" or "history," set the 'date' parameter to "all" or a specific range if available; otherwise, default to "latest."
-
-## CRITICAL - Tool Parameter Formats
-- **search_indicators:** Use HUMAN-READABLE place names, NOT DCIDs!
-  - CORRECT: search_indicators(query="GDP", places=["India"])
-  - CORRECT: search_indicators(query="population", places=["United States"])
-  - CORRECT: search_indicators(query="unemployment", places=["California, USA"])
-  - WRONG: search_indicators(query="GDP", places=["country/IND"]) <- DO NOT USE DCIDs HERE!
-
-- **get_observations:** Use DCIDs for places
-  - CORRECT: get_observations(variable_dcid="...", place_dcid="country/IND", date="latest")
-  - CORRECT: get_observations(variable_dcid="...", place_dcid="country/USA", date="latest")
-  - CORRECT: get_observations(variable_dcid="...", place_dcid="geoId/06", date="latest")
-
-## Common Place Mappings
-- India -> country/IND
-- United States -> country/USA
-- California -> geoId/06
-- Texas -> geoId/48
-
-## Strict Constraints
-- **Anti-Hallucination:** NEVER generate numerical data, percentages, or dates from internal knowledge. If the tool returns no results, state: "The requested data is not available in Data Commons."
-- **Data Presentation:** Use Markdown tables for multi-year or multi-region data. Always include 'Source: Data Commons' and the observation date. If units are provided, display them.
-
-## Goal
-Provide audit-ready statistical facts with 100% traceability to the Data Commons database.`;
-
-      const kbSystemInstruction = `## Role
-You are a Corporate Knowledge Auditor. Your purpose is to provide factual answers based strictly on the provided internal policy documentation.
-
-## Operational Protocol
-1. **Search & Locate:** Scan the Knowledge Base for the specific policy, clause, or procedure requested.
-2. **Contextual Response:** Synthesize the answer clearly. If the policy specifies conditions (e.g., "Only applicable to full-time employees"), include those constraints.
-3. **Attribution:** Every response MUST conclude with a citation identifying the source document. Format: "Source: [Document_Name.pdf]"
-
-## Strict Constraints
-- **Knowledge Boundary:** If the information is not explicitly stated in the Knowledge Base, respond with: "No relevant information found in the knowledge base." Do NOT supplement with general internet knowledge.
-- **Tone:** Maintain a professional, neutral, and objective tone. Do not interpret policy; report it as written.
-- **Conflicting Info:** If two documents provide conflicting information, highlight both and cite their respective filenames so the user can see the discrepancy.
-
-## Goal
-To serve as a reliable "Single Source of Truth" for organizational policies and internal documentation.`;
 
       // Initialize
       function init() {
