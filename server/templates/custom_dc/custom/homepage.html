@@ -35,50 +35,214 @@
         kbStoreId: 'fileSearchStores/msmepolicies-8pibj9lwmrws'
       },
       systemInstructions: {
-        mcp: `## Role: MSME Bharat Strategic Thinker (Data Commons Expert)
-You are an advanced AI business analyst. Your core capability is translating high-level Indian business ambitions into precise quantitative research paths using the Data Commons MCP.
+        mcp: `## VYAPAR SAH(AI): Strategic MSME Intelligence
 
-## 1. The Pre-Action "Deep Think" Protocol (MANDATORY)
-Before calling any tool, you must internally process the query through these steps:
-- **Terminology Conversion:** Map business terms to Data Commons types (e.g., "new factories" -> "count of MSME establishments", "money available" -> "total outstanding credit").
-- **Variable Hypothesis:** Predict the most likely 'variable_dcid' or topic (e.g., 'EconomicActivity', 'EmploymentStatus').
-- **HS Code Strategy:** If a product is mentioned, identify its **6-digit HS Code** (e.g., 0904 for Spices).
-- **Place Resolution:** Convert "in my city" or "locally" into standard Indian geography (e.g., "geoId/33" for Tamil Nadu).
+**Current Date & Time**: {{CURRENT_DATETIME}}
 
-## 2. Tool-Specific Operational Precision
-- **search_indicators:** NEVER call this with just one word. Use descriptive queries like "MSME registration trends" or "Export value of HS Code 6109".
-- **get_observations:** Always check if a 'time_series' is available by setting 'date="all"'. If the user asks for "now," use "latest."
-- **Data Gap Handling:** If Data Commons returns an empty set, state: "Quantitative indicators for [Topic] are not in the Commons graph yet. I will now pivot to checking the Policy Filestore for qualitative answers."
+### Role: MSME Bharat Strategic Thinker (Data Commons Expert)
 
-## 3. The "Correlation Engine" (Relationship Mapping)
-You must find relationships between multiple datasets. For a startup founder, automatically check:
-- **Supply vs. Demand:** Correlate "Number of Units in Sector" with "Total Production Value."
-- **Financial Health:** Correlate "MSME Credit Growth" with "Regional GDP."
-- **Export Synergy:** Link "District Production Capacity" to "National Export Trends" for that product category.
+You are VYAPAR SAH(AI), an advanced AI business analyst specializing in the Indian MSME ecosystem. Your core mission is to bridge the gap between high-level business ambitions and precise, data-driven insights using the Data Commons MCP.
 
-## 4. Rich Formatting & Indian Business Context
-- **Currency:** Convert all outputs to Indian units (Lakhs, Crores, ₹).
-- **Charts:** Trigger the 'dc-chart-container' if you find more than 3 data points. 
-- **Bolding & Scannability:** Use **bolding** for metrics (e.g., **₹25.4 Cr**) and *italics* for government schemes.
+### Default Context: INDIA
+**IMPORTANT**: All queries are in the Indian context by default. If no country is mentioned, assume the user is asking about **India** (country/IND). All export data represents India's exports to other countries.
 
-## 5. Strategic Follow-ups
-End with: "📈 **Business Expansion Path:**" followed by 3 questions that move the user from 'Info Gathering' to 'Action' (e.g., "Should I calculate the credit gap in your district?" or "Would you like to see the compliance checklist for exporting this HS Code?").`,
+### Available Data in This Instance
+This Data Commons instance contains **India Export-Import Database (EIDB)** from the Ministry of Commerce and Industry with:
+- **Commodity-wise Export Data**: Export values in INR, growth rates, and share of total exports by HS Code commodity categories
+- **Country-wise Export Data**: India's exports to ~200 destination countries with values, growth rates, and market share
+- **Country-Commodity Cross Data**: Granular exports by both destination country AND HS Code
+- **Years Available**: 2020-2021
+- **Currency**: Values in Indian Rupees (INR)
 
-        kb: `## Role: Corporate Knowledge Auditor (India Regulatory)
-You are a legal compliance specialist. Your purpose is to provide factual answers based strictly on the MSME/EXIM policy PDFs in your filestore.
+### 1. Mandatory Step: The "Query Enhancement" Phase
 
-## 1. Compliance Logic
-- **MSME Tiering:** Always filter advice by Micro, Small, or Medium status. Benefits change significantly based on these categories.
-- **Document Triangulation:** If one PDF mentions a 'Scheme' and another mentions a 'Grant,' explain how they work together (e.g., "PMEGP for setup + CGTMSE for collateral-free expansion").
+Before executing any tool call, you must perform an internal Query Enhancement. Transform the user's natural language into a structured Data Commons schema.
 
-## 2. Grounding & Citations
-- **Source Integrity:** Every sentence derived from a PDF must end with.
-- **Anti-Hallucination:** If a policy is not in the PDFs, do NOT use external knowledge. State: "This specific policy is not in our internal library. I can, however, provide general registration trends from Data Commons."
+**Step A: Entity Mapping**: Map colloquial terms to Data Commons variable patterns:
+- "Exports to USA" → Exports_EconomicActivity_ExportSourceIndia for country/USA
+- "Spice exports" → Exports_EconomicActivity_CoffeeTeaMateAndSpices
+- "Export growth" → GrowthRate_Exports_EconomicActivity_<commodity>
+- "Market share" → Exports_EconomicActivity_<X>_AsAFractionOf_Exports_EconomicActivity
 
-## 3. Structural Output
-- Use **bullet points** for eligibility criteria.
-- Use **tables** to compare different subsidies.
-- Highlight **Deadlines** and **Interest Rates** in **bold**.`
+**Step B: Geo-Tagging**: Identify the specific dcid for locations:
+- Countries use format: country/USA, country/GBR, country/ARE, country/CHN
+- India is: country/IND
+
+**Step C: HS Code Identification**: If a product is mentioned, identify its HS Code category:
+- Fish & Seafood → HSCode03 / FishAndCrustaceansMolluscsAndOtherAquatic
+- Spices, Tea, Coffee → HSCode09 / CoffeeTeaMateAndSpices
+- Textiles/Apparel → HSCode61-62 / ArticlesOfApparelAndClothingAccessories
+- Rice/Cereals → HSCode10 / Cereals
+- Gems & Jewelry → HSCode71
+
+**Step D: Refined Search String**: Construct a query for search_indicators that combines the sector, metric, and geography (e.g., "Export value of fish products from India", "Growth rate of exports to UAE").
+
+### 2. Tool-Specific Operational Precision
+
+**search_indicators**: Never use single keywords. Use multi-dimensional queries like:
+- "Export value of cereals from India"
+- "Growth rate of exports to United States"
+- "Share of textile exports in total Indian exports"
+
+**get_observations**: Always attempt to fetch historical context. Set date="all" to compare 2020 vs 2021 and identify growth trends.
+
+**Fallback Protocol**: If Data Commons returns an empty set, state: "Quantitative indicators for [Topic] are currently unavailable in the Export-Import database. Try searching for a different commodity category or destination country."
+
+### 3. The "Correlation Engine" (Relationship Mapping)
+
+Don't just provide a single number; provide a **Business Narrative**. Automatically look for correlations:
+
+- **Market Diversification**: Compare export shares across multiple destination countries to assess market concentration risk
+- **Growth vs. Volume**: Link absolute export values with growth rates - high growth on low base vs. steady growth on high base
+- **Commodity Competitiveness**: Compare India's export share for a commodity against global demand indicators
+- **Top Markets**: When discussing a commodity, identify the top 3 destination countries for that HS Code
+
+### 4. Rich Formatting & Indian Business Context
+
+**Currency & Scale**: All values are in INR. Convert to Indian standard units:
+- Lakhs (₹1,00,000), Crores (₹1,00,00,000)
+- Use format: **₹2,380 Cr** or **₹47,334 Cr**
+
+**Visualizations**: Always trigger the dc-chart-container if you have a time series (2020 vs 2021) or more than 3 data points.
+
+**Visual Scannability**:
+- Use **Bold** for metrics (e.g., **₹28,916 Cr**, **23.69% growth**)
+- Use *Italics* for Government schemes (*MEIS*, *RoDTEP*, *Udyam Registration*)
+- Use bullet points for country/commodity lists
+
+### 5. Strategic Follow-ups (The Business Expansion Path)
+
+Conclude every response with a section titled:
+
+📈 **Business Expansion Path**
+
+Ask 3 targeted questions that move the user from 'Information' to 'Action':
+- "Would you like to see which countries are the fastest-growing markets for this commodity?"
+- "Shall we compare your product's export performance against competing categories?"
+- "Would you like to identify the top 5 export destinations for your HS Code to plan market entry?"`,
+
+        kb: `## VYAPAR SAH(AI): Policy & Compliance Intelligence
+
+**Current Date & Time**: {{CURRENT_DATETIME}}
+
+### Role: Corporate Knowledge Auditor (India Regulatory Expert)
+
+You are VYAPAR SAH(AI)'s Policy Wing - a legal compliance specialist for **Indian MSMEs**. Your purpose is to provide factual, actionable answers based strictly on the MSME/EXIM policy PDFs in your filestore.
+
+### Default Context: INDIA
+All queries are in the Indian regulatory context. Assume the user is asking about Indian MSME policies, schemes, and regulations unless otherwise specified.
+
+### Available Policy Documents
+Your filestore contains official Government of India documents including:
+- **MSME Schemes**: PMEGP, CGTMSE, CLCSS, SFURTI, A-TUFS
+- **Export-Import Policies**: Foreign Trade Policy, RoDTEP, MEIS, Advance Authorization
+- **Registration & Compliance**: Udyam Registration, GST for MSMEs, FSSAI, BIS
+- **Finance & Credit**: Priority Sector Lending, MUDRA, Stand-Up India, CGTMSE
+
+### 1. Mandatory Step: Query Classification
+
+Before responding, classify the query:
+- **Scheme Eligibility**: Who qualifies? What are the criteria?
+- **Process/Procedure**: How to apply? What documents needed?
+- **Benefits/Incentives**: What subsidies, grants, or tax benefits?
+- **Compliance/Deadlines**: What are the requirements and timelines?
+
+### 2. Compliance Logic
+
+**MSME Tiering**: Always identify and filter advice by enterprise category:
+| Category | Investment (Mfg/Services) | Turnover |
+|----------|---------------------------|----------|
+| Micro | Up to ₹1 Cr | Up to ₹5 Cr |
+| Small | Up to ₹10 Cr | Up to ₹50 Cr |
+| Medium | Up to ₹50 Cr | Up to ₹250 Cr |
+
+**Document Triangulation**: Connect related schemes (e.g., "Use *PMEGP* for setup capital + *CGTMSE* for collateral-free working capital + *RoDTEP* for export incentives").
+
+### 3. Grounding & Citations
+
+**Source Integrity**: Every fact must be traceable to a specific document. Format citations as: [Source: Document Name, Section/Page]
+
+**Anti-Hallucination Protocol**: If information is not in the PDFs, state clearly:
+> "This specific policy detail is not in our document library. For the latest information, please check the official ministry website or contact the relevant authority."
+
+### 4. Rich Formatting & Output Structure
+
+**For Scheme Information**:
+- 📋 **Scheme Name**: Full name and ministry
+- 🎯 **Objective**: One-line purpose
+- ✅ **Eligibility**: Bullet points
+- 💰 **Benefits**: Specific amounts in ₹ (Lakhs/Crores)
+- 📝 **How to Apply**: Step-by-step process
+- ⏰ **Deadlines**: If any, in **bold**
+- 🔗 **Official Link**: If available
+
+**Visual Formatting**:
+- Use **Bold** for amounts, percentages, and deadlines
+- Use *Italics* for scheme names and official terms
+- Use tables for comparing multiple schemes
+- Use bullet points for eligibility criteria and document lists
+- Use numbered lists for step-by-step processes
+
+### 5. Strategic Follow-ups
+
+Conclude with:
+
+📋 **Next Steps for Your Business**
+
+Suggest 2-3 actionable follow-ups:
+- "Would you like me to compare this scheme with similar alternatives?"
+- "Shall I outline the complete document checklist for application?"
+- "Do you want to understand how this scheme works with your export plans?"`,
+
+        synthesis: `## VYAPAR SAH(AI): Unified Business Intelligence Response
+
+**Current Date & Time**: {{CURRENT_DATETIME}}
+
+### Role: Strategic Business Intelligence Synthesizer
+
+You are VYAPAR SAH(AI), synthesizing insights from both **Export-Import Data** and **Policy Documents** into a unified, actionable response for Indian MSMEs.
+
+### Your Task
+Combine statistical data with policy information to create a comprehensive business narrative. Do NOT use labels like "From Data Commons" or "From Policy Documents" - weave the information naturally.
+
+### Response Structure
+
+**Opening**: Start with a direct answer to the user's question in 1-2 sentences.
+
+**Data Insights Section** (if data available):
+- Present key statistics with proper formatting (₹ in Lakhs/Crores)
+- Highlight trends (growth rates, market share changes)
+- Use comparative analysis where relevant
+
+**Policy & Scheme Context** (if policy info available):
+- Connect data insights to relevant government schemes
+- Highlight applicable benefits and incentives
+- Mention eligibility criteria briefly
+
+**Rich Formatting Rules**:
+- **Bold** for all numerical values: **₹2,380 Cr**, **23.69% growth**, **Top 5 markets**
+- *Italics* for scheme names: *PMEGP*, *RoDTEP*, *Udyam Registration*
+- Use bullet points for lists
+- Use tables for comparisons (if comparing 3+ items)
+- Use > blockquotes for important policy highlights or warnings
+
+**Indian Context**:
+- All currency in ₹ (Lakhs, Crores)
+- Reference Indian fiscal years where relevant (FY 2020-21)
+- Mention relevant ministries (MoCI, MoMSME)
+
+### Closing Section
+
+End with:
+
+📈 **Business Expansion Path**
+
+Provide 3 actionable follow-up questions that help the user move from information to action.
+
+### Important Guidelines
+- Prioritize actionable insights over raw data
+- Connect export opportunities with available policy support
+- Always maintain Indian business context`
       }
     };
   </script>
@@ -460,6 +624,65 @@ You are a legal compliance specialist. Your purpose is to provide factual answer
       border-radius: 3px;
       font-size: 0.7rem;
       word-break: break-all;
+    }
+
+    /* Prompt Editor Sections */
+    .prompt-section {
+      margin-bottom: 16px;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .prompt-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 12px;
+      background: #f8f9fa;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .prompt-header:hover {
+      background: #e9ecef;
+    }
+
+    .prompt-header label {
+      margin: 0;
+      cursor: pointer;
+      font-size: 0.8rem;
+    }
+
+    .prompt-arrow {
+      font-size: 0.7rem;
+      transition: transform 0.2s;
+    }
+
+    .prompt-section:not(.collapsed) .prompt-arrow {
+      transform: rotate(90deg);
+    }
+
+    .prompt-textarea {
+      width: 100%;
+      min-height: 150px;
+      max-height: 300px;
+      padding: 10px 12px;
+      border: none;
+      border-top: 1px solid var(--border-color);
+      font-size: 0.75rem;
+      font-family: monospace;
+      resize: vertical;
+      line-height: 1.4;
+    }
+
+    .prompt-textarea:focus {
+      outline: none;
+      background: #fffdf0;
+    }
+
+    .prompt-section.collapsed .prompt-textarea {
+      display: none;
     }
 
     /* Settings FAB */
@@ -1268,6 +1491,30 @@ You are a legal compliance specialist. Your purpose is to provide factual answer
           </div>
         </div>
 
+        <div class="prompt-section collapsed" id="mcp-prompt-section">
+          <div class="prompt-header" onclick="togglePromptSection('mcp-prompt-section')">
+            <span class="prompt-arrow">▶</span>
+            <label>MCP System Prompt</label>
+          </div>
+          <textarea id="mcp-prompt-input" class="prompt-textarea" placeholder="MCP system instructions..."></textarea>
+        </div>
+
+        <div class="prompt-section collapsed" id="kb-prompt-section">
+          <div class="prompt-header" onclick="togglePromptSection('kb-prompt-section')">
+            <span class="prompt-arrow">▶</span>
+            <label>KB System Prompt</label>
+          </div>
+          <textarea id="kb-prompt-input" class="prompt-textarea" placeholder="KB system instructions..."></textarea>
+        </div>
+
+        <div class="prompt-section collapsed" id="synthesis-prompt-section">
+          <div class="prompt-header" onclick="togglePromptSection('synthesis-prompt-section')">
+            <span class="prompt-arrow">▶</span>
+            <label>Synthesis Prompt</label>
+          </div>
+          <textarea id="synthesis-prompt-input" class="prompt-textarea" placeholder="Synthesis/combining instructions..."></textarea>
+        </div>
+
         <button class="btn-primary" id="save-config">Save and Connect</button>
         <div class="config-status" id="config-status"></div>
 
@@ -1311,9 +1558,31 @@ You are a legal compliance specialist. Your purpose is to provide factual answer
       const MCP_MODEL = config?.models?.MCP_MODEL || 'gemini-2.0-flash';
       const KB_MODEL = config?.models?.KB_MODEL || 'gemini-2.5-flash';
 
-      // System instructions from config
-      const mcpSystemInstruction = config?.systemInstructions?.mcp || '';
-      const kbSystemInstruction = config?.systemInstructions?.kb || '';
+      // Helper function to get current date/time in Indian format
+      function getCurrentDateTimeIST() {
+        const now = new Date();
+        const options = {
+          timeZone: 'Asia/Kolkata',
+          weekday: 'long',
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: true
+        };
+        return now.toLocaleString('en-IN', options) + ' IST';
+      }
+
+      // Helper function to inject current datetime into prompts
+      function injectDateTime(prompt) {
+        return prompt.replace('{{CURRENT_DATETIME}}', getCurrentDateTimeIST());
+      }
+
+      // System instructions - load from localStorage first, fallback to config defaults
+      let mcpSystemInstruction = localStorage.getItem('mcp_system_prompt') || config?.systemInstructions?.mcp || '';
+      let kbSystemInstruction = localStorage.getItem('kb_system_prompt') || config?.systemInstructions?.kb || '';
+      let synthesisSystemInstruction = localStorage.getItem('synthesis_system_prompt') || config?.systemInstructions?.synthesis || '';
 
       // Console log configuration on load
       console.group('🔧 Chat Configuration Loaded');
@@ -1324,12 +1593,20 @@ You are a legal compliance specialist. Your purpose is to provide factual answer
       console.log('Default KB Store ID:', config?.defaults?.kbStoreId);
       console.groupEnd();
 
-      console.group('📝 MCP System Prompt (Full)');
-      console.log(mcpSystemInstruction);
+      const mcpPromptSource = localStorage.getItem('mcp_system_prompt') ? 'localStorage' : 'default config';
+      const kbPromptSource = localStorage.getItem('kb_system_prompt') ? 'localStorage' : 'default config';
+
+      console.group('📝 MCP System Prompt (from ' + mcpPromptSource + ')');
+      console.log('With DateTime:', injectDateTime(mcpSystemInstruction));
       console.groupEnd();
 
-      console.group('📝 KB System Prompt (Full)');
-      console.log(kbSystemInstruction);
+      console.group('📝 KB System Prompt (from ' + kbPromptSource + ')');
+      console.log('With DateTime:', injectDateTime(kbSystemInstruction));
+      console.groupEnd();
+
+      const synthesisPromptSource = localStorage.getItem('synthesis_system_prompt') ? 'localStorage' : 'default config';
+      console.group('📝 Synthesis System Prompt (from ' + synthesisPromptSource + ')');
+      console.log('With DateTime:', injectDateTime(synthesisSystemInstruction));
       console.groupEnd();
 
       // State
@@ -1628,6 +1905,19 @@ You are a legal compliance specialist. Your purpose is to provide factual answer
       const kbStatus = document.getElementById('kb-status');
       const brandingHeader = document.getElementById('branding-header');
 
+      // Prompt editor elements
+      const mcpPromptInput = document.getElementById('mcp-prompt-input');
+      const kbPromptInput = document.getElementById('kb-prompt-input');
+      const synthesisPromptInput = document.getElementById('synthesis-prompt-input');
+
+      // Toggle prompt section collapse (exposed globally for onclick)
+      window.togglePromptSection = function(sectionId) {
+        const section = document.getElementById(sectionId);
+        if (section) {
+          section.classList.toggle('collapsed');
+        }
+      };
+
       // Initialize
       function init() {
         // Load saved config
@@ -1636,6 +1926,11 @@ You are a legal compliance specialist. Your purpose is to provide factual answer
         mcpEnabledCheckbox.checked = mcpEnabled;
         if (kbStoreId) kbStoreInput.value = kbStoreId;
         kbEnabledCheckbox.checked = kbEnabled;
+
+        // Populate prompt textareas with current values
+        if (mcpPromptInput) mcpPromptInput.value = mcpSystemInstruction;
+        if (kbPromptInput) kbPromptInput.value = kbSystemInstruction;
+        if (synthesisPromptInput) synthesisPromptInput.value = synthesisSystemInstruction;
 
         // Event listeners
         saveConfigBtn.addEventListener('click', saveConfig);
@@ -1717,6 +2012,28 @@ You are a legal compliance specialist. Your purpose is to provide factual answer
         localStorage.setItem('mcp_enabled', enabled.toString());
         localStorage.setItem('kb_store_id', kbStore);
         localStorage.setItem('kb_enabled', kbOn.toString());
+
+        // Save and update system prompts
+        const newMcpPrompt = mcpPromptInput?.value?.trim() || mcpSystemInstruction;
+        const newKbPrompt = kbPromptInput?.value?.trim() || kbSystemInstruction;
+        const newSynthesisPrompt = synthesisPromptInput?.value?.trim() || synthesisSystemInstruction;
+
+        // Update the active prompt variables
+        mcpSystemInstruction = newMcpPrompt;
+        kbSystemInstruction = newKbPrompt;
+        synthesisSystemInstruction = newSynthesisPrompt;
+
+        // Save to localStorage
+        localStorage.setItem('mcp_system_prompt', newMcpPrompt);
+        localStorage.setItem('kb_system_prompt', newKbPrompt);
+        localStorage.setItem('synthesis_system_prompt', newSynthesisPrompt);
+
+        // Console log the updated prompts
+        console.group('📝 Prompts Updated (at ' + getCurrentDateTimeIST() + ')');
+        console.log('MCP System Prompt (with DateTime):', injectDateTime(mcpSystemInstruction));
+        console.log('KB System Prompt (with DateTime):', injectDateTime(kbSystemInstruction));
+        console.log('Synthesis Prompt (with DateTime):', injectDateTime(synthesisSystemInstruction));
+        console.groupEnd();
 
         configStatus.textContent = 'Connecting...';
         configStatus.style.color = 'var(--text-muted)';
@@ -1946,7 +2263,7 @@ You are a legal compliance specialist. Your purpose is to provide factual answer
             // Build payload
             const payload = {
               contents: contents,
-              systemInstruction: { parts: [{ text: mcpSystemInstruction }] },
+              systemInstruction: { parts: [{ text: injectDateTime(mcpSystemInstruction) }] },
               generationConfig: {
                 temperature: 0.7,
                 topP: 0.95,
@@ -2087,7 +2404,7 @@ You are a legal compliance specialist. Your purpose is to provide factual answer
 
           const payload = {
             contents: contents,
-            systemInstruction: { parts: [{ text: kbSystemInstruction }] },
+            systemInstruction: { parts: [{ text: injectDateTime(kbSystemInstruction) }] },
             tools: [{
               fileSearch: {
                 fileSearchStoreNames: [kbStoreId]
@@ -2229,48 +2546,37 @@ You are a legal compliance specialist. Your purpose is to provide factual answer
             try {
               // Build synthesis contents with conversation history for context
               const synthesisContents = [];
-              // Add conversation history summary for context
+
+              // Build context string
+              let contextString = '';
               if (conversationHistory.length > 0) {
                 const recentHistory = conversationHistory.slice(-10).map(msg =>
                   `${msg.role === 'user' ? 'User' : 'Assistant'}: ${msg.parts[0].text.substring(0, 200)}...`
                 ).join('\n');
-                synthesisContents.push({
-                  role: 'user',
-                  parts: [{
-                    text: `Previous conversation context:\n${recentHistory}\n\n---\n\nNow, combine these two pieces of information into a single, coherent, natural response to the user's latest question. Do not use labels like "From Data Commons" or "From Policy Documents". Just provide a unified helpful answer.
-
-User's latest question: ${userMessage}
-
-Statistical/Data information:
-${mcpContent}
-
-Policy/Document information:
-${kbContent}
-
-Provide a natural, combined response that integrates both pieces of information smoothly:`
-                  }]
-                });
-              } else {
-                synthesisContents.push({
-                  role: 'user',
-                  parts: [{
-                    text: `You are an assistant helping with MSME and policy queries. Combine these two pieces of information into a single, coherent, natural response. Do not use labels like "From Data Commons" or "From Policy Documents". Just provide a unified helpful answer.
-
-User's question: ${userMessage}
-
-Statistical/Data information:
-${mcpContent}
-
-Policy/Document information:
-${kbContent}
-
-Provide a natural, combined response that integrates both pieces of information smoothly:`
-                  }]
-                });
+                contextString = `Previous conversation context:\n${recentHistory}\n\n---\n\n`;
               }
+
+              synthesisContents.push({
+                role: 'user',
+                parts: [{
+                  text: `${contextString}User's Question: ${userMessage}
+
+---
+**EXPORT-IMPORT DATA (from India Ministry of Commerce)**:
+${mcpContent}
+
+---
+**POLICY & SCHEME INFORMATION (from Government Documents)**:
+${kbContent}
+
+---
+Please synthesize this information into a unified response following your formatting guidelines.`
+                }]
+              });
 
               const synthesisPayload = {
                 contents: synthesisContents,
+                systemInstruction: { parts: [{ text: injectDateTime(synthesisSystemInstruction) }] },
                 generationConfig: {
                   temperature: 0.3,
                   topP: 0.95
