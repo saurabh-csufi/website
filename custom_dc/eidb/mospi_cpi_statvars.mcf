@@ -1,0 +1,1498 @@
+# Auto generated using command: "/usr/local/google/home/hareeshms/dc/repo/data/tools/statvar_importer/stat_var_processor.py --input_data=/usr/local/google/home/hareeshms/dc/customdc/msme/Custom_DC_Files/mospi/mospi_cpi_data.csv --pv_map=/usr/local/google/home/hareeshms/dc/customdc/msme/Custom_DC_Files/mospi/MOSPI_cpi_pvmap.csv --output_path=/usr/local/google/home/hareeshms/dc/customdc/msme/Custom_DC_Files/mospi//output_files/mospi_cpi --config_file=/usr/local/google/home/hareeshms/dc/customdc/msme/Custom_DC_Files/mospi/MOSPI_cpi_metadata.csv --dc_api_key=AIzaSyBCybF1COkc05kj5n5FHpXOnH3EdGBnUz0 --existing_statvar_mcf=/usr/local/google/dc/stat_vars/stat_vars.mcf --genai_model=gemini-2.5-flash --google_genai_key=AIzaSyA3l-ZVZ_RmcEy5vnibKzymSxlREiZYMoo --generate_pvmap=True --generate_statvar_name=True" on 2026-01-02 11:47:49.435000
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_CerealsAndProducts
+typeOf: dcid:StatisticalVariable
+name: "Consumer price index of consumer good cereals and products"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:consumerPriceIndex
+statType: dcid:measuredValue
+consumerGoodsCategory: dcid:CerealsAndProducts
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_CerealsAndProducts_Rural
+typeOf: dcid:StatisticalVariable
+name: "Consumer price index of consumer good cereals and products in rural areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:consumerPriceIndex
+statType: dcid:measuredValue
+consumerGoodsCategory: dcid:CerealsAndProducts
+placeOfResidenceClassification: dcid:Rural
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_CerealsAndProducts_Urban
+typeOf: dcid:StatisticalVariable
+name: "Consumer price index of consumer good cereals and products in urban areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:consumerPriceIndex
+statType: dcid:measuredValue
+consumerGoodsCategory: dcid:CerealsAndProducts
+placeOfResidenceClassification: dcid:Urban
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_Clothing
+typeOf: dcid:StatisticalVariable
+name: "Consumer price index of consumer good clothing"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:consumerPriceIndex
+statType: dcid:measuredValue
+consumerGoodsCategory: dcid:Clothing
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_ClothingAndFootwear
+typeOf: dcid:StatisticalVariable
+name: "Consumer price index of consumer good clothing and footwear"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:consumerPriceIndex
+statType: dcid:measuredValue
+consumerGoodsCategory: dcid:ClothingAndFootwear
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_ClothingAndFootwear_Rural
+typeOf: dcid:StatisticalVariable
+name: "Consumer price index of consumer good clothing and footwear in rural areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:consumerPriceIndex
+statType: dcid:measuredValue
+consumerGoodsCategory: dcid:ClothingAndFootwear
+placeOfResidenceClassification: dcid:Rural
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_ClothingAndFootwear_Urban
+typeOf: dcid:StatisticalVariable
+name: "Consumer price index of consumer good clothing and footwear in urban areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:consumerPriceIndex
+statType: dcid:measuredValue
+consumerGoodsCategory: dcid:ClothingAndFootwear
+placeOfResidenceClassification: dcid:Urban
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_Clothing_Rural
+typeOf: dcid:StatisticalVariable
+name: "Consumer price index of consumer good clothing in rural areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:consumerPriceIndex
+statType: dcid:measuredValue
+consumerGoodsCategory: dcid:Clothing
+placeOfResidenceClassification: dcid:Rural
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_Clothing_Urban
+typeOf: dcid:StatisticalVariable
+name: "Consumer price index of consumer good clothing in urban areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:consumerPriceIndex
+statType: dcid:measuredValue
+consumerGoodsCategory: dcid:Clothing
+placeOfResidenceClassification: dcid:Urban
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_ConsumerFood
+typeOf: dcid:StatisticalVariable
+name: "Consumer price index of consumer good consumer food"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:consumerPriceIndex
+statType: dcid:measuredValue
+consumerGoodsCategory: dcid:ConsumerFood
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_ConsumerFood_Rural
+typeOf: dcid:StatisticalVariable
+name: "Consumer price index of consumer good consumer food in rural areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:consumerPriceIndex
+statType: dcid:measuredValue
+consumerGoodsCategory: dcid:ConsumerFood
+placeOfResidenceClassification: dcid:Rural
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_ConsumerFood_Urban
+typeOf: dcid:StatisticalVariable
+name: "Consumer price index of consumer good consumer food in urban areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:consumerPriceIndex
+statType: dcid:measuredValue
+consumerGoodsCategory: dcid:ConsumerFood
+placeOfResidenceClassification: dcid:Urban
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_Education
+typeOf: dcid:StatisticalVariable
+name: "Consumer price index of consumer good education"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:consumerPriceIndex
+statType: dcid:measuredValue
+consumerGoodsCategory: dcid:Education
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_Education_Rural
+typeOf: dcid:StatisticalVariable
+name: "Consumer price index of consumer good education in rural areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:consumerPriceIndex
+statType: dcid:measuredValue
+consumerGoodsCategory: dcid:Education
+placeOfResidenceClassification: dcid:Rural
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_Education_Urban
+typeOf: dcid:StatisticalVariable
+name: "Consumer price index of consumer good education in urban areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:consumerPriceIndex
+statType: dcid:measuredValue
+consumerGoodsCategory: dcid:Education
+placeOfResidenceClassification: dcid:Urban
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_Egg
+typeOf: dcid:StatisticalVariable
+name: "Consumer price index of consumer good egg"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:consumerPriceIndex
+statType: dcid:measuredValue
+consumerGoodsCategory: dcid:Egg
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_Egg_Rural
+typeOf: dcid:StatisticalVariable
+name: "Consumer price index of consumer good egg in rural areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:consumerPriceIndex
+statType: dcid:measuredValue
+consumerGoodsCategory: dcid:Egg
+placeOfResidenceClassification: dcid:Rural
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_Egg_Urban
+typeOf: dcid:StatisticalVariable
+name: "Consumer price index of consumer good egg in urban areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:consumerPriceIndex
+statType: dcid:measuredValue
+consumerGoodsCategory: dcid:Egg
+placeOfResidenceClassification: dcid:Urban
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_FoodAndBeverages
+typeOf: dcid:StatisticalVariable
+name: "Consumer price index of consumer good food and beverages"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:consumerPriceIndex
+statType: dcid:measuredValue
+consumerGoodsCategory: dcid:FoodAndBeverages
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_FoodAndBeverages_Rural
+typeOf: dcid:StatisticalVariable
+name: "Consumer price index of consumer good food and beverages in rural areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:consumerPriceIndex
+statType: dcid:measuredValue
+consumerGoodsCategory: dcid:FoodAndBeverages
+placeOfResidenceClassification: dcid:Rural
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_FoodAndBeverages_Urban
+typeOf: dcid:StatisticalVariable
+name: "Consumer price index of consumer good food and beverages in urban areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:consumerPriceIndex
+statType: dcid:measuredValue
+consumerGoodsCategory: dcid:FoodAndBeverages
+placeOfResidenceClassification: dcid:Urban
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_Footwear
+typeOf: dcid:StatisticalVariable
+name: "Consumer price index of consumer good footwear"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:consumerPriceIndex
+statType: dcid:measuredValue
+consumerGoodsCategory: dcid:Footwear
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_Footwear_Rural
+typeOf: dcid:StatisticalVariable
+name: "Consumer price index of consumer good footwear in rural areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:consumerPriceIndex
+statType: dcid:measuredValue
+consumerGoodsCategory: dcid:Footwear
+placeOfResidenceClassification: dcid:Rural
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_Footwear_Urban
+typeOf: dcid:StatisticalVariable
+name: "Consumer price index of consumer good footwear in urban areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:consumerPriceIndex
+statType: dcid:measuredValue
+consumerGoodsCategory: dcid:Footwear
+placeOfResidenceClassification: dcid:Urban
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_Fruits
+typeOf: dcid:StatisticalVariable
+name: "Consumer price index of consumer good fruits"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:consumerPriceIndex
+statType: dcid:measuredValue
+consumerGoodsCategory: dcid:Fruits
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_Fruits_Rural
+typeOf: dcid:StatisticalVariable
+name: "Consumer price index of consumer good fruits in rural areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:consumerPriceIndex
+statType: dcid:measuredValue
+consumerGoodsCategory: dcid:Fruits
+placeOfResidenceClassification: dcid:Rural
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_Fruits_Urban
+typeOf: dcid:StatisticalVariable
+name: "Consumer price index of consumer good fruits in urban areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:consumerPriceIndex
+statType: dcid:measuredValue
+consumerGoodsCategory: dcid:Fruits
+placeOfResidenceClassification: dcid:Urban
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_FuelAndLight
+typeOf: dcid:StatisticalVariable
+name: "Consumer price index of consumer good fuel and light"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:consumerPriceIndex
+statType: dcid:measuredValue
+consumerGoodsCategory: dcid:FuelAndLight
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_FuelAndLight_Rural
+typeOf: dcid:StatisticalVariable
+name: "Consumer price index of consumer good fuel and light in rural areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:consumerPriceIndex
+statType: dcid:measuredValue
+consumerGoodsCategory: dcid:FuelAndLight
+placeOfResidenceClassification: dcid:Rural
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_FuelAndLight_Urban
+typeOf: dcid:StatisticalVariable
+name: "Consumer price index of consumer good fuel and light in urban areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:consumerPriceIndex
+statType: dcid:measuredValue
+consumerGoodsCategory: dcid:FuelAndLight
+placeOfResidenceClassification: dcid:Urban
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_Health
+typeOf: dcid:StatisticalVariable
+name: "Consumer price index of consumer good health"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:consumerPriceIndex
+statType: dcid:measuredValue
+consumerGoodsCategory: dcid:Health
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_Health_Rural
+typeOf: dcid:StatisticalVariable
+name: "Consumer price index of consumer good health in rural areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:consumerPriceIndex
+statType: dcid:measuredValue
+consumerGoodsCategory: dcid:Health
+placeOfResidenceClassification: dcid:Rural
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_Health_Urban
+typeOf: dcid:StatisticalVariable
+name: "Consumer price index of consumer good health in urban areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:consumerPriceIndex
+statType: dcid:measuredValue
+consumerGoodsCategory: dcid:Health
+placeOfResidenceClassification: dcid:Urban
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_HouseholdGoodsAndServices
+typeOf: dcid:StatisticalVariable
+name: "Consumer price index of consumer good household goods and services"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:consumerPriceIndex
+statType: dcid:measuredValue
+consumerGoodsCategory: dcid:HouseholdGoodsAndServices
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_HouseholdGoodsAndServices_Rural
+typeOf: dcid:StatisticalVariable
+name: "Consumer price index of consumer good household goods and services in rural areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:consumerPriceIndex
+statType: dcid:measuredValue
+consumerGoodsCategory: dcid:HouseholdGoodsAndServices
+placeOfResidenceClassification: dcid:Rural
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_HouseholdGoodsAndServices_Urban
+typeOf: dcid:StatisticalVariable
+name: "Consumer price index of consumer good household goods and services in urban areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:consumerPriceIndex
+statType: dcid:measuredValue
+consumerGoodsCategory: dcid:HouseholdGoodsAndServices
+placeOfResidenceClassification: dcid:Urban
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_Housing_Rural
+typeOf: dcid:StatisticalVariable
+name: "Consumer price index of consumer good housing in rural areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:consumerPriceIndex
+statType: dcid:measuredValue
+consumerGoodsCategory: dcid:Housing
+placeOfResidenceClassification: dcid:Rural
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_MOSPIGeneral_Rural
+typeOf: dcid:StatisticalVariable
+name: "Consumer price index of consumer good all items in rural areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:consumerPriceIndex
+statType: dcid:measuredValue
+consumerGoodsCategory: dcid:MOSPI_General
+placeOfResidenceClassification: dcid:Rural
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_MOSPIMiscellaneous
+typeOf: dcid:StatisticalVariable
+name: "Consumer price index of consumer good miscellaneous items"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:consumerPriceIndex
+statType: dcid:measuredValue
+consumerGoodsCategory: dcid:MOSPI_Miscellaneous
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_MOSPIMiscellaneous_Rural
+typeOf: dcid:StatisticalVariable
+name: "Consumer price index of consumer good miscellaneous items in rural areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:consumerPriceIndex
+statType: dcid:measuredValue
+consumerGoodsCategory: dcid:MOSPI_Miscellaneous
+placeOfResidenceClassification: dcid:Rural
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_MOSPIMiscellaneous_Urban
+typeOf: dcid:StatisticalVariable
+name: "Consumer price index of consumer good miscellaneous items in urban areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:consumerPriceIndex
+statType: dcid:measuredValue
+consumerGoodsCategory: dcid:MOSPI_Miscellaneous
+placeOfResidenceClassification: dcid:Urban
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_MeatAndFish
+typeOf: dcid:StatisticalVariable
+name: "Consumer price index of consumer good meat and fish"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:consumerPriceIndex
+statType: dcid:measuredValue
+consumerGoodsCategory: dcid:MeatAndFish
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_MeatAndFish_Rural
+typeOf: dcid:StatisticalVariable
+name: "Consumer price index of consumer good meat and fish in rural areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:consumerPriceIndex
+statType: dcid:measuredValue
+consumerGoodsCategory: dcid:MeatAndFish
+placeOfResidenceClassification: dcid:Rural
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_MeatAndFish_Urban
+typeOf: dcid:StatisticalVariable
+name: "Consumer price index of consumer good meat and fish in urban areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:consumerPriceIndex
+statType: dcid:measuredValue
+consumerGoodsCategory: dcid:MeatAndFish
+placeOfResidenceClassification: dcid:Urban
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_MilkAndProducts
+typeOf: dcid:StatisticalVariable
+name: "Consumer price index of consumer good milk and products"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:consumerPriceIndex
+statType: dcid:measuredValue
+consumerGoodsCategory: dcid:MilkAndProducts
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_MilkAndProducts_Rural
+typeOf: dcid:StatisticalVariable
+name: "Consumer price index of consumer good milk and products in rural areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:consumerPriceIndex
+statType: dcid:measuredValue
+consumerGoodsCategory: dcid:MilkAndProducts
+placeOfResidenceClassification: dcid:Rural
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_MilkAndProducts_Urban
+typeOf: dcid:StatisticalVariable
+name: "Consumer price index of consumer good milk and products in urban areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:consumerPriceIndex
+statType: dcid:measuredValue
+consumerGoodsCategory: dcid:MilkAndProducts
+placeOfResidenceClassification: dcid:Urban
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_NonAlcoholicBeverages
+typeOf: dcid:StatisticalVariable
+name: "Consumer price index of consumer good non alcoholic beverages"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:consumerPriceIndex
+statType: dcid:measuredValue
+consumerGoodsCategory: dcid:NonAlcoholicBeverages
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_NonAlcoholicBeverages_Rural
+typeOf: dcid:StatisticalVariable
+name: "Consumer price index of consumer good non alcoholic beverages in rural areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:consumerPriceIndex
+statType: dcid:measuredValue
+consumerGoodsCategory: dcid:NonAlcoholicBeverages
+placeOfResidenceClassification: dcid:Rural
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_NonAlcoholicBeverages_Urban
+typeOf: dcid:StatisticalVariable
+name: "Consumer price index of consumer good non alcoholic beverages in urban areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:consumerPriceIndex
+statType: dcid:measuredValue
+consumerGoodsCategory: dcid:NonAlcoholicBeverages
+placeOfResidenceClassification: dcid:Urban
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_OilsAndFats
+typeOf: dcid:StatisticalVariable
+name: "Consumer price index of consumer good oils and fats"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:consumerPriceIndex
+statType: dcid:measuredValue
+consumerGoodsCategory: dcid:OilsAndFats
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_OilsAndFats_Rural
+typeOf: dcid:StatisticalVariable
+name: "Consumer price index of consumer good oils and fats in rural areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:consumerPriceIndex
+statType: dcid:measuredValue
+consumerGoodsCategory: dcid:OilsAndFats
+placeOfResidenceClassification: dcid:Rural
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_OilsAndFats_Urban
+typeOf: dcid:StatisticalVariable
+name: "Consumer price index of consumer good oils and fats in urban areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:consumerPriceIndex
+statType: dcid:measuredValue
+consumerGoodsCategory: dcid:OilsAndFats
+placeOfResidenceClassification: dcid:Urban
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_PanTobaccoAndIntoxicants
+typeOf: dcid:StatisticalVariable
+name: "Consumer price index of consumer good pan tobacco and intoxicants"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:consumerPriceIndex
+statType: dcid:measuredValue
+consumerGoodsCategory: dcid:PanTobaccoAndIntoxicants
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_PanTobaccoAndIntoxicants_Rural
+typeOf: dcid:StatisticalVariable
+name: "Consumer price index of consumer good pan tobacco and intoxicants in rural areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:consumerPriceIndex
+statType: dcid:measuredValue
+consumerGoodsCategory: dcid:PanTobaccoAndIntoxicants
+placeOfResidenceClassification: dcid:Rural
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_PanTobaccoAndIntoxicants_Urban
+typeOf: dcid:StatisticalVariable
+name: "Consumer price index of consumer good pan tobacco and intoxicants in urban areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:consumerPriceIndex
+statType: dcid:measuredValue
+consumerGoodsCategory: dcid:PanTobaccoAndIntoxicants
+placeOfResidenceClassification: dcid:Urban
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_PersonalCareAndEffects
+typeOf: dcid:StatisticalVariable
+name: "Consumer price index of consumer good personal care and effects"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:consumerPriceIndex
+statType: dcid:measuredValue
+consumerGoodsCategory: dcid:PersonalCareAndEffects
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_PersonalCareAndEffects_Rural
+typeOf: dcid:StatisticalVariable
+name: "Consumer price index of consumer good personal care and effects in rural areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:consumerPriceIndex
+statType: dcid:measuredValue
+consumerGoodsCategory: dcid:PersonalCareAndEffects
+placeOfResidenceClassification: dcid:Rural
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_PersonalCareAndEffects_Urban
+typeOf: dcid:StatisticalVariable
+name: "Consumer price index of consumer good personal care and effects in urban areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:consumerPriceIndex
+statType: dcid:measuredValue
+consumerGoodsCategory: dcid:PersonalCareAndEffects
+placeOfResidenceClassification: dcid:Urban
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_PreparedMealsSnacksSweets
+typeOf: dcid:StatisticalVariable
+name: "Consumer price index of consumer good prepared meals snacks sweets"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:consumerPriceIndex
+statType: dcid:measuredValue
+consumerGoodsCategory: dcid:PreparedMealsSnacksSweets
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_PreparedMealsSnacksSweets_Rural
+typeOf: dcid:StatisticalVariable
+name: "Consumer price index of consumer good prepared meals snacks sweets in rural areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:consumerPriceIndex
+statType: dcid:measuredValue
+consumerGoodsCategory: dcid:PreparedMealsSnacksSweets
+placeOfResidenceClassification: dcid:Rural
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_PreparedMealsSnacksSweets_Urban
+typeOf: dcid:StatisticalVariable
+name: "Consumer price index of consumer good prepared meals snacks sweets in urban areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:consumerPriceIndex
+statType: dcid:measuredValue
+consumerGoodsCategory: dcid:PreparedMealsSnacksSweets
+placeOfResidenceClassification: dcid:Urban
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_PulsesAndProducts
+typeOf: dcid:StatisticalVariable
+name: "Consumer price index of consumer good pulses and products"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:consumerPriceIndex
+statType: dcid:measuredValue
+consumerGoodsCategory: dcid:PulsesAndProducts
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_PulsesAndProducts_Rural
+typeOf: dcid:StatisticalVariable
+name: "Consumer price index of consumer good pulses and products in rural areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:consumerPriceIndex
+statType: dcid:measuredValue
+consumerGoodsCategory: dcid:PulsesAndProducts
+placeOfResidenceClassification: dcid:Rural
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_PulsesAndProducts_Urban
+typeOf: dcid:StatisticalVariable
+name: "Consumer price index of consumer good pulses and products in urban areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:consumerPriceIndex
+statType: dcid:measuredValue
+consumerGoodsCategory: dcid:PulsesAndProducts
+placeOfResidenceClassification: dcid:Urban
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_RecreationAndAmusement
+typeOf: dcid:StatisticalVariable
+name: "Consumer price index of consumer good recreation and amusement"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:consumerPriceIndex
+statType: dcid:measuredValue
+consumerGoodsCategory: dcid:RecreationAndAmusement
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_RecreationAndAmusement_Rural
+typeOf: dcid:StatisticalVariable
+name: "Consumer price index of consumer good recreation and amusement in rural areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:consumerPriceIndex
+statType: dcid:measuredValue
+consumerGoodsCategory: dcid:RecreationAndAmusement
+placeOfResidenceClassification: dcid:Rural
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_RecreationAndAmusement_Urban
+typeOf: dcid:StatisticalVariable
+name: "Consumer price index of consumer good recreation and amusement in urban areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:consumerPriceIndex
+statType: dcid:measuredValue
+consumerGoodsCategory: dcid:RecreationAndAmusement
+placeOfResidenceClassification: dcid:Urban
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_Spices
+typeOf: dcid:StatisticalVariable
+name: "Consumer price index of consumer good spices"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:consumerPriceIndex
+statType: dcid:measuredValue
+consumerGoodsCategory: dcid:Spices
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_Spices_Rural
+typeOf: dcid:StatisticalVariable
+name: "Consumer price index of consumer good spices in rural areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:consumerPriceIndex
+statType: dcid:measuredValue
+consumerGoodsCategory: dcid:Spices
+placeOfResidenceClassification: dcid:Rural
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_Spices_Urban
+typeOf: dcid:StatisticalVariable
+name: "Consumer price index of consumer good spices in urban areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:consumerPriceIndex
+statType: dcid:measuredValue
+consumerGoodsCategory: dcid:Spices
+placeOfResidenceClassification: dcid:Urban
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_SugarAndConfectionery
+typeOf: dcid:StatisticalVariable
+name: "Consumer price index of consumer good sugar and confectionery"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:consumerPriceIndex
+statType: dcid:measuredValue
+consumerGoodsCategory: dcid:SugarAndConfectionery
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_SugarAndConfectionery_Rural
+typeOf: dcid:StatisticalVariable
+name: "Consumer price index of consumer good sugar and confectionery in rural areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:consumerPriceIndex
+statType: dcid:measuredValue
+consumerGoodsCategory: dcid:SugarAndConfectionery
+placeOfResidenceClassification: dcid:Rural
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_SugarAndConfectionery_Urban
+typeOf: dcid:StatisticalVariable
+name: "Consumer price index of consumer good sugar and confectionery in urban areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:consumerPriceIndex
+statType: dcid:measuredValue
+consumerGoodsCategory: dcid:SugarAndConfectionery
+placeOfResidenceClassification: dcid:Urban
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_TransportAndCommunication
+typeOf: dcid:StatisticalVariable
+name: "Consumer price index of consumer good transport and communication"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:consumerPriceIndex
+statType: dcid:measuredValue
+consumerGoodsCategory: dcid:TransportAndCommunication
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_TransportAndCommunication_Rural
+typeOf: dcid:StatisticalVariable
+name: "Consumer price index of consumer good transport and communication in rural areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:consumerPriceIndex
+statType: dcid:measuredValue
+consumerGoodsCategory: dcid:TransportAndCommunication
+placeOfResidenceClassification: dcid:Rural
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_TransportAndCommunication_Urban
+typeOf: dcid:StatisticalVariable
+name: "Consumer price index of consumer good transport and communication in urban areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:consumerPriceIndex
+statType: dcid:measuredValue
+consumerGoodsCategory: dcid:TransportAndCommunication
+placeOfResidenceClassification: dcid:Urban
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_Vegetables
+typeOf: dcid:StatisticalVariable
+name: "Consumer price index of consumer good vegetables"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:consumerPriceIndex
+statType: dcid:measuredValue
+consumerGoodsCategory: dcid:Vegetables
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_Vegetables_Rural
+typeOf: dcid:StatisticalVariable
+name: "Consumer price index of consumer good vegetables in rural areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:consumerPriceIndex
+statType: dcid:measuredValue
+consumerGoodsCategory: dcid:Vegetables
+placeOfResidenceClassification: dcid:Rural
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_Vegetables_Urban
+typeOf: dcid:StatisticalVariable
+name: "Consumer price index of consumer good vegetables in urban areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:consumerPriceIndex
+statType: dcid:measuredValue
+consumerGoodsCategory: dcid:Vegetables
+placeOfResidenceClassification: dcid:Urban
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_CerealsAndProducts
+typeOf: dcid:StatisticalVariable
+name: "Inflation of consumer good cereals and products"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:inflation
+statType: dcid:measuredValue
+activitySource: dcid:ConsumerPriceIndex
+consumerGoodsCategory: dcid:CerealsAndProducts
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_CerealsAndProducts_Rural
+typeOf: dcid:StatisticalVariable
+name: "Inflation of consumer good cereals and products in rural areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:inflation
+statType: dcid:measuredValue
+activitySource: dcid:ConsumerPriceIndex
+consumerGoodsCategory: dcid:CerealsAndProducts
+placeOfResidenceClassification: dcid:Rural
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_CerealsAndProducts_Urban
+typeOf: dcid:StatisticalVariable
+name: "Inflation of consumer good cereals and products in urban areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:inflation
+statType: dcid:measuredValue
+activitySource: dcid:ConsumerPriceIndex
+consumerGoodsCategory: dcid:CerealsAndProducts
+placeOfResidenceClassification: dcid:Urban
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_Clothing
+typeOf: dcid:StatisticalVariable
+name: "Inflation of consumer good clothing"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:inflation
+statType: dcid:measuredValue
+activitySource: dcid:ConsumerPriceIndex
+consumerGoodsCategory: dcid:Clothing
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_ClothingAndFootwear
+typeOf: dcid:StatisticalVariable
+name: "Inflation of consumer good clothing and footwear"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:inflation
+statType: dcid:measuredValue
+activitySource: dcid:ConsumerPriceIndex
+consumerGoodsCategory: dcid:ClothingAndFootwear
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_ClothingAndFootwear_Rural
+typeOf: dcid:StatisticalVariable
+name: "Inflation of consumer good clothing and footwear in rural areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:inflation
+statType: dcid:measuredValue
+activitySource: dcid:ConsumerPriceIndex
+consumerGoodsCategory: dcid:ClothingAndFootwear
+placeOfResidenceClassification: dcid:Rural
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_ClothingAndFootwear_Urban
+typeOf: dcid:StatisticalVariable
+name: "Inflation of consumer good clothing and footwear in urban areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:inflation
+statType: dcid:measuredValue
+activitySource: dcid:ConsumerPriceIndex
+consumerGoodsCategory: dcid:ClothingAndFootwear
+placeOfResidenceClassification: dcid:Urban
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_Clothing_Rural
+typeOf: dcid:StatisticalVariable
+name: "Inflation of consumer good clothing in rural areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:inflation
+statType: dcid:measuredValue
+activitySource: dcid:ConsumerPriceIndex
+consumerGoodsCategory: dcid:Clothing
+placeOfResidenceClassification: dcid:Rural
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_Clothing_Urban
+typeOf: dcid:StatisticalVariable
+name: "Inflation of consumer good clothing in urban areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:inflation
+statType: dcid:measuredValue
+activitySource: dcid:ConsumerPriceIndex
+consumerGoodsCategory: dcid:Clothing
+placeOfResidenceClassification: dcid:Urban
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_ConsumerFood
+typeOf: dcid:StatisticalVariable
+name: "Inflation of consumer good consumer food"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:inflation
+statType: dcid:measuredValue
+activitySource: dcid:ConsumerPriceIndex
+consumerGoodsCategory: dcid:ConsumerFood
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_ConsumerFood_Rural
+typeOf: dcid:StatisticalVariable
+name: "Inflation of consumer good consumer food in rural areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:inflation
+statType: dcid:measuredValue
+activitySource: dcid:ConsumerPriceIndex
+consumerGoodsCategory: dcid:ConsumerFood
+placeOfResidenceClassification: dcid:Rural
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_ConsumerFood_Urban
+typeOf: dcid:StatisticalVariable
+name: "Inflation of consumer good consumer food in urban areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:inflation
+statType: dcid:measuredValue
+activitySource: dcid:ConsumerPriceIndex
+consumerGoodsCategory: dcid:ConsumerFood
+placeOfResidenceClassification: dcid:Urban
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_Education
+typeOf: dcid:StatisticalVariable
+name: "Inflation of consumer good education"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:inflation
+statType: dcid:measuredValue
+activitySource: dcid:ConsumerPriceIndex
+consumerGoodsCategory: dcid:Education
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_Education_Rural
+typeOf: dcid:StatisticalVariable
+name: "Inflation of consumer good education in rural areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:inflation
+statType: dcid:measuredValue
+activitySource: dcid:ConsumerPriceIndex
+consumerGoodsCategory: dcid:Education
+placeOfResidenceClassification: dcid:Rural
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_Education_Urban
+typeOf: dcid:StatisticalVariable
+name: "Inflation of consumer good education in urban areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:inflation
+statType: dcid:measuredValue
+activitySource: dcid:ConsumerPriceIndex
+consumerGoodsCategory: dcid:Education
+placeOfResidenceClassification: dcid:Urban
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_Egg
+typeOf: dcid:StatisticalVariable
+name: "Inflation of consumer good egg"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:inflation
+statType: dcid:measuredValue
+activitySource: dcid:ConsumerPriceIndex
+consumerGoodsCategory: dcid:Egg
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_Egg_Rural
+typeOf: dcid:StatisticalVariable
+name: "Inflation of consumer good egg in rural areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:inflation
+statType: dcid:measuredValue
+activitySource: dcid:ConsumerPriceIndex
+consumerGoodsCategory: dcid:Egg
+placeOfResidenceClassification: dcid:Rural
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_Egg_Urban
+typeOf: dcid:StatisticalVariable
+name: "Inflation of consumer good egg in urban areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:inflation
+statType: dcid:measuredValue
+activitySource: dcid:ConsumerPriceIndex
+consumerGoodsCategory: dcid:Egg
+placeOfResidenceClassification: dcid:Urban
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_FoodAndBeverages
+typeOf: dcid:StatisticalVariable
+name: "Inflation of consumer good food and beverages"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:inflation
+statType: dcid:measuredValue
+activitySource: dcid:ConsumerPriceIndex
+consumerGoodsCategory: dcid:FoodAndBeverages
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_FoodAndBeverages_Rural
+typeOf: dcid:StatisticalVariable
+name: "Inflation of consumer good food and beverages in rural areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:inflation
+statType: dcid:measuredValue
+activitySource: dcid:ConsumerPriceIndex
+consumerGoodsCategory: dcid:FoodAndBeverages
+placeOfResidenceClassification: dcid:Rural
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_FoodAndBeverages_Urban
+typeOf: dcid:StatisticalVariable
+name: "Inflation of consumer good food and beverages in urban areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:inflation
+statType: dcid:measuredValue
+activitySource: dcid:ConsumerPriceIndex
+consumerGoodsCategory: dcid:FoodAndBeverages
+placeOfResidenceClassification: dcid:Urban
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_Footwear
+typeOf: dcid:StatisticalVariable
+name: "Inflation of consumer good footwear"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:inflation
+statType: dcid:measuredValue
+activitySource: dcid:ConsumerPriceIndex
+consumerGoodsCategory: dcid:Footwear
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_Footwear_Rural
+typeOf: dcid:StatisticalVariable
+name: "Inflation of consumer good footwear in rural areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:inflation
+statType: dcid:measuredValue
+activitySource: dcid:ConsumerPriceIndex
+consumerGoodsCategory: dcid:Footwear
+placeOfResidenceClassification: dcid:Rural
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_Footwear_Urban
+typeOf: dcid:StatisticalVariable
+name: "Inflation of consumer good footwear in urban areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:inflation
+statType: dcid:measuredValue
+activitySource: dcid:ConsumerPriceIndex
+consumerGoodsCategory: dcid:Footwear
+placeOfResidenceClassification: dcid:Urban
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_Fruits
+typeOf: dcid:StatisticalVariable
+name: "Inflation of consumer good fruits"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:inflation
+statType: dcid:measuredValue
+activitySource: dcid:ConsumerPriceIndex
+consumerGoodsCategory: dcid:Fruits
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_Fruits_Rural
+typeOf: dcid:StatisticalVariable
+name: "Inflation of consumer good fruits in rural areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:inflation
+statType: dcid:measuredValue
+activitySource: dcid:ConsumerPriceIndex
+consumerGoodsCategory: dcid:Fruits
+placeOfResidenceClassification: dcid:Rural
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_Fruits_Urban
+typeOf: dcid:StatisticalVariable
+name: "Inflation of consumer good fruits in urban areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:inflation
+statType: dcid:measuredValue
+activitySource: dcid:ConsumerPriceIndex
+consumerGoodsCategory: dcid:Fruits
+placeOfResidenceClassification: dcid:Urban
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_FuelAndLight
+typeOf: dcid:StatisticalVariable
+name: "Inflation of consumer good fuel and light"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:inflation
+statType: dcid:measuredValue
+activitySource: dcid:ConsumerPriceIndex
+consumerGoodsCategory: dcid:FuelAndLight
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_FuelAndLight_Rural
+typeOf: dcid:StatisticalVariable
+name: "Inflation of consumer good fuel and light in rural areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:inflation
+statType: dcid:measuredValue
+activitySource: dcid:ConsumerPriceIndex
+consumerGoodsCategory: dcid:FuelAndLight
+placeOfResidenceClassification: dcid:Rural
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_FuelAndLight_Urban
+typeOf: dcid:StatisticalVariable
+name: "Inflation of consumer good fuel and light in urban areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:inflation
+statType: dcid:measuredValue
+activitySource: dcid:ConsumerPriceIndex
+consumerGoodsCategory: dcid:FuelAndLight
+placeOfResidenceClassification: dcid:Urban
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_Health
+typeOf: dcid:StatisticalVariable
+name: "Inflation of consumer good health"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:inflation
+statType: dcid:measuredValue
+activitySource: dcid:ConsumerPriceIndex
+consumerGoodsCategory: dcid:Health
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_Health_Rural
+typeOf: dcid:StatisticalVariable
+name: "Inflation of consumer good health in rural areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:inflation
+statType: dcid:measuredValue
+activitySource: dcid:ConsumerPriceIndex
+consumerGoodsCategory: dcid:Health
+placeOfResidenceClassification: dcid:Rural
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_Health_Urban
+typeOf: dcid:StatisticalVariable
+name: "Inflation of consumer good health in urban areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:inflation
+statType: dcid:measuredValue
+activitySource: dcid:ConsumerPriceIndex
+consumerGoodsCategory: dcid:Health
+placeOfResidenceClassification: dcid:Urban
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_HouseholdGoodsAndServices
+typeOf: dcid:StatisticalVariable
+name: "Inflation of consumer good household goods and services"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:inflation
+statType: dcid:measuredValue
+activitySource: dcid:ConsumerPriceIndex
+consumerGoodsCategory: dcid:HouseholdGoodsAndServices
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_HouseholdGoodsAndServices_Rural
+typeOf: dcid:StatisticalVariable
+name: "Inflation of consumer good household goods and services in rural areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:inflation
+statType: dcid:measuredValue
+activitySource: dcid:ConsumerPriceIndex
+consumerGoodsCategory: dcid:HouseholdGoodsAndServices
+placeOfResidenceClassification: dcid:Rural
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_HouseholdGoodsAndServices_Urban
+typeOf: dcid:StatisticalVariable
+name: "Inflation of consumer good household goods and services in urban areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:inflation
+statType: dcid:measuredValue
+activitySource: dcid:ConsumerPriceIndex
+consumerGoodsCategory: dcid:HouseholdGoodsAndServices
+placeOfResidenceClassification: dcid:Urban
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_Housing
+typeOf: dcid:StatisticalVariable
+name: "Inflation of consumer good housing"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:inflation
+statType: dcid:measuredValue
+activitySource: dcid:ConsumerPriceIndex
+consumerGoodsCategory: dcid:Housing
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_Housing_Urban
+typeOf: dcid:StatisticalVariable
+name: "Inflation of consumer good housing in urban areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:inflation
+statType: dcid:measuredValue
+activitySource: dcid:ConsumerPriceIndex
+consumerGoodsCategory: dcid:Housing
+placeOfResidenceClassification: dcid:Urban
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_MOSPIGeneral
+typeOf: dcid:StatisticalVariable
+name: "Inflation of consumer good all items"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:inflation
+statType: dcid:measuredValue
+activitySource: dcid:ConsumerPriceIndex
+consumerGoodsCategory: dcid:MOSPI_General
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_MOSPIGeneral_Rural
+typeOf: dcid:StatisticalVariable
+name: "Inflation of consumer good all items in rural areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:inflation
+statType: dcid:measuredValue
+activitySource: dcid:ConsumerPriceIndex
+consumerGoodsCategory: dcid:MOSPI_General
+placeOfResidenceClassification: dcid:Rural
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_MOSPIGeneral_Urban
+typeOf: dcid:StatisticalVariable
+name: "Inflation of consumer good all items in urban areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:inflation
+statType: dcid:measuredValue
+activitySource: dcid:ConsumerPriceIndex
+consumerGoodsCategory: dcid:MOSPI_General
+placeOfResidenceClassification: dcid:Urban
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_MOSPIMiscellaneous
+typeOf: dcid:StatisticalVariable
+name: "Inflation of consumer good miscellaneous items"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:inflation
+statType: dcid:measuredValue
+activitySource: dcid:ConsumerPriceIndex
+consumerGoodsCategory: dcid:MOSPI_Miscellaneous
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_MOSPIMiscellaneous_Rural
+typeOf: dcid:StatisticalVariable
+name: "Inflation of consumer good miscellaneous items in rural areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:inflation
+statType: dcid:measuredValue
+activitySource: dcid:ConsumerPriceIndex
+consumerGoodsCategory: dcid:MOSPI_Miscellaneous
+placeOfResidenceClassification: dcid:Rural
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_MOSPIMiscellaneous_Urban
+typeOf: dcid:StatisticalVariable
+name: "Inflation of consumer good miscellaneous items in urban areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:inflation
+statType: dcid:measuredValue
+activitySource: dcid:ConsumerPriceIndex
+consumerGoodsCategory: dcid:MOSPI_Miscellaneous
+placeOfResidenceClassification: dcid:Urban
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_MeatAndFish
+typeOf: dcid:StatisticalVariable
+name: "Inflation of consumer good meat and fish"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:inflation
+statType: dcid:measuredValue
+activitySource: dcid:ConsumerPriceIndex
+consumerGoodsCategory: dcid:MeatAndFish
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_MeatAndFish_Rural
+typeOf: dcid:StatisticalVariable
+name: "Inflation of consumer good meat and fish in rural areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:inflation
+statType: dcid:measuredValue
+activitySource: dcid:ConsumerPriceIndex
+consumerGoodsCategory: dcid:MeatAndFish
+placeOfResidenceClassification: dcid:Rural
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_MeatAndFish_Urban
+typeOf: dcid:StatisticalVariable
+name: "Inflation of consumer good meat and fish in urban areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:inflation
+statType: dcid:measuredValue
+activitySource: dcid:ConsumerPriceIndex
+consumerGoodsCategory: dcid:MeatAndFish
+placeOfResidenceClassification: dcid:Urban
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_MilkAndProducts
+typeOf: dcid:StatisticalVariable
+name: "Inflation of consumer good milk and products"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:inflation
+statType: dcid:measuredValue
+activitySource: dcid:ConsumerPriceIndex
+consumerGoodsCategory: dcid:MilkAndProducts
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_MilkAndProducts_Rural
+typeOf: dcid:StatisticalVariable
+name: "Inflation of consumer good milk and products in rural areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:inflation
+statType: dcid:measuredValue
+activitySource: dcid:ConsumerPriceIndex
+consumerGoodsCategory: dcid:MilkAndProducts
+placeOfResidenceClassification: dcid:Rural
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_MilkAndProducts_Urban
+typeOf: dcid:StatisticalVariable
+name: "Inflation of consumer good milk and products in urban areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:inflation
+statType: dcid:measuredValue
+activitySource: dcid:ConsumerPriceIndex
+consumerGoodsCategory: dcid:MilkAndProducts
+placeOfResidenceClassification: dcid:Urban
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_NonAlcoholicBeverages
+typeOf: dcid:StatisticalVariable
+name: "Inflation of consumer good non alcoholic beverages"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:inflation
+statType: dcid:measuredValue
+activitySource: dcid:ConsumerPriceIndex
+consumerGoodsCategory: dcid:NonAlcoholicBeverages
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_NonAlcoholicBeverages_Rural
+typeOf: dcid:StatisticalVariable
+name: "Inflation of consumer good non alcoholic beverages in rural areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:inflation
+statType: dcid:measuredValue
+activitySource: dcid:ConsumerPriceIndex
+consumerGoodsCategory: dcid:NonAlcoholicBeverages
+placeOfResidenceClassification: dcid:Rural
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_NonAlcoholicBeverages_Urban
+typeOf: dcid:StatisticalVariable
+name: "Inflation of consumer good non alcoholic beverages in urban areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:inflation
+statType: dcid:measuredValue
+activitySource: dcid:ConsumerPriceIndex
+consumerGoodsCategory: dcid:NonAlcoholicBeverages
+placeOfResidenceClassification: dcid:Urban
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_OilsAndFats
+typeOf: dcid:StatisticalVariable
+name: "Inflation of consumer good oils and fats"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:inflation
+statType: dcid:measuredValue
+activitySource: dcid:ConsumerPriceIndex
+consumerGoodsCategory: dcid:OilsAndFats
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_OilsAndFats_Rural
+typeOf: dcid:StatisticalVariable
+name: "Inflation of consumer good oils and fats in rural areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:inflation
+statType: dcid:measuredValue
+activitySource: dcid:ConsumerPriceIndex
+consumerGoodsCategory: dcid:OilsAndFats
+placeOfResidenceClassification: dcid:Rural
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_OilsAndFats_Urban
+typeOf: dcid:StatisticalVariable
+name: "Inflation of consumer good oils and fats in urban areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:inflation
+statType: dcid:measuredValue
+activitySource: dcid:ConsumerPriceIndex
+consumerGoodsCategory: dcid:OilsAndFats
+placeOfResidenceClassification: dcid:Urban
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_PanTobaccoAndIntoxicants
+typeOf: dcid:StatisticalVariable
+name: "Inflation of consumer good pan tobacco and intoxicants"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:inflation
+statType: dcid:measuredValue
+activitySource: dcid:ConsumerPriceIndex
+consumerGoodsCategory: dcid:PanTobaccoAndIntoxicants
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_PanTobaccoAndIntoxicants_Rural
+typeOf: dcid:StatisticalVariable
+name: "Inflation of consumer good pan tobacco and intoxicants in rural areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:inflation
+statType: dcid:measuredValue
+activitySource: dcid:ConsumerPriceIndex
+consumerGoodsCategory: dcid:PanTobaccoAndIntoxicants
+placeOfResidenceClassification: dcid:Rural
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_PanTobaccoAndIntoxicants_Urban
+typeOf: dcid:StatisticalVariable
+name: "Inflation of consumer good pan tobacco and intoxicants in urban areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:inflation
+statType: dcid:measuredValue
+activitySource: dcid:ConsumerPriceIndex
+consumerGoodsCategory: dcid:PanTobaccoAndIntoxicants
+placeOfResidenceClassification: dcid:Urban
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_PersonalCareAndEffects
+typeOf: dcid:StatisticalVariable
+name: "Inflation of consumer good personal care and effects"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:inflation
+statType: dcid:measuredValue
+activitySource: dcid:ConsumerPriceIndex
+consumerGoodsCategory: dcid:PersonalCareAndEffects
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_PersonalCareAndEffects_Rural
+typeOf: dcid:StatisticalVariable
+name: "Inflation of consumer good personal care and effects in rural areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:inflation
+statType: dcid:measuredValue
+activitySource: dcid:ConsumerPriceIndex
+consumerGoodsCategory: dcid:PersonalCareAndEffects
+placeOfResidenceClassification: dcid:Rural
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_PersonalCareAndEffects_Urban
+typeOf: dcid:StatisticalVariable
+name: "Inflation of consumer good personal care and effects in urban areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:inflation
+statType: dcid:measuredValue
+activitySource: dcid:ConsumerPriceIndex
+consumerGoodsCategory: dcid:PersonalCareAndEffects
+placeOfResidenceClassification: dcid:Urban
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_PreparedMealsSnacksSweets
+typeOf: dcid:StatisticalVariable
+name: "Inflation of consumer good prepared meals snacks sweets"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:inflation
+statType: dcid:measuredValue
+activitySource: dcid:ConsumerPriceIndex
+consumerGoodsCategory: dcid:PreparedMealsSnacksSweets
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_PreparedMealsSnacksSweets_Rural
+typeOf: dcid:StatisticalVariable
+name: "Inflation of consumer good prepared meals snacks sweets in rural areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:inflation
+statType: dcid:measuredValue
+activitySource: dcid:ConsumerPriceIndex
+consumerGoodsCategory: dcid:PreparedMealsSnacksSweets
+placeOfResidenceClassification: dcid:Rural
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_PreparedMealsSnacksSweets_Urban
+typeOf: dcid:StatisticalVariable
+name: "Inflation of consumer good prepared meals snacks sweets in urban areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:inflation
+statType: dcid:measuredValue
+activitySource: dcid:ConsumerPriceIndex
+consumerGoodsCategory: dcid:PreparedMealsSnacksSweets
+placeOfResidenceClassification: dcid:Urban
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_PulsesAndProducts
+typeOf: dcid:StatisticalVariable
+name: "Inflation of consumer good pulses and products"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:inflation
+statType: dcid:measuredValue
+activitySource: dcid:ConsumerPriceIndex
+consumerGoodsCategory: dcid:PulsesAndProducts
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_PulsesAndProducts_Rural
+typeOf: dcid:StatisticalVariable
+name: "Inflation of consumer good pulses and products in rural areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:inflation
+statType: dcid:measuredValue
+activitySource: dcid:ConsumerPriceIndex
+consumerGoodsCategory: dcid:PulsesAndProducts
+placeOfResidenceClassification: dcid:Rural
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_PulsesAndProducts_Urban
+typeOf: dcid:StatisticalVariable
+name: "Inflation of consumer good pulses and products in urban areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:inflation
+statType: dcid:measuredValue
+activitySource: dcid:ConsumerPriceIndex
+consumerGoodsCategory: dcid:PulsesAndProducts
+placeOfResidenceClassification: dcid:Urban
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_RecreationAndAmusement
+typeOf: dcid:StatisticalVariable
+name: "Inflation of consumer good recreation and amusement"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:inflation
+statType: dcid:measuredValue
+activitySource: dcid:ConsumerPriceIndex
+consumerGoodsCategory: dcid:RecreationAndAmusement
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_RecreationAndAmusement_Rural
+typeOf: dcid:StatisticalVariable
+name: "Inflation of consumer good recreation and amusement in rural areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:inflation
+statType: dcid:measuredValue
+activitySource: dcid:ConsumerPriceIndex
+consumerGoodsCategory: dcid:RecreationAndAmusement
+placeOfResidenceClassification: dcid:Rural
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_RecreationAndAmusement_Urban
+typeOf: dcid:StatisticalVariable
+name: "Inflation of consumer good recreation and amusement in urban areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:inflation
+statType: dcid:measuredValue
+activitySource: dcid:ConsumerPriceIndex
+consumerGoodsCategory: dcid:RecreationAndAmusement
+placeOfResidenceClassification: dcid:Urban
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_Spices
+typeOf: dcid:StatisticalVariable
+name: "Inflation of consumer good spices"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:inflation
+statType: dcid:measuredValue
+activitySource: dcid:ConsumerPriceIndex
+consumerGoodsCategory: dcid:Spices
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_Spices_Rural
+typeOf: dcid:StatisticalVariable
+name: "Inflation of consumer good spices in rural areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:inflation
+statType: dcid:measuredValue
+activitySource: dcid:ConsumerPriceIndex
+consumerGoodsCategory: dcid:Spices
+placeOfResidenceClassification: dcid:Rural
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_Spices_Urban
+typeOf: dcid:StatisticalVariable
+name: "Inflation of consumer good spices in urban areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:inflation
+statType: dcid:measuredValue
+activitySource: dcid:ConsumerPriceIndex
+consumerGoodsCategory: dcid:Spices
+placeOfResidenceClassification: dcid:Urban
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_SugarAndConfectionery
+typeOf: dcid:StatisticalVariable
+name: "Inflation of consumer good sugar and confectionery"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:inflation
+statType: dcid:measuredValue
+activitySource: dcid:ConsumerPriceIndex
+consumerGoodsCategory: dcid:SugarAndConfectionery
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_SugarAndConfectionery_Rural
+typeOf: dcid:StatisticalVariable
+name: "Inflation of consumer good sugar and confectionery in rural areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:inflation
+statType: dcid:measuredValue
+activitySource: dcid:ConsumerPriceIndex
+consumerGoodsCategory: dcid:SugarAndConfectionery
+placeOfResidenceClassification: dcid:Rural
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_SugarAndConfectionery_Urban
+typeOf: dcid:StatisticalVariable
+name: "Inflation of consumer good sugar and confectionery in urban areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:inflation
+statType: dcid:measuredValue
+activitySource: dcid:ConsumerPriceIndex
+consumerGoodsCategory: dcid:SugarAndConfectionery
+placeOfResidenceClassification: dcid:Urban
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_TransportAndCommunication
+typeOf: dcid:StatisticalVariable
+name: "Inflation of consumer good transport and communication"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:inflation
+statType: dcid:measuredValue
+activitySource: dcid:ConsumerPriceIndex
+consumerGoodsCategory: dcid:TransportAndCommunication
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_TransportAndCommunication_Rural
+typeOf: dcid:StatisticalVariable
+name: "Inflation of consumer good transport and communication in rural areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:inflation
+statType: dcid:measuredValue
+activitySource: dcid:ConsumerPriceIndex
+consumerGoodsCategory: dcid:TransportAndCommunication
+placeOfResidenceClassification: dcid:Rural
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_TransportAndCommunication_Urban
+typeOf: dcid:StatisticalVariable
+name: "Inflation of consumer good transport and communication in urban areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:inflation
+statType: dcid:measuredValue
+activitySource: dcid:ConsumerPriceIndex
+consumerGoodsCategory: dcid:TransportAndCommunication
+placeOfResidenceClassification: dcid:Urban
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_Vegetables
+typeOf: dcid:StatisticalVariable
+name: "Inflation of consumer good vegetables"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:inflation
+statType: dcid:measuredValue
+activitySource: dcid:ConsumerPriceIndex
+consumerGoodsCategory: dcid:Vegetables
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_Vegetables_Rural
+typeOf: dcid:StatisticalVariable
+name: "Inflation of consumer good vegetables in rural areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:inflation
+statType: dcid:measuredValue
+activitySource: dcid:ConsumerPriceIndex
+consumerGoodsCategory: dcid:Vegetables
+placeOfResidenceClassification: dcid:Rural
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_Vegetables_Urban
+typeOf: dcid:StatisticalVariable
+name: "Inflation of consumer good vegetables in urban areas"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:inflation
+statType: dcid:measuredValue
+activitySource: dcid:ConsumerPriceIndex
+consumerGoodsCategory: dcid:Vegetables
+placeOfResidenceClassification: dcid:Urban
+

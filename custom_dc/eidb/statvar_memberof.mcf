@@ -13835,3 +13835,508 @@ memberOf: dcid:dc/g/EIDB_GrowthRates
 
 Node: dcid:GrowthRate_Exports_EconomicActivity_ZirconiumArticlesThereofIncludingWasteAndScrap
 memberOf: dcid:dc/g/EIDB_GrowthRates
+
+# ============================================================
+# MOSPI CPI memberOf statements (auto-generated)
+# ============================================================
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_CerealsAndProducts
+memberOf: dcid:dc/g/MOSPI_CPI
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_CerealsAndProducts_Rural
+memberOf: dcid:dc/g/MOSPI_CPI
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_CerealsAndProducts_Urban
+memberOf: dcid:dc/g/MOSPI_CPI
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_Clothing
+memberOf: dcid:dc/g/MOSPI_CPI
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_ClothingAndFootwear
+memberOf: dcid:dc/g/MOSPI_CPI
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_ClothingAndFootwear_Rural
+memberOf: dcid:dc/g/MOSPI_CPI
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_ClothingAndFootwear_Urban
+memberOf: dcid:dc/g/MOSPI_CPI
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_Clothing_Rural
+memberOf: dcid:dc/g/MOSPI_CPI
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_Clothing_Urban
+memberOf: dcid:dc/g/MOSPI_CPI
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_ConsumerFood
+memberOf: dcid:dc/g/MOSPI_CPI
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_ConsumerFood_Rural
+memberOf: dcid:dc/g/MOSPI_CPI
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_ConsumerFood_Urban
+memberOf: dcid:dc/g/MOSPI_CPI
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_Education
+memberOf: dcid:dc/g/MOSPI_CPI
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_Education_Rural
+memberOf: dcid:dc/g/MOSPI_CPI
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_Education_Urban
+memberOf: dcid:dc/g/MOSPI_CPI
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_Egg
+memberOf: dcid:dc/g/MOSPI_CPI
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_Egg_Rural
+memberOf: dcid:dc/g/MOSPI_CPI
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_Egg_Urban
+memberOf: dcid:dc/g/MOSPI_CPI
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_FoodAndBeverages
+memberOf: dcid:dc/g/MOSPI_CPI
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_FoodAndBeverages_Rural
+memberOf: dcid:dc/g/MOSPI_CPI
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_FoodAndBeverages_Urban
+memberOf: dcid:dc/g/MOSPI_CPI
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_Footwear
+memberOf: dcid:dc/g/MOSPI_CPI
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_Footwear_Rural
+memberOf: dcid:dc/g/MOSPI_CPI
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_Footwear_Urban
+memberOf: dcid:dc/g/MOSPI_CPI
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_Fruits
+memberOf: dcid:dc/g/MOSPI_CPI
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_Fruits_Rural
+memberOf: dcid:dc/g/MOSPI_CPI
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_Fruits_Urban
+memberOf: dcid:dc/g/MOSPI_CPI
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_FuelAndLight
+memberOf: dcid:dc/g/MOSPI_CPI
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_FuelAndLight_Rural
+memberOf: dcid:dc/g/MOSPI_CPI
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_FuelAndLight_Urban
+memberOf: dcid:dc/g/MOSPI_CPI
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_Health
+memberOf: dcid:dc/g/MOSPI_CPI
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_Health_Rural
+memberOf: dcid:dc/g/MOSPI_CPI
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_Health_Urban
+memberOf: dcid:dc/g/MOSPI_CPI
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_HouseholdGoodsAndServices
+memberOf: dcid:dc/g/MOSPI_CPI
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_HouseholdGoodsAndServices_Rural
+memberOf: dcid:dc/g/MOSPI_CPI
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_HouseholdGoodsAndServices_Urban
+memberOf: dcid:dc/g/MOSPI_CPI
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_Housing
+memberOf: dcid:dc/g/MOSPI_CPI
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_Housing_Rural
+memberOf: dcid:dc/g/MOSPI_CPI
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_Housing_Urban
+memberOf: dcid:dc/g/MOSPI_CPI
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_MOSPIGeneral
+memberOf: dcid:dc/g/MOSPI_CPI
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_MOSPIGeneral_Rural
+memberOf: dcid:dc/g/MOSPI_CPI
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_MOSPIGeneral_Urban
+memberOf: dcid:dc/g/MOSPI_CPI
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_MOSPIMiscellaneous
+memberOf: dcid:dc/g/MOSPI_CPI
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_MOSPIMiscellaneous_Rural
+memberOf: dcid:dc/g/MOSPI_CPI
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_MOSPIMiscellaneous_Urban
+memberOf: dcid:dc/g/MOSPI_CPI
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_MeatAndFish
+memberOf: dcid:dc/g/MOSPI_CPI
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_MeatAndFish_Rural
+memberOf: dcid:dc/g/MOSPI_CPI
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_MeatAndFish_Urban
+memberOf: dcid:dc/g/MOSPI_CPI
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_MilkAndProducts
+memberOf: dcid:dc/g/MOSPI_CPI
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_MilkAndProducts_Rural
+memberOf: dcid:dc/g/MOSPI_CPI
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_MilkAndProducts_Urban
+memberOf: dcid:dc/g/MOSPI_CPI
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_NonAlcoholicBeverages
+memberOf: dcid:dc/g/MOSPI_CPI
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_NonAlcoholicBeverages_Rural
+memberOf: dcid:dc/g/MOSPI_CPI
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_NonAlcoholicBeverages_Urban
+memberOf: dcid:dc/g/MOSPI_CPI
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_OilsAndFats
+memberOf: dcid:dc/g/MOSPI_CPI
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_OilsAndFats_Rural
+memberOf: dcid:dc/g/MOSPI_CPI
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_OilsAndFats_Urban
+memberOf: dcid:dc/g/MOSPI_CPI
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_PanTobaccoAndIntoxicants
+memberOf: dcid:dc/g/MOSPI_CPI
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_PanTobaccoAndIntoxicants_Rural
+memberOf: dcid:dc/g/MOSPI_CPI
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_PanTobaccoAndIntoxicants_Urban
+memberOf: dcid:dc/g/MOSPI_CPI
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_PersonalCareAndEffects
+memberOf: dcid:dc/g/MOSPI_CPI
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_PersonalCareAndEffects_Rural
+memberOf: dcid:dc/g/MOSPI_CPI
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_PersonalCareAndEffects_Urban
+memberOf: dcid:dc/g/MOSPI_CPI
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_PreparedMealsSnacksSweets
+memberOf: dcid:dc/g/MOSPI_CPI
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_PreparedMealsSnacksSweets_Rural
+memberOf: dcid:dc/g/MOSPI_CPI
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_PreparedMealsSnacksSweets_Urban
+memberOf: dcid:dc/g/MOSPI_CPI
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_PulsesAndProducts
+memberOf: dcid:dc/g/MOSPI_CPI
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_PulsesAndProducts_Rural
+memberOf: dcid:dc/g/MOSPI_CPI
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_PulsesAndProducts_Urban
+memberOf: dcid:dc/g/MOSPI_CPI
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_RecreationAndAmusement
+memberOf: dcid:dc/g/MOSPI_CPI
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_RecreationAndAmusement_Rural
+memberOf: dcid:dc/g/MOSPI_CPI
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_RecreationAndAmusement_Urban
+memberOf: dcid:dc/g/MOSPI_CPI
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_Spices
+memberOf: dcid:dc/g/MOSPI_CPI
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_Spices_Rural
+memberOf: dcid:dc/g/MOSPI_CPI
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_Spices_Urban
+memberOf: dcid:dc/g/MOSPI_CPI
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_SugarAndConfectionery
+memberOf: dcid:dc/g/MOSPI_CPI
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_SugarAndConfectionery_Rural
+memberOf: dcid:dc/g/MOSPI_CPI
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_SugarAndConfectionery_Urban
+memberOf: dcid:dc/g/MOSPI_CPI
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_TransportAndCommunication
+memberOf: dcid:dc/g/MOSPI_CPI
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_TransportAndCommunication_Rural
+memberOf: dcid:dc/g/MOSPI_CPI
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_TransportAndCommunication_Urban
+memberOf: dcid:dc/g/MOSPI_CPI
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_Vegetables
+memberOf: dcid:dc/g/MOSPI_CPI
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_Vegetables_Rural
+memberOf: dcid:dc/g/MOSPI_CPI
+
+Node: dcid:ConsumerPriceIndex_EconomicActivity_Vegetables_Urban
+memberOf: dcid:dc/g/MOSPI_CPI
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_CerealsAndProducts
+memberOf: dcid:dc/g/MOSPI_Inflation
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_CerealsAndProducts_Rural
+memberOf: dcid:dc/g/MOSPI_Inflation
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_CerealsAndProducts_Urban
+memberOf: dcid:dc/g/MOSPI_Inflation
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_Clothing
+memberOf: dcid:dc/g/MOSPI_Inflation
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_ClothingAndFootwear
+memberOf: dcid:dc/g/MOSPI_Inflation
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_ClothingAndFootwear_Rural
+memberOf: dcid:dc/g/MOSPI_Inflation
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_ClothingAndFootwear_Urban
+memberOf: dcid:dc/g/MOSPI_Inflation
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_Clothing_Rural
+memberOf: dcid:dc/g/MOSPI_Inflation
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_Clothing_Urban
+memberOf: dcid:dc/g/MOSPI_Inflation
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_ConsumerFood
+memberOf: dcid:dc/g/MOSPI_Inflation
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_ConsumerFood_Rural
+memberOf: dcid:dc/g/MOSPI_Inflation
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_ConsumerFood_Urban
+memberOf: dcid:dc/g/MOSPI_Inflation
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_Education
+memberOf: dcid:dc/g/MOSPI_Inflation
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_Education_Rural
+memberOf: dcid:dc/g/MOSPI_Inflation
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_Education_Urban
+memberOf: dcid:dc/g/MOSPI_Inflation
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_Egg
+memberOf: dcid:dc/g/MOSPI_Inflation
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_Egg_Rural
+memberOf: dcid:dc/g/MOSPI_Inflation
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_Egg_Urban
+memberOf: dcid:dc/g/MOSPI_Inflation
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_FoodAndBeverages
+memberOf: dcid:dc/g/MOSPI_Inflation
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_FoodAndBeverages_Rural
+memberOf: dcid:dc/g/MOSPI_Inflation
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_FoodAndBeverages_Urban
+memberOf: dcid:dc/g/MOSPI_Inflation
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_Footwear
+memberOf: dcid:dc/g/MOSPI_Inflation
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_Footwear_Rural
+memberOf: dcid:dc/g/MOSPI_Inflation
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_Footwear_Urban
+memberOf: dcid:dc/g/MOSPI_Inflation
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_Fruits
+memberOf: dcid:dc/g/MOSPI_Inflation
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_Fruits_Rural
+memberOf: dcid:dc/g/MOSPI_Inflation
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_Fruits_Urban
+memberOf: dcid:dc/g/MOSPI_Inflation
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_FuelAndLight
+memberOf: dcid:dc/g/MOSPI_Inflation
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_FuelAndLight_Rural
+memberOf: dcid:dc/g/MOSPI_Inflation
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_FuelAndLight_Urban
+memberOf: dcid:dc/g/MOSPI_Inflation
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_Health
+memberOf: dcid:dc/g/MOSPI_Inflation
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_Health_Rural
+memberOf: dcid:dc/g/MOSPI_Inflation
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_Health_Urban
+memberOf: dcid:dc/g/MOSPI_Inflation
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_HouseholdGoodsAndServices
+memberOf: dcid:dc/g/MOSPI_Inflation
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_HouseholdGoodsAndServices_Rural
+memberOf: dcid:dc/g/MOSPI_Inflation
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_HouseholdGoodsAndServices_Urban
+memberOf: dcid:dc/g/MOSPI_Inflation
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_Housing
+memberOf: dcid:dc/g/MOSPI_Inflation
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_Housing_Urban
+memberOf: dcid:dc/g/MOSPI_Inflation
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_MOSPIGeneral
+memberOf: dcid:dc/g/MOSPI_Inflation
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_MOSPIGeneral_Rural
+memberOf: dcid:dc/g/MOSPI_Inflation
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_MOSPIGeneral_Urban
+memberOf: dcid:dc/g/MOSPI_Inflation
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_MOSPIMiscellaneous
+memberOf: dcid:dc/g/MOSPI_Inflation
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_MOSPIMiscellaneous_Rural
+memberOf: dcid:dc/g/MOSPI_Inflation
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_MOSPIMiscellaneous_Urban
+memberOf: dcid:dc/g/MOSPI_Inflation
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_MeatAndFish
+memberOf: dcid:dc/g/MOSPI_Inflation
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_MeatAndFish_Rural
+memberOf: dcid:dc/g/MOSPI_Inflation
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_MeatAndFish_Urban
+memberOf: dcid:dc/g/MOSPI_Inflation
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_MilkAndProducts
+memberOf: dcid:dc/g/MOSPI_Inflation
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_MilkAndProducts_Rural
+memberOf: dcid:dc/g/MOSPI_Inflation
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_MilkAndProducts_Urban
+memberOf: dcid:dc/g/MOSPI_Inflation
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_NonAlcoholicBeverages
+memberOf: dcid:dc/g/MOSPI_Inflation
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_NonAlcoholicBeverages_Rural
+memberOf: dcid:dc/g/MOSPI_Inflation
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_NonAlcoholicBeverages_Urban
+memberOf: dcid:dc/g/MOSPI_Inflation
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_OilsAndFats
+memberOf: dcid:dc/g/MOSPI_Inflation
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_OilsAndFats_Rural
+memberOf: dcid:dc/g/MOSPI_Inflation
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_OilsAndFats_Urban
+memberOf: dcid:dc/g/MOSPI_Inflation
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_PanTobaccoAndIntoxicants
+memberOf: dcid:dc/g/MOSPI_Inflation
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_PanTobaccoAndIntoxicants_Rural
+memberOf: dcid:dc/g/MOSPI_Inflation
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_PanTobaccoAndIntoxicants_Urban
+memberOf: dcid:dc/g/MOSPI_Inflation
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_PersonalCareAndEffects
+memberOf: dcid:dc/g/MOSPI_Inflation
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_PersonalCareAndEffects_Rural
+memberOf: dcid:dc/g/MOSPI_Inflation
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_PersonalCareAndEffects_Urban
+memberOf: dcid:dc/g/MOSPI_Inflation
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_PreparedMealsSnacksSweets
+memberOf: dcid:dc/g/MOSPI_Inflation
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_PreparedMealsSnacksSweets_Rural
+memberOf: dcid:dc/g/MOSPI_Inflation
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_PreparedMealsSnacksSweets_Urban
+memberOf: dcid:dc/g/MOSPI_Inflation
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_PulsesAndProducts
+memberOf: dcid:dc/g/MOSPI_Inflation
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_PulsesAndProducts_Rural
+memberOf: dcid:dc/g/MOSPI_Inflation
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_PulsesAndProducts_Urban
+memberOf: dcid:dc/g/MOSPI_Inflation
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_RecreationAndAmusement
+memberOf: dcid:dc/g/MOSPI_Inflation
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_RecreationAndAmusement_Rural
+memberOf: dcid:dc/g/MOSPI_Inflation
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_RecreationAndAmusement_Urban
+memberOf: dcid:dc/g/MOSPI_Inflation
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_Spices
+memberOf: dcid:dc/g/MOSPI_Inflation
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_Spices_Rural
+memberOf: dcid:dc/g/MOSPI_Inflation
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_Spices_Urban
+memberOf: dcid:dc/g/MOSPI_Inflation
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_SugarAndConfectionery
+memberOf: dcid:dc/g/MOSPI_Inflation
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_SugarAndConfectionery_Rural
+memberOf: dcid:dc/g/MOSPI_Inflation
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_SugarAndConfectionery_Urban
+memberOf: dcid:dc/g/MOSPI_Inflation
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_TransportAndCommunication
+memberOf: dcid:dc/g/MOSPI_Inflation
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_TransportAndCommunication_Rural
+memberOf: dcid:dc/g/MOSPI_Inflation
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_TransportAndCommunication_Urban
+memberOf: dcid:dc/g/MOSPI_Inflation
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_Vegetables
+memberOf: dcid:dc/g/MOSPI_Inflation
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_Vegetables_Rural
+memberOf: dcid:dc/g/MOSPI_Inflation
+
+Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_Vegetables_Urban
+memberOf: dcid:dc/g/MOSPI_Inflation

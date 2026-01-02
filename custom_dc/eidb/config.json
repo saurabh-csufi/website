@@ -35,6 +35,18 @@
         "unit": "unit",
         "measurementMethod": "measurementMethod"
       }
+    },
+    "mospi_cpi.csv": {
+      "provenance": "MOSPI CPI Data",
+      "format": "variablePerRow",
+      "columnMappings": {
+        "entity": "observationAbout",
+        "date": "observationDate",
+        "value": "value",
+        "variable": "variableMeasured",
+        "unit": "unit",
+        "measurementMethod": "measurementMethod"
+      }
     }
   },
   "sources": {
@@ -44,6 +56,12 @@
         "Commodity Wise Export": "https://tradestat.commerce.gov.in/eidb/commodity_wise_export",
         "Country Wise Export": "https://tradestat.commerce.gov.in/eidb/country_wise_export",
         "Country Commodity Export": "https://tradestat.commerce.gov.in/eidb/country_commodity_export"
+      }
+    },
+    "Ministry of Statistics and Programme Implementation": {
+      "url": "https://mospi.gov.in/",
+      "provenances": {
+        "MOSPI CPI Data": "https://mospi.gov.in/publication/consumer-price-index"
       }
     }
   }
