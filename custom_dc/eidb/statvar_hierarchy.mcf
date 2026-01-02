@@ -36,3 +36,25 @@ Node: dcid:dc/g/EIDB_CountryCommodityExports
 typeOf: dcs:StatVarGroup
 name: "Country-Commodity Exports"
 specializationOf: dcid:dc/g/EIDB
+
+# ============================================================
+# MOSPI Consumer Price Index Data
+# ============================================================
+
+# Root group for MOSPI data - connects to dc/g/Root (top level)
+Node: dcid:dc/g/MOSPI
+typeOf: dcs:StatVarGroup
+name: "MOSPI Consumer Price Index"
+specializationOf: dcid:dc/g/Root
+
+# Sub-group for Consumer Price Index
+Node: dcid:dc/g/MOSPI_CPI
+typeOf: dcs:StatVarGroup
+name: "Consumer Price Index"
+specializationOf: dcid:dc/g/MOSPI
+
+# Sub-group for Inflation Rates
+Node: dcid:dc/g/MOSPI_Inflation
+typeOf: dcs:StatVarGroup
+name: "Inflation Rates"
+specializationOf: dcid:dc/g/MOSPI
