@@ -1689,8 +1689,19 @@ Provide 3 actionable follow-up questions that help the user move from informatio
               // Extract values
               const values = timeSeries.map(point => point[1]);
 
+              // Smart label: use variableName if single place, placeName if multiple places
+              // This ensures proper labels when comparing variables vs comparing places
+              let datasetLabel;
+              if (places.length === 1) {
+                // Single place - use variable name (for comparing different variables)
+                datasetLabel = variableName;
+              } else {
+                // Multiple places - use place name (for comparing same variable across places)
+                datasetLabel = placeName;
+              }
+
               datasets.push({
-                label: placeName,
+                label: datasetLabel,
                 data: values,
                 borderColor: getChartColor(datasets.length),
                 backgroundColor: getChartColor(datasets.length, 0.2),
