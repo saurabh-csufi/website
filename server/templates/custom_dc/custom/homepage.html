@@ -1741,6 +1741,75 @@ Provide 3 actionable follow-up questions that help the user move from informatio
         }
       }
 
+      // Merge chart data from multiple get_observations calls (for multi-curve charts)
+      function mergeChartData(existing, newData) {
+        if (!existing) return newData;
+        if (!newData) return existing;
+
+        console.log('Merging chart data:', {
+          existingDatasets: existing.datasets.length,
+          existingLabels: existing.labels.length,
+          newDatasets: newData.datasets.length,
+          newLabels: newData.labels.length
+        });
+
+        // Combine variable names if different
+        let combinedVariableName = existing.variableName;
+        if (newData.variableName && newData.variableName !== existing.variableName) {
+          combinedVariableName = `${existing.variableName} vs ${newData.variableName}`;
+        }
+
+        // Merge labels (union of all dates, sorted)
+        const allLabelsSet = new Set([...existing.labels, ...newData.labels]);
+        const mergedLabels = Array.from(allLabelsSet).sort();
+
+        // Reindex existing datasets to new merged labels
+        const reindexedExisting = existing.datasets.map(ds => ({
+          ...ds,
+          data: mergedLabels.map(label => {
+            const idx = existing.labels.indexOf(label);
+            return idx !== -1 ? ds.data[idx] : null;
+          })
+        }));
+
+        // Reindex new datasets to merged labels with new colors
+        const colorOffset = existing.datasets.length;
+        const reindexedNew = newData.datasets.map((ds, i) => ({
+          ...ds,
+          data: mergedLabels.map(label => {
+            const idx = newData.labels.indexOf(label);
+            return idx !== -1 ? ds.data[idx] : null;
+          }),
+          // Assign new colors to avoid duplicates
+          borderColor: getChartColor(colorOffset + i),
+          backgroundColor: getChartColor(colorOffset + i, 0.2)
+        }));
+
+        // Combine datasets
+        const mergedDatasets = [...reindexedExisting, ...reindexedNew];
+
+        // Combine source info (deduplicated)
+        const sourceNames = [existing.sourceName, newData.sourceName]
+          .filter((s, i, arr) => s && arr.indexOf(s) === i);
+
+        console.log('Merged chart data:', {
+          variableName: combinedVariableName,
+          labelsCount: mergedLabels.length,
+          datasetsCount: mergedDatasets.length,
+          datasetLabels: mergedDatasets.map(ds => ds.label)
+        });
+
+        return {
+          chartType: existing.chartType,
+          variableName: combinedVariableName,
+          labels: mergedLabels,
+          datasets: mergedDatasets,
+          unit: existing.unit || newData.unit,
+          sourceName: sourceNames.join(' | '),
+          sourceUrl: existing.sourceUrl || newData.sourceUrl
+        };
+      }
+
       // Chart color palette
       function getChartColor(index, alpha = 1) {
         const colors = [
@@ -1836,10 +1905,15 @@ Provide 3 actionable follow-up questions that help the user move from informatio
             options: {
               responsive: true,
               maintainAspectRatio: true,
+              spanGaps: false,  // Don't connect lines across null values (for merged datasets)
               plugins: {
                 legend: {
                   display: chartConfig.datasets.length > 1,
-                  position: 'bottom'
+                  position: 'bottom',
+                  labels: {
+                    usePointStyle: true,
+                    padding: 15
+                  }
                 },
                 title: {
                   display: false
@@ -1848,6 +1922,7 @@ Provide 3 actionable follow-up questions that help the user move from informatio
                   callbacks: {
                     label: function(context) {
                       const value = context.parsed.y;
+                      if (value === null) return null;  // Skip null values in tooltip
                       return `${context.dataset.label}: ${formatNumber(value)}`;
                     }
                   }
@@ -1862,6 +1937,10 @@ Provide 3 actionable follow-up questions that help the user move from informatio
                     }
                   }
                 }
+              },
+              interaction: {
+                intersect: false,
+                mode: 'index'  // Show all datasets at same x-position in tooltip
               }
             }
           });
@@ -2196,8 +2275,14 @@ Provide 3 actionable follow-up questions that help the user move from informatio
           try {
             const chartData = analyzeChartData(toolName, result);
             if (chartData) {
-              lastChartAnalysis = chartData;
-              console.log('Chart data extracted:', chartData);
+              // Accumulate chart data from multiple get_observations calls (for multi-curve charts)
+              if (lastChartAnalysis) {
+                lastChartAnalysis = mergeChartData(lastChartAnalysis, chartData);
+                console.log('Chart data merged (multi-curve):', lastChartAnalysis);
+              } else {
+                lastChartAnalysis = chartData;
+                console.log('Chart data extracted:', chartData);
+              }
 
               // Also store source info for text responses
               if (chartData.sourceName || chartData.sourceUrl) {
