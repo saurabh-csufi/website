@@ -40,7 +40,7 @@
     --saffron: #FBBC04;
     --white: #FFFFFF;
     --green: #34A853;
-    --navy: #4285F4;
+    --navy: #174ea6;
     --chakra-blue: #4285F4;
   }
 
@@ -54,7 +54,7 @@
     text-align: center;
     margin-bottom: 2rem;
     padding: 2rem;
-    background: linear-gradient(135deg, var(--saffron) 0%, var(--green) 100%);
+    background: linear-gradient(135deg, #174EA6 0%, #4285F4 100%);
     border-radius: 16px;
     color: white;
   }
@@ -167,8 +167,8 @@
   }
 
   .india-tooltip {
-    background: rgba(255, 153, 51, 0.95);
-    color: #003366;
+    background: rgba(95, 99, 104, 0.95);
+    color: #ffffff;
   }
 
   .leaflet-container {
@@ -200,7 +200,7 @@
   .section-header .icon {
     width: 36px;
     height: 36px;
-    background: var(--saffron);
+    background: #174ea6;
     border-radius: 8px;
     display: flex;
     align-items: center;
@@ -563,12 +563,12 @@
       <div style="display: flex; align-items: center; gap: 1rem; margin-top: 1rem; font-size: 0.8rem; color: #666;">
         <span>Export Value:</span>
         <div style="display: flex; align-items: center; gap: 4px;">
-          <div style="width: 20px; height: 12px; background: #EA4335; border: 1px solid #ddd; border-radius: 2px;"></div>
+          <div style="width: 20px; height: 12px; background: #E8EAED; border: 1px solid #ddd; border-radius: 2px;"></div>
           <span>Low</span>
         </div>
-        <div style="background: linear-gradient(to right, #EA4335, #F9AB00, #FBBC04, #7BAAF7, #4285F4, #34A853, #1E8E3E); width: 140px; height: 12px; border: 1px solid #ddd; border-radius: 2px;"></div>
+        <div style="background: linear-gradient(to right, #E8EAED, #D2E3FC, #AECBFA, #669DF6, #4285F4, #1967D2, #174EA6); width: 140px; height: 12px; border: 1px solid #ddd; border-radius: 2px;"></div>
         <div style="display: flex; align-items: center; gap: 4px;">
-          <div style="width: 20px; height: 12px; background: #1E8E3E; border: 1px solid #ddd; border-radius: 2px;"></div>
+          <div style="width: 20px; height: 12px; background: #174EA6; border: 1px solid #ddd; border-radius: 2px;"></div>
           <span>High</span>
         </div>
       </div>
@@ -950,17 +950,17 @@ function formatExportValue(value) {
 }
 
 function getColor(value) {
-  // Color scale: warm (red/orange) for LOW values, cool (green/blue) for HIGH values
-  // Uses Google brand colors
+  // Color scale: shades of blue and gray
+  // Darker blue for higher values, lighter blue/gray for lower values
   // Max is USA at ~7.3 trillion
-  if (!value) return '#F5F5F5';                    // No data - light gray
-  if (value > 3000000000000) return '#1E8E3E';     // Very high - Dark green
-  if (value > 1000000000000) return '#34A853';     // High - Google Green
-  if (value > 500000000000) return '#4285F4';      // Medium-high - Google Blue
-  if (value > 200000000000) return '#7BAAF7';      // Medium - Light blue
-  if (value > 100000000000) return '#FBBC04';      // Medium-low - Google Yellow
-  if (value > 50000000000) return '#F9AB00';       // Low - Orange
-  return '#EA4335';                                 // Very low - Google Red
+  if (!value) return '#F1F3F4';                    // No data - light grey
+  if (value > 3000000000000) return '#174EA6';     // Very high - Dark blue
+  if (value > 1000000000000) return '#1967D2';     // High - Blue
+  if (value > 500000000000) return '#4285F4';      // Medium-high - Medium blue
+  if (value > 200000000000) return '#669DF6';      // Medium - Blue
+  if (value > 100000000000) return '#AECBFA';      // Medium-low - Light blue
+  if (value > 50000000000) return '#D2E3FC';       // Low - Very light blue
+  return '#E8EAED';                                 // Very low - Light grey
 }
 
 function initExportMap() {
@@ -1007,14 +1007,14 @@ function initExportMap() {
                               feature.properties.ISO3 || '';
           const value = exportData[countryCode] || 0;
 
-          // Skip India - make it transparent/no fill
+          // India (source country) - show as gray
           if (countryCode === 'IND') {
             return {
-              fillColor: '#FF9933',
+              fillColor: '#9AA0A6',
               weight: 2,
               opacity: 1,
-              color: '#FF9933',
-              fillOpacity: 0.4
+              color: '#5F6368',
+              fillOpacity: 0.6
             };
           }
 
@@ -1133,9 +1133,9 @@ function drawGauge(container) {
   const fillAngle = (absValue / 100) * (Math.PI / 2);
 
   // === STEP 1: Draw gray background arc ===
-  // Semicircle from LEFT to RIGHT, going COUNTER-CLOCKWISE (through TOP)
+  // Semicircle from LEFT to RIGHT, going CLOCKWISE (through TOP)
   ctx.beginPath();
-  ctx.arc(centerX, centerY, radius, LEFT, RIGHT, true);  // true = counter-clockwise
+  ctx.arc(centerX, centerY, radius, LEFT, RIGHT, false);  // false = clockwise through top
   ctx.strokeStyle = '#E0E0E0';
   ctx.lineWidth = lineWidth;
   ctx.lineCap = 'round';
@@ -1179,7 +1179,7 @@ function drawGauge(container) {
 
     ctx.strokeStyle = fillColor;
     ctx.lineWidth = lineWidth;
-    ctx.lineCap = 'round';
+    ctx.lineCap = 'butt';  // Use butt cap so fill starts exactly at 0% line
     ctx.stroke();
   }
 
