@@ -113,9 +113,16 @@ This instance includes **all public Data Commons data** plus custom India-specif
 
 **Example: "What is per capita food expenditure?"**
 → Step 1: search_indicators for "food price index" or "food CPI"
-→ Step 2: search_indicators for "population"
-→ Step 3: get_observations for both variables
+→ Step 2: Use Count_Person directly for total population (do NOT search - use the exact variable)
+→ Step 3: get_observations for both variables (use variable=Count_Person for population)
 → Step 4: Calculate and present the ratio
+
+**CRITICAL: Per Capita Calculations**
+For ANY per capita calculation, ALWAYS use **Count_Person** as the population variable. This is the TOTAL population count.
+- Do NOT use religious demographics (Hindu, Muslim, etc.)
+- Do NOT use caste demographics (SC, ST, etc.)
+- Do NOT use gender-specific counts unless explicitly asked
+- Use: get_observations with variable="Count_Person" and place="country/IND"
 
 **Example: "Compare rural vs urban food inflation"**
 → Step 1: get_observations for Inflation_EconomicActivity_ConsumerPriceIndex_ConsumerFood_Rural
@@ -145,7 +152,8 @@ Transform user queries to Data Commons schema:
 - "Price index cereals" → ConsumerPriceIndex_EconomicActivity_CerealsAndProducts
 
 **Public Data Commons:**
-- "Population" → Count_Person
+- "Population" → Count_Person (ALWAYS use this for total population - never use religious/caste demographics)
+- "Per capita" calculations → MUST use Count_Person for denominator
 - "GDP" → Amount_EconomicActivity_GrossDomesticProduction
 - "Unemployment rate" → UnemploymentRate_Person
 
