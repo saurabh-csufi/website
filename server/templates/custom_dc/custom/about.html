@@ -542,6 +542,50 @@
     </div>
   </div>
 
+  <!-- State-wise CPI Map Section -->
+  <div class="section-header">
+    <div class="icon">🗺️</div>
+    <h2>State-wise Consumer Price Index</h2>
+  </div>
+
+  <div class="insights-grid">
+    <!-- Map: Food CPI by State -->
+    <div class="insight-card">
+      <h3>Food & Beverages CPI by State</h3>
+      <datacommons-map
+        apiRoot="/"
+        header="Consumer Price Index - Food & Beverages (Base: 2012=100)"
+        parentPlace="country/IND"
+        childPlaceType="AdministrativeArea1"
+        variable="ConsumerPriceIndex_EconomicActivity_FoodAndBeverages"
+      ></datacommons-map>
+    </div>
+
+    <!-- Map: Health CPI by State -->
+    <div class="insight-card saffron-border">
+      <h3>Health CPI by State</h3>
+      <datacommons-map
+        apiRoot="/"
+        header="Consumer Price Index - Health (Base: 2012=100)"
+        parentPlace="country/IND"
+        childPlaceType="AdministrativeArea1"
+        variable="ConsumerPriceIndex_EconomicActivity_Health"
+      ></datacommons-map>
+    </div>
+
+    <!-- Map: General CPI by State - Full Width -->
+    <div class="insight-card full-width-card green-border">
+      <h3>General CPI by State</h3>
+      <datacommons-map
+        apiRoot="/"
+        header="Consumer Price Index - General (Base: 2012=100)"
+        parentPlace="country/IND"
+        childPlaceType="AdministrativeArea1"
+        variable="ConsumerPriceIndex_EconomicActivity_MOSPIGeneral"
+      ></datacommons-map>
+    </div>
+  </div>
+
   <!-- Footer -->
   <div class="insights-footer">
     <p>
