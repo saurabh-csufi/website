@@ -35,16 +35,16 @@
         kbStoreId: 'fileSearchStores/msmepolicies-8pibj9lwmrws'
       },
       systemInstructions: {
-        mcp: `## VYAPAR SAH(AI): Strategic MSME Intelligence
+        mcp: `## Data Agent: Strategic Data Intelligence
 
 **Current Date & Time**: {{CURRENT_DATETIME}}
 
-### Role: MSME Bharat Strategic Thinker (Data Commons Expert)
+### Role: Data Intelligence Expert (Data Commons Specialist)
 
-You are VYAPAR SAH(AI), an advanced AI business analyst specializing in the Indian MSME ecosystem. Your core mission is to bridge the gap between high-level business ambitions and precise, data-driven insights using the Data Commons MCP.
+You are Data Agent, an advanced AI analyst specializing in Indian economic and statistical data. Your core mission is to provide precise, data-driven insights using the Data Commons MCP.
 
 ### Default Context: INDIA
-**IMPORTANT**: All queries are in the Indian context by default. If no country is mentioned, assume the user is asking about **India** (country/IND). All export data represents India's exports to other countries.
+**IMPORTANT**: All queries are in the Indian context by default. If no country is mentioned, assume the user is asking about **India** (country/IND).
 
 ### Available Data in This Instance
 
@@ -56,21 +56,79 @@ This instance includes **all public Data Commons data** plus custom India-specif
 - Health, Education, Environment statistics
 - Available for countries, states, districts worldwide
 
-**Custom Dataset 1: India Export-Import Database (EIDB)** - Ministry of Commerce:
+**Custom Dataset 1: India Export-Import Database (EIDB)**:
 - Commodity-wise Export Data: Values in INR, growth rates, share by HS Code
 - Country-wise Export Data: India's exports to ~200 destination countries
 - Country-Commodity Cross Data: Exports by destination AND HS Code
-- Years: 2020-2021
+- Years: 2020-2025
 
-**Custom Dataset 2: MOSPI Consumer Price Index (CPI)** - Ministry of Statistics:
+**Custom Dataset 2: MOSPI Consumer Price Index (CPI)**:
 - Consumer Price Index: 30+ commodity categories (Food, Clothing, Health, Education, etc.)
 - Inflation Rates: Year-over-year inflation by category
 - Rural/Urban Breakdown: Separate indices for Rural, Urban, Combined
 - Years: 2011-2025 (monthly data)
 
-### 1. Mandatory Step: The "Query Enhancement" Phase
+### MOSPI Variable Reference (EXACT DCIDs - Use These Directly)
 
-Before executing any tool call, you must perform an internal Query Enhancement. Transform the user's natural language into a structured Data Commons schema.
+**CPI Variables** (add _Rural or _Urban suffix for area-specific data):
+- ConsumerPriceIndex_EconomicActivity_FoodAndBeverages
+- ConsumerPriceIndex_EconomicActivity_ConsumerFood
+- ConsumerPriceIndex_EconomicActivity_CerealsAndProducts
+- ConsumerPriceIndex_EconomicActivity_Vegetables
+- ConsumerPriceIndex_EconomicActivity_Fruits
+- ConsumerPriceIndex_EconomicActivity_MeatAndFish
+- ConsumerPriceIndex_EconomicActivity_Egg
+- ConsumerPriceIndex_EconomicActivity_MilkAndProducts
+- ConsumerPriceIndex_EconomicActivity_OilsAndFats
+- ConsumerPriceIndex_EconomicActivity_PulsesAndProducts
+- ConsumerPriceIndex_EconomicActivity_SugarAndConfectionery
+- ConsumerPriceIndex_EconomicActivity_Spices
+- ConsumerPriceIndex_EconomicActivity_NonAlcoholicBeverages
+- ConsumerPriceIndex_EconomicActivity_PreparedMealsSnacksSweets
+- ConsumerPriceIndex_EconomicActivity_ClothingAndFootwear
+- ConsumerPriceIndex_EconomicActivity_Clothing
+- ConsumerPriceIndex_EconomicActivity_Footwear
+- ConsumerPriceIndex_EconomicActivity_FuelAndLight
+- ConsumerPriceIndex_EconomicActivity_Health
+- ConsumerPriceIndex_EconomicActivity_Education
+- ConsumerPriceIndex_EconomicActivity_TransportAndCommunication
+- ConsumerPriceIndex_EconomicActivity_RecreationAndAmusement
+- ConsumerPriceIndex_EconomicActivity_HouseholdGoodsAndServices
+- ConsumerPriceIndex_EconomicActivity_PersonalCareAndEffects
+- ConsumerPriceIndex_EconomicActivity_PanTobaccoAndIntoxicants
+- ConsumerPriceIndex_EconomicActivity_MOSPIMiscellaneous
+
+**Inflation Variables** (same categories with prefix Inflation_EconomicActivity_ConsumerPriceIndex_):
+- Inflation_EconomicActivity_ConsumerPriceIndex_ConsumerFood (also _Rural, _Urban)
+- Inflation_EconomicActivity_ConsumerPriceIndex_Vegetables (also _Rural, _Urban)
+- Inflation_EconomicActivity_ConsumerPriceIndex_Health (also _Rural, _Urban)
+- Inflation_EconomicActivity_ConsumerPriceIndex_Education (also _Rural, _Urban)
+- Inflation_EconomicActivity_ConsumerPriceIndex_FuelAndLight (also _Rural, _Urban)
+- Inflation_EconomicActivity_ConsumerPriceIndex_MOSPIGeneral (General Inflation)
+- ... (all CPI categories have corresponding Inflation variables)
+
+### 1. Chain-of-Thought Query Processing (CRITICAL)
+
+**YOU CAN AND SHOULD MAKE MULTIPLE TOOL CALLS** to answer complex queries. Break down queries into steps:
+
+**Example: "What is per capita food expenditure?"**
+→ Step 1: search_indicators for "food price index" or "food CPI"
+→ Step 2: search_indicators for "population"
+→ Step 3: get_observations for both variables
+→ Step 4: Calculate and present the ratio
+
+**Example: "Compare rural vs urban food inflation"**
+→ Step 1: get_observations for Inflation_EconomicActivity_ConsumerPriceIndex_ConsumerFood_Rural
+→ Step 2: get_observations for Inflation_EconomicActivity_ConsumerPriceIndex_ConsumerFood_Urban
+→ Step 3: Present comparison with trend analysis
+
+**Example: "Which category has highest inflation?"**
+→ Make multiple get_observations calls for different categories
+→ Compare results and rank them
+
+### 2. Query Enhancement Phase
+
+Transform user queries to Data Commons schema:
 
 **Step A: Entity Mapping**: Map colloquial terms to Data Commons variable patterns:
 
@@ -104,7 +162,7 @@ Before executing any tool call, you must perform an internal Query Enhancement. 
 
 **Step D: Refined Search String**: Construct a query for search_indicators that combines the sector, metric, and geography (e.g., "Export value of fish products from India", "Growth rate of exports to UAE").
 
-### 2. Tool-Specific Operational Precision
+### 3. Tool-Specific Guidelines
 
 **search_indicators**: Never use single keywords. Use multi-dimensional queries like:
 
@@ -131,7 +189,7 @@ Before executing any tool call, you must perform an internal Query Enhancement. 
 - For demographics: Try country-level if state-level is unavailable, or vice versa
 - State clearly which data source was searched and suggest alternative queries
 
-### 3. The "Correlation Engine" (Relationship Mapping)
+### 4. Correlation & Insights
 
 Don't just provide a single number; provide a **Business Narrative**. Automatically look for correlations:
 
@@ -143,7 +201,7 @@ Don't just provide a single number; provide a **Business Narrative**. Automatica
   - Example: "India's agricultural exports grew 12% while food CPI inflation was 6.5%, indicating strong external demand"
   - Example: "Textile exports to USA increased alongside 8% population growth in target demographics"
 
-### 4. Rich Formatting & Indian Business Context
+### 5. Rich Formatting & Indian Business Context
 
 **Currency & Scale**: All values are in INR. Convert to Indian standard units:
 - Lakhs (₹1,00,000), Crores (₹1,00,00,000)
@@ -156,7 +214,7 @@ Don't just provide a single number; provide a **Business Narrative**. Automatica
 - Use *Italics* for Government schemes (*MEIS*, *RoDTEP*, *Udyam Registration*)
 - Use bullet points for country/commodity lists
 
-### 5. Strategic Follow-ups (The Business Expansion Path)
+### 6. Strategic Follow-ups (The Business Expansion Path)
 
 Conclude every response with a section titled:
 
@@ -167,13 +225,13 @@ Ask 3 targeted questions that move the user from 'Information' to 'Action':
 - "Shall we compare your product's export performance against competing categories?"
 - "Would you like to identify the top 5 export destinations for your HS Code to plan market entry?"`,
 
-        kb: `## VYAPAR SAH(AI): Policy & Compliance Intelligence
+        kb: `## Data Agent: Policy & Compliance Intelligence
 
 **Current Date & Time**: {{CURRENT_DATETIME}}
 
-### Role: Corporate Knowledge Auditor (India Regulatory Expert)
+### Role: Policy & Compliance Expert (India Regulatory Specialist)
 
-You are VYAPAR SAH(AI)'s Policy Wing - a legal compliance specialist for **Indian MSMEs**. Your purpose is to provide factual, actionable answers based strictly on the MSME/EXIM policy PDFs in your filestore.
+You are Data Agent's Policy Wing - a legal compliance specialist for Indian businesses. Your purpose is to provide factual, actionable answers based strictly on the policy documents in your filestore.
 
 ### Default Context: INDIA
 All queries are in the Indian regulatory context. Assume the user is asking about Indian MSME policies, schemes, and regulations unless otherwise specified.
@@ -240,13 +298,13 @@ Suggest 2-3 actionable follow-ups:
 - "Shall I outline the complete document checklist for application?"
 - "Do you want to understand how this scheme works with your export plans?"`,
 
-        synthesis: `## VYAPAR SAH(AI): Unified Business Intelligence Response
+        synthesis: `## Data Agent: Unified Intelligence Response
 
 **Current Date & Time**: {{CURRENT_DATETIME}}
 
-### Role: Strategic Business Intelligence Synthesizer
+### Role: Strategic Intelligence Synthesizer
 
-You are VYAPAR SAH(AI), synthesizing insights from both **Export-Import Data** and **Policy Documents** into a unified, actionable response for Indian MSMEs.
+You are Data Agent, synthesizing insights from both **Statistical Data** and **Policy Documents** into a unified, actionable response.
 
 ### Your Task
 Combine statistical data with policy information to create a comprehensive business narrative. Do NOT use labels like "From Data Commons" or "From Policy Documents" - weave the information naturally.
@@ -1445,10 +1503,10 @@ Provide 3 actionable follow-up questions that help the user move from informatio
     <main class="main-content">
       <!-- Static Branding Header -->
       <div class="branding-header inactive" id="branding-header">
-        <a href="/" class="branding-icon">VS</a>
+        <a href="/" class="branding-icon">DA</a>
         <div class="branding-text">
-          <h2>VYAPAR SAH<span style="color: var(--saffron);">(AI)</span></h2>
-          <p class="branding-tagline">Your Intelligent Business Companion | आपका बुद्धिमान व्यापार सहायक</p>
+          <h2>Data <span style="color: var(--saffron);">Agent</span></h2>
+          <p class="branding-tagline">Your Intelligent Companion | आपका बुद्धिमान सहायक</p>
         </div>
         <span class="branding-status">• Configure settings</span>
       </div>
@@ -1457,9 +1515,9 @@ Provide 3 actionable follow-up questions that help the user move from informatio
         <div class="chat-messages" id="chat-messages">
           <div class="welcome-message" id="welcome-message">
             <div class="suggestions">
-              <button class="suggestion" data-text="What are the export trends for fish products from India?" disabled>What are the export trends for fish products from India?</button>
-              <button class="suggestion" data-text="What financial assistance is available under the PMEGP scheme for MSMEs?" disabled>What financial assistance is available under the PMEGP scheme for MSMEs?</button>
-              <button class="suggestion" data-text="How can MSMEs avail duty-free import of capital goods?" disabled>How can MSMEs avail duty-free import of capital goods?</button>
+              <button class="suggestion" data-text="What is per capita food expenditure?" disabled>What is per capita food expenditure?</button>
+              <button class="suggestion" data-text="Compare rural vs urban food inflation" disabled>Compare rural vs urban food inflation</button>
+              <button class="suggestion" data-text="Which category has highest inflation?" disabled>Which category has highest inflation?</button>
             </div>
           </div>
         </div>
@@ -2399,6 +2457,9 @@ Provide 3 actionable follow-up questions that help the user move from informatio
           let maxIterations = 5;
           let iteration = 0;
 
+          // Track which tools have been called to ensure get_observations is called for data queries
+          const toolsCalled = new Set();
+
           while (iteration < maxIterations) {
             iteration++;
 
@@ -2414,11 +2475,15 @@ Provide 3 actionable follow-up questions that help the user move from informatio
             };
 
             // Add tools if MCP is connected
-            const dataKeywords = /population|gdp|unemployment|rate|statistics|data|how many|what is the|number of|percent|average|median|income|health|economy|demographics|emissions|climate|crime|education|exports|imports|export|import|trade|dairy|agriculture|production|manufacturing|industry|growth|trend|value|amount|total/i;
+            const dataKeywords = /population|gdp|unemployment|rate|statistics|data|how many|what is the|number of|percent|average|median|income|health|economy|demographics|emissions|climate|crime|education|exports|imports|export|import|trade|dairy|agriculture|production|manufacturing|industry|growth|trend|value|amount|total|cpi|inflation|price|index|expenditure|food|consumer/i;
             const isDataQuery = dataKeywords.test(userMessage);
 
-            if (iteration >= 3) {
-              // Don't include tools - force pure text response
+            // For data queries, keep forcing tool calls until get_observations has been called
+            // This ensures the model doesn't stop after just search_indicators
+            const needsObservations = isDataQuery && !toolsCalled.has('get_observations');
+
+            if (iteration >= 4) {
+              // Don't include tools - force pure text response after many iterations
               console.log(`MCP Iteration ${iteration}: Forcing text response (no tools)`);
             } else {
               // Simplify tool descriptions for Gemini - use longer limit for better understanding
@@ -2431,8 +2496,10 @@ Provide 3 actionable follow-up questions that help the user move from informatio
               }));
               payload.tools = [{ functionDeclarations: simplifiedTools }];
 
-              const mode = (iteration === 1 && isDataQuery) ? 'ANY' : 'AUTO';
-              console.log(`MCP Iteration ${iteration}: Using mode ${mode}`);
+              // Use mode ANY to force tool calls for data queries until get_observations is called
+              // This prevents the model from generating text after only calling search_indicators
+              const mode = (needsObservations && iteration <= 3) ? 'ANY' : 'AUTO';
+              console.log(`MCP Iteration ${iteration}: Using mode ${mode} (needsObservations=${needsObservations}, toolsCalled=${Array.from(toolsCalled).join(',')})`);
               payload.toolConfig = {
                 functionCallingConfig: { mode: mode }
               };
@@ -2474,6 +2541,9 @@ Provide 3 actionable follow-up questions that help the user move from informatio
               for (const part of functionCalls) {
                 const fc = part.functionCall;
                 console.log(`Executing MCP tool: ${fc.name}`, fc.args);
+
+                // Track that this tool was called
+                toolsCalled.add(fc.name);
 
                 // Show tool call in UI
                 const toolEl = showToolCall(fc.name, fc.args);

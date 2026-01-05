@@ -18,14 +18,11 @@
 
 {% set main_id = 'standard-insights' %}
 {% set page_id = 'page-standard-insights' %}
-{% set title = 'India Export Insights' %}
+{% set title = 'India Price & Inflation Insights' %}
 
 {% block head %}
 {{ super() }}
 <script src="https://datacommons.org/datacommons.js"></script>
-<!-- Leaflet for custom map -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
   :root {
     /* Google Brand Colors */
@@ -139,45 +136,6 @@
 
   .full-width-card {
     grid-column: 1 / -1;
-  }
-
-  .map-card {
-    min-height: 550px;
-  }
-
-  .map-card datacommons-map {
-    width: 100%;
-    height: 480px;
-    display: block;
-  }
-
-  /* Leaflet map tooltip styling */
-  .country-tooltip {
-    background: rgba(0, 51, 102, 0.95);
-    color: white;
-    border: none;
-    border-radius: 6px;
-    padding: 8px 12px;
-    font-size: 13px;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.2);
-  }
-
-  .country-tooltip strong {
-    font-size: 14px;
-  }
-
-  .india-tooltip {
-    background: rgba(95, 99, 104, 0.95);
-    color: #ffffff;
-  }
-
-  .leaflet-container {
-    font-family: inherit;
-    background: #f8fafc;
-  }
-
-  #export-map {
-    border: 1px solid #e2e8f0;
   }
 
   /* Section Headers */
@@ -384,201 +342,213 @@
 <div class="insights-container">
   <!-- Header -->
   <div class="insights-header">
-    <h1>India Export Insights Dashboard</h1>
-    <p>Commodity-wise and Country-wise Export Data from EIDB</p>
-    <span class="badge">Data: 2020-2025 | Source: Ministry of Commerce</span>
+    <h1>India Price & Inflation Insights</h1>
+    <p>Consumer Price Index and Inflation Data from MOSPI</p>
+    <span class="badge">Data: 2011-2025 | Source: Ministry of Statistics and Programme Implementation</span>
   </div>
 
   <!-- Key Highlights Section -->
   <div class="section-header">
-    <div class="icon">₹</div>
-    <h2>Key Export Statistics</h2>
+    <div class="icon">📊</div>
+    <h2>Key CPI Categories (Base: 2012=100)</h2>
   </div>
 
   <div class="highlight-section">
     <div class="highlight-card">
       <datacommons-highlight
         apiRoot="/"
-        header="Petroleum Products"
+        header="Food & Beverages CPI"
         place="country/IND"
-        variable="Exports_EconomicActivity_MineralFuelsMineralOilsAndProductsOfTheir"
+        variable="ConsumerPriceIndex_EconomicActivity_FoodAndBeverages"
       ></datacommons-highlight>
     </div>
     <div class="highlight-card saffron">
       <datacommons-highlight
         apiRoot="/"
-        header="Electronics"
+        header="Health CPI"
         place="country/IND"
-        variable="Exports_EconomicActivity_ElectricalMachineryAndEquipmentAndPartsThereof"
+        variable="ConsumerPriceIndex_EconomicActivity_Health"
       ></datacommons-highlight>
     </div>
     <div class="highlight-card green">
       <datacommons-highlight
         apiRoot="/"
-        header="Machinery"
+        header="Education CPI"
         place="country/IND"
-        variable="Exports_EconomicActivity_MachineryAndMechanicalAppliancesBoilersNuclear"
+        variable="ConsumerPriceIndex_EconomicActivity_Education"
       ></datacommons-highlight>
     </div>
     <div class="highlight-card saffron">
       <datacommons-highlight
         apiRoot="/"
-        header="Gems & Jewellery"
+        header="Housing CPI (Urban)"
         place="country/IND"
-        variable="Exports_EconomicActivity_NaturalCulturedPearlsPreciousSemiPreciousStones"
+        variable="ConsumerPriceIndex_EconomicActivity_Housing_Urban"
       ></datacommons-highlight>
     </div>
     <div class="highlight-card green">
       <datacommons-highlight
         apiRoot="/"
-        header="Pharmaceuticals"
+        header="Fuel & Light CPI"
         place="country/IND"
-        variable="Exports_EconomicActivity_PharmaceuticalProducts"
+        variable="ConsumerPriceIndex_EconomicActivity_FuelAndLight"
       ></datacommons-highlight>
     </div>
   </div>
 
   <!-- Time Series Trends -->
   <div class="section-header">
-    <div class="icon">~</div>
-    <h2>Export Trends Over Time</h2>
+    <div class="icon">📈</div>
+    <h2>CPI Trends Over Time</h2>
   </div>
 
   <div class="insights-grid">
-    <!-- Line Chart: Commodity Export Trends - Full Width -->
+    <!-- Line Chart: CPI Trends - Full Width -->
     <div class="insight-card full-width-card">
-      <h3>Top 5 Export Trends (2020-2025)</h3>
+      <h3>Consumer Price Index Trends (2011-2025)</h3>
       <datacommons-line
         apiRoot="/"
-        header="Export Values Over Time"
+        header="CPI by Category Over Time (Base: 2012=100)"
         places="country/IND"
-        variables="Exports_EconomicActivity_MineralFuelsMineralOilsAndProductsOfTheir Exports_EconomicActivity_ElectricalMachineryAndEquipmentAndPartsThereof Exports_EconomicActivity_MachineryAndMechanicalAppliancesBoilersNuclear Exports_EconomicActivity_NaturalCulturedPearlsPreciousSemiPreciousStones Exports_EconomicActivity_PharmaceuticalProducts"
+        variables="ConsumerPriceIndex_EconomicActivity_FoodAndBeverages ConsumerPriceIndex_EconomicActivity_Health ConsumerPriceIndex_EconomicActivity_Education ConsumerPriceIndex_EconomicActivity_FuelAndLight ConsumerPriceIndex_EconomicActivity_ClothingAndFootwear"
       ></datacommons-line>
     </div>
   </div>
 
-  <!-- Distribution Section -->
+  <!-- Inflation Section -->
   <div class="section-header">
-    <div class="icon">%</div>
-    <h2>Export Distribution</h2>
+    <div class="icon">📉</div>
+    <h2>Inflation Rates by Category</h2>
   </div>
 
   <div class="small-grid">
-    <!-- Pie Chart: Export Distribution -->
+    <!-- Bar Chart: Inflation Comparison -->
     <div class="small-card">
-      <h3>Top 5 Export Distribution</h3>
-      <datacommons-pie
+      <h3>Latest Inflation by Category</h3>
+      <datacommons-bar
         apiRoot="/"
-        header="Top 5 Exports Breakdown"
-        subheader="These 5 categories = 22.7% of total exports (₹16.84L Cr of ₹74.07L Cr)"
+        header="Year-over-Year Inflation (%)"
         place="country/IND"
-        variables="Exports_EconomicActivity_MineralFuelsMineralOilsAndProductsOfTheir Exports_EconomicActivity_ElectricalMachineryAndEquipmentAndPartsThereof Exports_EconomicActivity_MachineryAndMechanicalAppliancesBoilersNuclear Exports_EconomicActivity_NaturalCulturedPearlsPreciousSemiPreciousStones Exports_EconomicActivity_PharmaceuticalProducts"
-        donut
-      ></datacommons-pie>
+        variables="Inflation_EconomicActivity_ConsumerPriceIndex_ConsumerFood Inflation_EconomicActivity_ConsumerPriceIndex_Vegetables Inflation_EconomicActivity_ConsumerPriceIndex_Health Inflation_EconomicActivity_ConsumerPriceIndex_Education Inflation_EconomicActivity_ConsumerPriceIndex_FuelAndLight"
+      ></datacommons-bar>
     </div>
 
-    <!-- Gauge: Petroleum Growth Rate (-22%) -->
+    <!-- Gauge: Food Inflation -->
     <div class="small-card">
-      <h3>Petroleum Growth Rate</h3>
-      <div class="custom-gauge-container" id="gauge-petroleum" data-value="-22" data-label="Petroleum Products">
+      <h3>Food Inflation</h3>
+      <div class="custom-gauge-container" id="gauge-food" data-value="-3.91" data-label="Consumer Food">
         <div class="gauge-canvas-wrapper">
           <canvas class="gauge-canvas" width="180" height="100"></canvas>
         </div>
         <div class="gauge-value">--</div>
-        <div class="gauge-label">YoY Growth (%)</div>
-        <div class="gauge-range"><span>-100%</span><span>0%</span><span>+100%</span></div>
-        <div class="gauge-source">Source: <a href="https://tradestat.commerce.gov.in" target="_blank">tradestat.commerce.gov.in</a></div>
+        <div class="gauge-label">YoY Inflation (%)</div>
+        <div class="gauge-range"><span>-20%</span><span>0%</span><span>+20%</span></div>
+        <div class="gauge-source">Source: <a href="https://mospi.gov.in" target="_blank">MOSPI</a></div>
       </div>
     </div>
 
-    <!-- Gauge: Electronics Growth Rate (+31%) -->
+    <!-- Gauge: Vegetables Inflation -->
     <div class="small-card">
-      <h3>Electronics Growth Rate</h3>
-      <div class="custom-gauge-container" id="gauge-electronics" data-value="31.1" data-label="Electronics">
+      <h3>Vegetables Inflation</h3>
+      <div class="custom-gauge-container" id="gauge-vegetables" data-value="-22.2" data-label="Vegetables">
         <div class="gauge-canvas-wrapper">
           <canvas class="gauge-canvas" width="180" height="100"></canvas>
         </div>
         <div class="gauge-value">--</div>
-        <div class="gauge-label">YoY Growth (%)</div>
-        <div class="gauge-range"><span>-100%</span><span>0%</span><span>+100%</span></div>
-        <div class="gauge-source">Source: <a href="https://tradestat.commerce.gov.in" target="_blank">tradestat.commerce.gov.in</a></div>
+        <div class="gauge-label">YoY Inflation (%)</div>
+        <div class="gauge-range"><span>-20%</span><span>0%</span><span>+20%</span></div>
+        <div class="gauge-source">Source: <a href="https://mospi.gov.in" target="_blank">MOSPI</a></div>
       </div>
     </div>
 
-    <!-- Gauge: Machinery Growth Rate (+14%) -->
+    <!-- Gauge: Health Inflation -->
     <div class="small-card">
-      <h3>Machinery Growth Rate</h3>
-      <div class="custom-gauge-container" id="gauge-machinery" data-value="13.8" data-label="Machinery">
+      <h3>Health Inflation</h3>
+      <div class="custom-gauge-container" id="gauge-health" data-value="3.6" data-label="Health">
         <div class="gauge-canvas-wrapper">
           <canvas class="gauge-canvas" width="180" height="100"></canvas>
         </div>
         <div class="gauge-value">--</div>
-        <div class="gauge-label">YoY Growth (%)</div>
-        <div class="gauge-range"><span>-100%</span><span>0%</span><span>+100%</span></div>
-        <div class="gauge-source">Source: <a href="https://tradestat.commerce.gov.in" target="_blank">tradestat.commerce.gov.in</a></div>
+        <div class="gauge-label">YoY Inflation (%)</div>
+        <div class="gauge-range"><span>-20%</span><span>0%</span><span>+20%</span></div>
+        <div class="gauge-source">Source: <a href="https://mospi.gov.in" target="_blank">MOSPI</a></div>
       </div>
     </div>
 
-    <!-- Gauge: Gems Growth Rate (-7%) -->
+    <!-- Gauge: Education Inflation -->
     <div class="small-card">
-      <h3>Gems & Jewellery Growth Rate</h3>
-      <div class="custom-gauge-container" id="gauge-gems" data-value="-6.8" data-label="Gems & Jewellery">
+      <h3>Education Inflation</h3>
+      <div class="custom-gauge-container" id="gauge-education" data-value="3.38" data-label="Education">
         <div class="gauge-canvas-wrapper">
           <canvas class="gauge-canvas" width="180" height="100"></canvas>
         </div>
         <div class="gauge-value">--</div>
-        <div class="gauge-label">YoY Growth (%)</div>
-        <div class="gauge-range"><span>-100%</span><span>0%</span><span>+100%</span></div>
-        <div class="gauge-source">Source: <a href="https://tradestat.commerce.gov.in" target="_blank">tradestat.commerce.gov.in</a></div>
+        <div class="gauge-label">YoY Inflation (%)</div>
+        <div class="gauge-range"><span>-20%</span><span>0%</span><span>+20%</span></div>
+        <div class="gauge-source">Source: <a href="https://mospi.gov.in" target="_blank">MOSPI</a></div>
       </div>
     </div>
 
-    <!-- Gauge: Pharma Growth Rate (+14%) -->
+    <!-- Gauge: Fuel Inflation -->
     <div class="small-card">
-      <h3>Pharma Growth Rate</h3>
-      <div class="custom-gauge-container" id="gauge-pharma" data-value="13.7" data-label="Pharmaceuticals">
+      <h3>Fuel & Light Inflation</h3>
+      <div class="custom-gauge-container" id="gauge-fuel" data-value="2.32" data-label="Fuel & Light">
         <div class="gauge-canvas-wrapper">
           <canvas class="gauge-canvas" width="180" height="100"></canvas>
         </div>
         <div class="gauge-value">--</div>
-        <div class="gauge-label">YoY Growth (%)</div>
-        <div class="gauge-range"><span>-100%</span><span>0%</span><span>+100%</span></div>
-        <div class="gauge-source">Source: <a href="https://tradestat.commerce.gov.in" target="_blank">tradestat.commerce.gov.in</a></div>
+        <div class="gauge-label">YoY Inflation (%)</div>
+        <div class="gauge-range"><span>-20%</span><span>0%</span><span>+20%</span></div>
+        <div class="gauge-source">Source: <a href="https://mospi.gov.in" target="_blank">MOSPI</a></div>
       </div>
     </div>
   </div>
 
-  <!-- Top Export Destinations Section -->
+  <!-- Rural vs Urban Comparison Section -->
   <div class="section-header">
-    <div class="icon">T</div>
-    <h2>Top Export Destinations</h2>
+    <div class="icon">🏙️</div>
+    <h2>Rural vs Urban Inflation Comparison</h2>
   </div>
 
   <div class="insights-grid">
-    <!-- World Map: Export Destinations -->
-    <div class="insight-card full-width-card map-card">
-      <h3>India's Export Destinations Worldwide</h3>
-      <p style="font-size: 0.85rem; color: #666; margin-bottom: 1rem;">Export values in INR (2025) | Hover over countries for details</p>
-      <div id="export-map" style="height: 480px; width: 100%; border-radius: 8px; background: #f0f4f8;"></div>
-      <div style="display: flex; align-items: center; gap: 1rem; margin-top: 1rem; font-size: 0.8rem; color: #666;">
-        <span>Export Value:</span>
-        <div style="display: flex; align-items: center; gap: 4px;">
-          <div style="width: 20px; height: 12px; background: #E8EAED; border: 1px solid #ddd; border-radius: 2px;"></div>
-          <span>Low</span>
-        </div>
-        <div style="background: linear-gradient(to right, #E8EAED, #D2E3FC, #AECBFA, #669DF6, #4285F4, #1967D2, #174EA6); width: 140px; height: 12px; border: 1px solid #ddd; border-radius: 2px;"></div>
-        <div style="display: flex; align-items: center; gap: 4px;">
-          <div style="width: 20px; height: 12px; background: #174EA6; border: 1px solid #ddd; border-radius: 2px;"></div>
-          <span>High</span>
-        </div>
-      </div>
+    <!-- Line Chart: Rural vs Urban Food Inflation -->
+    <div class="insight-card">
+      <h3>Food Inflation: Rural vs Urban</h3>
+      <datacommons-line
+        apiRoot="/"
+        header="Consumer Food Inflation Comparison"
+        places="country/IND"
+        variables="Inflation_EconomicActivity_ConsumerPriceIndex_ConsumerFood_Rural Inflation_EconomicActivity_ConsumerPriceIndex_ConsumerFood_Urban"
+      ></datacommons-line>
+    </div>
+
+    <!-- Line Chart: Rural vs Urban Health Inflation -->
+    <div class="insight-card saffron-border">
+      <h3>Health Inflation: Rural vs Urban</h3>
+      <datacommons-line
+        apiRoot="/"
+        header="Health Inflation Comparison"
+        places="country/IND"
+        variables="Inflation_EconomicActivity_ConsumerPriceIndex_Health_Rural Inflation_EconomicActivity_ConsumerPriceIndex_Health_Urban"
+      ></datacommons-line>
+    </div>
+
+    <!-- Line Chart: Rural vs Urban General CPI -->
+    <div class="insight-card full-width-card green-border">
+      <h3>General CPI: Rural vs Urban vs Combined</h3>
+      <datacommons-line
+        apiRoot="/"
+        header="General Consumer Price Index Comparison (Base: 2012=100)"
+        places="country/IND"
+        variables="ConsumerPriceIndex_EconomicActivity_MOSPIGeneral ConsumerPriceIndex_EconomicActivity_MOSPIGeneral_Rural ConsumerPriceIndex_EconomicActivity_MOSPIGeneral_Urban"
+      ></datacommons-line>
     </div>
   </div>
 
   <!-- Footer -->
   <div class="insights-footer">
     <p>
-      Data Source: <a href="https://tradestat.commerce.gov.in/" target="_blank">Export Import Data Bank (EIDB)</a> - Ministry of Commerce & Industry, Government of India
+      Data Source: <a href="https://mospi.gov.in/" target="_blank">Ministry of Statistics and Programme Implementation (MOSPI)</a> - Government of India
     </p>
     <p>
       <a href="/explore">Search Data</a> |
@@ -592,511 +562,9 @@
 </div>
 
 <script>
-// Convert Billion/Trillion display to Crore (Indian numbering system)
-// 1 Billion = 100 Crore, 1 Trillion = 1,00,000 Crore (1 Lakh Crore)
-function convertToIndianFormat(text) {
-  if (!text) return text;
-
-  // Match patterns like "5.66T", "532B", "2.08T", "10T INR", "8T INR" etc.
-  const match = text.match(/([\d.]+)\s*([TBM])\s*(INR)?/i);
-  if (!match) return null;
-
-  let value = parseFloat(match[1]);
-  const suffix = match[2].toUpperCase();
-
-  // Convert to Lakh Crore
-  let lakhCrore;
-  if (suffix === 'T') {
-    // Trillion to Lakh Crore: 1T = 1 Lakh Crore
-    lakhCrore = value;
-  } else if (suffix === 'B') {
-    // Billion to Lakh Crore: 1B = 0.01 Lakh Crore
-    lakhCrore = value / 100;
-  } else if (suffix === 'M') {
-    // Million to Lakh Crore
-    lakhCrore = value / 100000;
-  } else {
-    return null;
-  }
-
-  // Format output
-  if (lakhCrore >= 1) {
-    return '₹' + lakhCrore.toFixed(2) + ' L Cr';
-  } else {
-    const crore = lakhCrore * 100000;
-    if (crore >= 1000) {
-      return '₹' + (crore / 1000).toFixed(1) + 'K Cr';
-    }
-    return '₹' + crore.toFixed(0) + ' Cr';
-  }
-}
-
-function convertAllValues() {
-  // Convert highlight card values
-  const highlights = document.querySelectorAll('datacommons-highlight');
-  highlights.forEach(highlight => {
-    if (!highlight.shadowRoot) return;
-
-    // Find all text elements that might contain values
-    const allElements = highlight.shadowRoot.querySelectorAll('*');
-    allElements.forEach(el => {
-      if (el.children.length === 0 && el.textContent) {
-        const text = el.textContent.trim();
-        if (/^\d+\.?\d*[TBM]\s*(INR)?$/i.test(text)) {
-          const converted = convertToIndianFormat(text);
-          if (converted && !el.dataset.converted) {
-            el.textContent = converted;
-            el.dataset.converted = 'true';
-          }
-        }
-      }
-    });
-  });
-
-  // Convert chart axis labels (line, bar charts)
-  const charts = document.querySelectorAll('datacommons-line, datacommons-bar');
-  charts.forEach(chart => {
-    if (!chart.shadowRoot) return;
-
-    // Find SVG text elements (axis labels)
-    const textElements = chart.shadowRoot.querySelectorAll('text');
-    textElements.forEach(text => {
-      const content = text.textContent.trim();
-      // Match axis labels like "10T INR", "8T INR", "6T INR"
-      if (/^\d+\.?\d*[TBM]\s*INR$/i.test(content)) {
-        const converted = convertToIndianFormat(content);
-        if (converted && !text.dataset.converted) {
-          text.textContent = converted;
-          text.dataset.converted = 'true';
-        }
-      }
-    });
-  });
-}
-
-// Run conversion multiple times as components load
-document.addEventListener('DOMContentLoaded', function() {
-  // Run at various intervals to catch when components render
-  [1000, 2000, 3000, 4000, 5000, 7000, 10000].forEach(delay => {
-    setTimeout(convertAllValues, delay);
-  });
-
-  // Also use MutationObserver
-  const observer = new MutationObserver(() => {
-    setTimeout(convertAllValues, 500);
-  });
-
-  observer.observe(document.body, {
-    childList: true,
-    subtree: true
-  });
-});
-
-// Pie Chart Hover Tooltips
-const pieChartData = {
-  'Exports of mineral fuels mineral oils and products of': { value: 5659552900000, label: 'Petroleum Products' },
-  'Exports of electrical machinery and equipment and parts thereof': { value: 3735320900000, label: 'Electronics' },
-  'Exports of machinery and mechanical appliances boilers nuclear': { value: 2832594600000, label: 'Machinery' },
-  'Exports of natural cultured pearls precious semi precious stones': { value: 2536008800000, label: 'Gems & Jewellery' },
-  'Exports of pharmaceutical products': { value: 2081286200000, label: 'Pharmaceuticals' }
-};
-
-const totalTop5 = 16844763400000;
-
-function formatINR(value) {
-  const crore = value / 10000000;
-  if (crore >= 100000) {
-    return '₹' + (crore / 100000).toFixed(2) + ' Lakh Cr';
-  }
-  return '₹' + crore.toLocaleString('en-IN', {maximumFractionDigits: 0}) + ' Cr';
-}
-
-function addPieChartTooltips() {
-  const pieChart = document.querySelector('datacommons-pie');
-  if (!pieChart || !pieChart.shadowRoot) return false;
-
-  const shadowRoot = pieChart.shadowRoot;
-
-  // Look for SVG paths (pie slices) or legend items
-  const paths = shadowRoot.querySelectorAll('path');
-  const legendItems = shadowRoot.querySelectorAll('.legend-item, [class*="legend"] text, .series-label');
-
-  // Create tooltip element if not exists
-  let tooltip = document.getElementById('pie-tooltip');
-  if (!tooltip) {
-    tooltip = document.createElement('div');
-    tooltip.id = 'pie-tooltip';
-    tooltip.style.cssText = `
-      position: fixed;
-      background: rgba(0, 51, 102, 0.95);
-      color: white;
-      padding: 10px 14px;
-      border-radius: 8px;
-      font-size: 13px;
-      pointer-events: none;
-      z-index: 10000;
-      display: none;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-      max-width: 280px;
-      line-height: 1.4;
-    `;
-    document.body.appendChild(tooltip);
-  }
-
-  // Try to match paths with data by looking at nearby text or aria labels
-  paths.forEach((path, index) => {
-    if (path.hasAttribute('data-tooltip-added')) return;
-
-    // Get fill color to potentially match with legend
-    const fill = path.getAttribute('fill');
-
-    path.style.cursor = 'pointer';
-    path.setAttribute('data-tooltip-added', 'true');
-
-    path.addEventListener('mouseenter', function(e) {
-      // Try to find the label from legend or nearby elements
-      let label = '';
-      let dataKey = '';
-
-      // Look for title element inside path
-      const title = path.querySelector('title');
-      if (title) {
-        label = title.textContent;
-      }
-
-      // Try aria-label
-      if (!label) {
-        label = path.getAttribute('aria-label') || '';
-      }
-
-      // Match with our data
-      let matchedData = null;
-      for (const [key, data] of Object.entries(pieChartData)) {
-        if (label.toLowerCase().includes(key.toLowerCase().split(' ').slice(0, 3).join(' '))) {
-          matchedData = data;
-          dataKey = key;
-          break;
-        }
-      }
-
-      // If no match found, try to use index
-      if (!matchedData) {
-        const keys = Object.keys(pieChartData);
-        if (index < keys.length) {
-          dataKey = keys[index];
-          matchedData = pieChartData[dataKey];
-        }
-      }
-
-      if (matchedData) {
-        const percentage = ((matchedData.value / totalTop5) * 100).toFixed(1);
-        tooltip.innerHTML = `
-          <strong>${matchedData.label}</strong><br>
-          ${formatINR(matchedData.value)}<br>
-          <span style="opacity: 0.8">${percentage}% of Top 5</span>
-        `;
-        tooltip.style.display = 'block';
-      }
-    });
-
-    path.addEventListener('mousemove', function(e) {
-      tooltip.style.left = (e.clientX + 15) + 'px';
-      tooltip.style.top = (e.clientY + 15) + 'px';
-    });
-
-    path.addEventListener('mouseleave', function() {
-      tooltip.style.display = 'none';
-    });
-  });
-
-  // Also add tooltips to legend text items
-  const textElements = shadowRoot.querySelectorAll('text');
-  textElements.forEach(text => {
-    if (text.hasAttribute('data-tooltip-added')) return;
-
-    const content = text.textContent.toLowerCase();
-    let matchedData = null;
-
-    for (const [key, data] of Object.entries(pieChartData)) {
-      if (content.includes('mineral fuel') || content.includes('petroleum')) {
-        matchedData = pieChartData['Exports of mineral fuels mineral oils and products of'];
-        break;
-      } else if (content.includes('electrical')) {
-        matchedData = pieChartData['Exports of electrical machinery and equipment and parts thereof'];
-        break;
-      } else if (content.includes('mechanical') || content.includes('machinery')) {
-        matchedData = pieChartData['Exports of machinery and mechanical appliances boilers nuclear'];
-        break;
-      } else if (content.includes('pearl') || content.includes('precious')) {
-        matchedData = pieChartData['Exports of natural cultured pearls precious semi precious stones'];
-        break;
-      } else if (content.includes('pharma')) {
-        matchedData = pieChartData['Exports of pharmaceutical products'];
-        break;
-      }
-    }
-
-    if (matchedData) {
-      text.style.cursor = 'pointer';
-      text.setAttribute('data-tooltip-added', 'true');
-
-      text.addEventListener('mouseenter', function(e) {
-        const percentage = ((matchedData.value / totalTop5) * 100).toFixed(1);
-        tooltip.innerHTML = `
-          <strong>${matchedData.label}</strong><br>
-          ${formatINR(matchedData.value)}<br>
-          <span style="opacity: 0.8">${percentage}% of Top 5</span>
-        `;
-        tooltip.style.display = 'block';
-        tooltip.style.left = (e.clientX + 15) + 'px';
-        tooltip.style.top = (e.clientY + 15) + 'px';
-      });
-
-      text.addEventListener('mousemove', function(e) {
-        tooltip.style.left = (e.clientX + 15) + 'px';
-        tooltip.style.top = (e.clientY + 15) + 'px';
-      });
-
-      text.addEventListener('mouseleave', function() {
-        tooltip.style.display = 'none';
-      });
-    }
-  });
-
-  return paths.length > 0;
-}
-
-// Initialize pie chart tooltips with retry
-function initPieTooltips() {
-  let attempts = 0;
-  const maxAttempts = 10;
-
-  const tryAdd = () => {
-    attempts++;
-    const success = addPieChartTooltips();
-    if (!success && attempts < maxAttempts) {
-      setTimeout(tryAdd, 1000);
-    }
-  };
-
-  setTimeout(tryAdd, 2000);
-}
-
-document.addEventListener('DOMContentLoaded', initPieTooltips);
-
-// Custom Leaflet World Map for Export Destinations
-const exportData = {
-  // Top 30 export destinations (excluding India) - values in INR
-  'USA': 7329568900000,
-  'ARE': 3100500800000,
-  'NLD': 1921183800000,
-  'GBR': 1230569800000,
-  'CHN': 1206165600000,
-  'SGP': 1095248800000,
-  'SAU': 995042100000,
-  'BGD': 972439500000,
-  'DEU': 899721600000,
-  'AUS': 726114700000,
-  'FRA': 672928600000,
-  'ITA': 653538400000,
-  'ZAF': 630167400000,
-  'NPL': 625025100000,
-  'MYS': 617489500000,
-  'BRA': 572195200000,
-  'BEL': 534578200000,
-  'JPN': 529103100000,
-  'HKG': 513464000000,
-  'KOR': 492349400000,
-  'MEX': 485933700000,
-  'TUR': 483256400000,
-  'VNM': 459166400000,
-  'IDN': 454085200000,
-  'RUS': 412432800000,
-  'THA': 407228100000,
-  'TZA': 405269800000,
-  'ESP': 403165300000,
-  'CAN': 357282700000,
-  'POL': 295000000000,
-  'KEN': 280000000000,
-  'LKA': 270000000000,
-  'EGY': 250000000000,
-  'PHL': 220000000000,
-  'NGA': 200000000000,
-  'PAK': 180000000000,
-  'IRN': 150000000000,
-  'IRQ': 140000000000,
-  'KWT': 130000000000,
-  'QAT': 120000000000,
-  'OMN': 110000000000,
-  'ISR': 100000000000,
-  'CHL': 97641800000,
-  'ARG': 86320000000,
-  'DZA': 80144300000,
-  'PER': 70000000000,
-  'COL': 60000000000,
-  'NZL': 50000000000,
-  'AFG': 26956300000,
-  'MMR': 20000000000
-};
-
-function formatExportValue(value) {
-  const crore = value / 10000000;
-  if (crore >= 100000) {
-    return '₹' + (crore / 100000).toFixed(2) + ' Lakh Cr';
-  } else if (crore >= 1000) {
-    return '₹' + (crore / 1000).toFixed(2) + 'K Cr';
-  }
-  return '₹' + crore.toFixed(0) + ' Cr';
-}
-
-function getColor(value) {
-  // Color scale: shades of blue and gray
-  // Darker blue for higher values, lighter blue/gray for lower values
-  // Max is USA at ~7.3 trillion
-  if (!value) return '#F1F3F4';                    // No data - light grey
-  if (value > 3000000000000) return '#174EA6';     // Very high - Dark blue
-  if (value > 1000000000000) return '#1967D2';     // High - Blue
-  if (value > 500000000000) return '#4285F4';      // Medium-high - Medium blue
-  if (value > 200000000000) return '#669DF6';      // Medium - Blue
-  if (value > 100000000000) return '#AECBFA';      // Medium-low - Light blue
-  if (value > 50000000000) return '#D2E3FC';       // Low - Very light blue
-  return '#E8EAED';                                 // Very low - Light grey
-}
-
-function initExportMap() {
-  const mapContainer = document.getElementById('export-map');
-  if (!mapContainer) return;
-
-  // Define world bounds to prevent map repetition
-  const worldBounds = L.latLngBounds(
-    L.latLng(-85, -180),  // Southwest corner
-    L.latLng(85, 180)     // Northeast corner
-  );
-
-  // Initialize map centered on world view with bounds to prevent repetition
-  const map = L.map('export-map', {
-    center: [20, 0],
-    zoom: 2,
-    minZoom: 2,           // Prevent zooming out too far
-    maxZoom: 6,
-    scrollWheelZoom: true,
-    worldCopyJump: false, // Prevent world copy jumping
-    maxBounds: worldBounds,
-    maxBoundsViscosity: 1.0  // Strict bounds enforcement
-  });
-
-  // Add tile layer (light gray base map) with noWrap to prevent repetition
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png', {
-    attribution: '&copy; OpenStreetMap, &copy; CARTO',
-    subdomains: 'abcd',
-    maxZoom: 19,
-    noWrap: true,         // Prevent tile wrapping/repetition
-    bounds: worldBounds   // Limit tiles to world bounds
-  }).addTo(map);
-
-  // Load world GeoJSON
-  fetch('https://raw.githubusercontent.com/datasets/geo-countries/master/data/countries.geojson')
-    .then(response => response.json())
-    .then(data => {
-      L.geoJSON(data, {
-        style: function(feature) {
-          // Try multiple property names for country code
-          const countryCode = feature.properties['ISO3166-1-Alpha-3'] ||
-                              feature.properties.ISO_A3 ||
-                              feature.properties.iso_a3 ||
-                              feature.properties.ISO3 || '';
-          const value = exportData[countryCode] || 0;
-
-          // India (source country) - show as gray
-          if (countryCode === 'IND') {
-            return {
-              fillColor: '#9AA0A6',
-              weight: 2,
-              opacity: 1,
-              color: '#5F6368',
-              fillOpacity: 0.6
-            };
-          }
-
-          return {
-            fillColor: getColor(value),
-            weight: 1,
-            opacity: 1,
-            color: '#999',
-            fillOpacity: 0.85
-          };
-        },
-        onEachFeature: function(feature, layer) {
-          // Try multiple property names
-          const countryCode = feature.properties['ISO3166-1-Alpha-3'] ||
-                              feature.properties.ISO_A3 ||
-                              feature.properties.iso_a3 ||
-                              feature.properties.ISO3 || '';
-          const countryName = feature.properties.name ||
-                              feature.properties.ADMIN ||
-                              feature.properties.NAME || 'Unknown';
-          const value = exportData[countryCode] || 0;
-
-          // Special tooltip for India
-          if (countryCode === 'IND') {
-            layer.bindTooltip('<strong>India</strong><br>(Source Country)', {
-              permanent: false,
-              direction: 'center',
-              className: 'country-tooltip india-tooltip'
-            });
-            return;
-          }
-
-          // Create tooltip content
-          const tooltipContent = value > 0
-            ? `<strong>${countryName}</strong><br>Exports: ${formatExportValue(value)}`
-            : `<strong>${countryName}</strong><br>Exports: Data not available`;
-
-          layer.bindTooltip(tooltipContent, {
-            permanent: false,
-            direction: 'center',
-            className: 'country-tooltip'
-          });
-
-          // Highlight on hover
-          layer.on({
-            mouseover: function(e) {
-              const layer = e.target;
-              if (countryCode !== 'IND') {
-                layer.setStyle({
-                  weight: 2,
-                  color: '#003366',
-                  fillOpacity: 0.95
-                });
-                layer.bringToFront();
-              }
-            },
-            mouseout: function(e) {
-              const layer = e.target;
-              if (countryCode !== 'IND') {
-                layer.setStyle({
-                  weight: 1,
-                  color: '#999',
-                  fillOpacity: 0.85
-                });
-              }
-            }
-          });
-        }
-      }).addTo(map);
-    })
-    .catch(err => {
-      console.error('Error loading GeoJSON:', err);
-      mapContainer.innerHTML = '<p style="padding: 2rem; text-align: center; color: #666;">Unable to load map data</p>';
-    });
-}
-
-document.addEventListener('DOMContentLoaded', initExportMap);
-
-// Custom Gauge Chart Rendering - Clean Design
-// Range: -100 to +100, with proper proportional fill
-// Full gray background, colored fill for percentage only
-// Warm colors (red/orange) for negative, cool colors (green/blue) for positive
+// Custom Gauge Chart Rendering for Inflation Rates
+// Displays inflation values with proper proportional fill
+// Warm colors (red/orange) for high inflation, cool colors (blue) for low/negative
 
 function drawGauge(container) {
   const canvas = container.querySelector('.gauge-canvas');
