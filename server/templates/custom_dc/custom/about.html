@@ -418,87 +418,84 @@
   <!-- Inflation Section -->
   <div class="section-header">
     <div class="icon">📉</div>
-    <h2>Inflation Rates by Category</h2>
+    <h2>Top 5 Inflation Movers (by Absolute Change)</h2>
+  </div>
+
+  <!-- Top 5 Inflation - Ranked Bar Chart -->
+  <div class="insights-grid" style="margin-bottom: 1.5rem;">
+    <div class="insight-card full-width-card">
+      <h3>Top 5 Categories by Inflation Impact (YoY %)</h3>
+      <div id="inflation-bar-chart" style="height: 300px; padding: 1rem;"></div>
+    </div>
   </div>
 
   <div class="small-grid">
-    <!-- Bar Chart: Inflation Comparison -->
+    <!-- Gauge: Personal Care & Effects - #1 by absolute value -->
     <div class="small-card">
-      <h3>Latest Inflation by Category</h3>
-      <datacommons-bar
-        apiRoot="/"
-        header="Year-over-Year Inflation (%)"
-        place="country/IND"
-        variables="Inflation_EconomicActivity_ConsumerPriceIndex_ConsumerFood Inflation_EconomicActivity_ConsumerPriceIndex_Vegetables Inflation_EconomicActivity_ConsumerPriceIndex_Health Inflation_EconomicActivity_ConsumerPriceIndex_Education Inflation_EconomicActivity_ConsumerPriceIndex_FuelAndLight"
-      ></datacommons-bar>
-    </div>
-
-    <!-- Gauge: Food Inflation -->
-    <div class="small-card">
-      <h3>Food Inflation</h3>
-      <div class="custom-gauge-container" id="gauge-food" data-value="-3.91" data-label="Consumer Food">
+      <h3>1. Personal Care & Effects</h3>
+      <div class="custom-gauge-container" id="gauge-personal-care" data-value="24.04" data-label="Personal Care">
         <div class="gauge-canvas-wrapper">
           <canvas class="gauge-canvas" width="180" height="100"></canvas>
         </div>
         <div class="gauge-value">--</div>
         <div class="gauge-label">YoY Inflation (%)</div>
-        <div class="gauge-range"><span>-20%</span><span>0%</span><span>+20%</span></div>
+        <div class="gauge-range"><span>-30%</span><span>0%</span><span>+30%</span></div>
         <div class="gauge-source">Source: <a href="https://mospi.gov.in" target="_blank">MOSPI</a></div>
       </div>
     </div>
 
-    <!-- Gauge: Vegetables Inflation -->
+    <!-- Gauge: Vegetables - #2 by absolute value -->
     <div class="small-card">
-      <h3>Vegetables Inflation</h3>
+      <h3>2. Vegetables</h3>
       <div class="custom-gauge-container" id="gauge-vegetables" data-value="-22.2" data-label="Vegetables">
         <div class="gauge-canvas-wrapper">
           <canvas class="gauge-canvas" width="180" height="100"></canvas>
         </div>
         <div class="gauge-value">--</div>
         <div class="gauge-label">YoY Inflation (%)</div>
-        <div class="gauge-range"><span>-20%</span><span>0%</span><span>+20%</span></div>
+        <div class="gauge-range"><span>-30%</span><span>0%</span><span>+30%</span></div>
         <div class="gauge-source">Source: <a href="https://mospi.gov.in" target="_blank">MOSPI</a></div>
       </div>
     </div>
 
-    <!-- Gauge: Health Inflation -->
+    <!-- Gauge: Pulses & Products - #3 by absolute value -->
     <div class="small-card">
-      <h3>Health Inflation</h3>
-      <div class="custom-gauge-container" id="gauge-health" data-value="3.6" data-label="Health">
+      <h3>3. Pulses & Products</h3>
+      <div class="custom-gauge-container" id="gauge-pulses" data-value="-15.86" data-label="Pulses">
         <div class="gauge-canvas-wrapper">
           <canvas class="gauge-canvas" width="180" height="100"></canvas>
         </div>
         <div class="gauge-value">--</div>
         <div class="gauge-label">YoY Inflation (%)</div>
-        <div class="gauge-range"><span>-20%</span><span>0%</span><span>+20%</span></div>
+        <div class="gauge-range"><span>-30%</span><span>0%</span><span>+30%</span></div>
         <div class="gauge-source">Source: <a href="https://mospi.gov.in" target="_blank">MOSPI</a></div>
       </div>
     </div>
 
-    <!-- Gauge: Education Inflation -->
+    <!-- Gauge: Oils & Fats - #4 by absolute value -->
     <div class="small-card">
-      <h3>Education Inflation</h3>
-      <div class="custom-gauge-container" id="gauge-education" data-value="3.38" data-label="Education">
+      <h3>4. Oils & Fats</h3>
+      <div class="custom-gauge-container" id="gauge-oils" data-value="7.87" data-label="Oils & Fats">
         <div class="gauge-canvas-wrapper">
           <canvas class="gauge-canvas" width="180" height="100"></canvas>
         </div>
         <div class="gauge-value">--</div>
         <div class="gauge-label">YoY Inflation (%)</div>
-        <div class="gauge-range"><span>-20%</span><span>0%</span><span>+20%</span></div>
+        <div class="gauge-range"><span>-30%</span><span>0%</span><span>+30%</span></div>
         <div class="gauge-source">Source: <a href="https://mospi.gov.in" target="_blank">MOSPI</a></div>
       </div>
     </div>
 
-    <!-- Gauge: Fuel Inflation -->
+    <!-- Gauge: Fruits - #5 by absolute value -->
     <div class="small-card">
-      <h3>Fuel & Light Inflation</h3>
-      <div class="custom-gauge-container" id="gauge-fuel" data-value="2.32" data-label="Fuel & Light">
+      <h3>5. Fruits</h3>
+      <div class="custom-gauge-container" id="gauge-fruits" data-value="6.87" data-label="Fruits">
         <div class="gauge-canvas-wrapper">
           <canvas class="gauge-canvas" width="180" height="100"></canvas>
         </div>
         <div class="gauge-value">--</div>
         <div class="gauge-label">YoY Inflation (%)</div>
-        <div class="gauge-range"><span>-20%</span><span>0%</span><span>+20%</span></div>
+        <div class="gauge-range"><span>-30%</span><span>0%</span><span>+30%</span></div>
         <div class="gauge-source">Source: <a href="https://mospi.gov.in" target="_blank">MOSPI</a></div>
       </div>
     </div>
@@ -685,6 +682,82 @@ function initCustomGauges() {
   });
 }
 
-document.addEventListener('DOMContentLoaded', initCustomGauges);
+// Draw Horizontal Bar Chart for Top 5 Inflation Categories
+function drawInflationBarChart() {
+  const container = document.getElementById('inflation-bar-chart');
+  if (!container) return;
+
+  // Top 5 categories by absolute inflation value (Nov 2025 data)
+  const data = [
+    { name: 'Personal Care & Effects', value: 24.04 },
+    { name: 'Vegetables', value: -22.2 },
+    { name: 'Pulses & Products', value: -15.86 },
+    { name: 'Oils & Fats', value: 7.87 },
+    { name: 'Fruits', value: 6.87 }
+  ];
+
+  // Sort by absolute value descending
+  data.sort((a, b) => Math.abs(b.value) - Math.abs(a.value));
+
+  const maxAbs = Math.max(...data.map(d => Math.abs(d.value)));
+  const barHeight = 40;
+  const gap = 12;
+  const labelWidth = 180;
+  const valueWidth = 70;
+
+  let html = '<div style="display: flex; flex-direction: column; gap: ' + gap + 'px; font-family: sans-serif;">';
+
+  data.forEach((item, index) => {
+    const isPositive = item.value >= 0;
+    const barWidth = (Math.abs(item.value) / maxAbs) * 100;
+    const color = isPositive ? '#34A853' : '#EA4335';
+    const sign = isPositive ? '+' : '';
+
+    html += `
+      <div style="display: flex; align-items: center; height: ${barHeight}px;">
+        <div style="width: ${labelWidth}px; font-size: 0.9rem; color: #3C4043; text-align: right; padding-right: 12px; white-space: nowrap;">
+          ${item.name}
+        </div>
+        <div style="flex: 1; background: #f0f0f0; border-radius: 4px; height: 24px; position: relative; overflow: hidden;">
+          <div style="
+            position: absolute;
+            ${isPositive ? 'left: 50%' : 'right: 50%'};
+            width: ${barWidth / 2}%;
+            height: 100%;
+            background: ${color};
+            border-radius: ${isPositive ? '0 4px 4px 0' : '4px 0 0 4px'};
+          "></div>
+          <div style="position: absolute; left: 50%; top: 0; bottom: 0; width: 2px; background: #9AA0A6;"></div>
+        </div>
+        <div style="width: ${valueWidth}px; font-size: 0.9rem; font-weight: 600; color: ${color}; text-align: left; padding-left: 12px;">
+          ${sign}${item.value.toFixed(1)}%
+        </div>
+      </div>
+    `;
+  });
+
+  // Add axis labels
+  html += `
+    <div style="display: flex; align-items: center;">
+      <div style="width: ${labelWidth}px;"></div>
+      <div style="flex: 1; display: flex; justify-content: space-between; font-size: 0.75rem; color: #9AA0A6; padding: 4px 0;">
+        <span>-25%</span>
+        <span>0%</span>
+        <span>+25%</span>
+      </div>
+      <div style="width: ${valueWidth}px;"></div>
+    </div>
+  `;
+
+  html += '</div>';
+  html += '<div style="text-align: center; margin-top: 12px; font-size: 0.75rem; color: #9AA0A6;">Source: <a href="https://mospi.gov.in" target="_blank" style="color: #174ea6;">MOSPI</a> (Nov 2025)</div>';
+
+  container.innerHTML = html;
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  initCustomGauges();
+  drawInflationBarChart();
+});
 </script>
 {% endblock %}
