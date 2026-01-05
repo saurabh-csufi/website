@@ -343,18 +343,63 @@ Combine statistical data with policy information to create a comprehensive busin
 - Reference Indian fiscal years where relevant (FY 2020-21)
 - Mention relevant ministries (MoCI, MoMSME)
 
-### Closing Section
+### Closing Section - Clickable Follow-Up Suggestions (MANDATORY)
 
-End with:
+End EVERY response with exactly 3 clickable follow-up suggestions. These will be rendered as clickable text links.
 
-📈 **Business Expansion Path**
+**CRITICAL FORMATTING RULES:**
+1. Start with the heading: **Follow up questions:**
+2. Use the EXACT format: \`[suggestion: Your query text here]\`
+3. Write as **direct commands/queries** (imperative), NOT as questions
+4. Do NOT use "Shall I...", "Would you like...", "Do you want..." - these are NOT clickable
+5. Keep suggestions concise (under 60 characters ideally)
+6. Put each suggestion on its own line, NO bullet points or dashes before them
 
-Provide 3 actionable follow-up questions that help the user move from information to action.
+**✅ CORRECT Format (Direct Commands):**
+\`[suggestion: Compare rural vs urban food inflation]\`
+\`[suggestion: Show vegetable price trends since 2020]\`
+\`[suggestion: Which category has the highest inflation?]\`
+
+**❌ WRONG Format (Conversational Questions):**
+- "Would you like to see rural vs urban comparison?" ← WRONG
+- "Shall I show the inflation trend?" ← WRONG
+- "Do you want to compare categories?" ← WRONG
+
+**Follow-Up Suggestion Ideas by Topic:**
+
+**If query was about CPI/Prices:**
+- \`[suggestion: Compare rural vs urban CPI for {category}]\`
+- \`[suggestion: Show {category} inflation rate trend]\`
+- \`[suggestion: Compare {category} with {related_category} prices]\`
+
+**If query was about Inflation:**
+- \`[suggestion: Show underlying CPI index for {category}]\`
+- \`[suggestion: Compare {category} inflation rural vs urban]\`
+- \`[suggestion: Which sub-category drives {category} inflation?]\`
+
+**If query was about specific category:**
+- \`[suggestion: Show {category} trend from 2020 to 2024]\`
+- \`[suggestion: Compare {category} rural vs urban]\`
+- \`[suggestion: Compare {category} with {related_category}]\`
+
+**Available MOSPI Categories for Suggestions:**
+- Food: Food, Cereals, Vegetables, Fruits, Meat & Fish, Eggs, Milk, Oils & Fats, Pulses, Sugar, Spices
+- Non-Food: Clothing, Fuel & Light, Health, Education, Transport, Recreation, Household Goods, Personal Care
+- Areas: Rural, Urban, Combined
+
+**Example Output:**
+\`\`\`
+**Follow up questions:**
+[suggestion: Compare rural vs urban vegetable inflation]
+[suggestion: Show food price index trend since 2020]
+[suggestion: Which food category has highest inflation?]
+\`\`\`
 
 ### Important Guidelines
 - Prioritize actionable insights over raw data
 - Connect export opportunities with available policy support
-- Always maintain Indian business context`
+- Always maintain Indian business context
+- ALWAYS end with 3 specific, data-driven follow-up questions`
       }
     };
   </script>
@@ -1083,6 +1128,45 @@ Provide 3 actionable follow-up questions that help the user move from informatio
       cursor: not-allowed;
     }
 
+    /* Follow-up Suggestion Links (in assistant messages) */
+    .followup-suggestion {
+      display: block;
+      background: none;
+      border: none;
+      padding: 0;
+      margin: 1px 0;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-family: inherit;
+      text-align: left;
+      text-decoration: none;
+      color: #4285F4; /* Google Blue */
+      transition: opacity 0.2s ease;
+    }
+
+    .followup-suggestion:hover {
+      opacity: 0.7;
+      text-decoration: underline;
+    }
+
+    .followup-suggestion:active {
+      opacity: 0.6;
+    }
+
+    /* Follow-up questions container - appears at end of message */
+    .followup-container {
+      margin-top: 16px;
+      padding-top: 12px;
+      border-top: 1px solid #e9ecef;
+    }
+
+    .followup-container .followup-heading {
+      font-weight: 600;
+      color: var(--text-dark);
+      margin-bottom: 4px;
+      font-size: 0.9rem;
+    }
+
     /* Chat Input Area */
     .chat-input-area {
       background: white;
@@ -1523,7 +1607,6 @@ Provide 3 actionable follow-up questions that help the user move from informatio
         <div class="chat-messages" id="chat-messages">
           <div class="welcome-message" id="welcome-message">
             <div class="suggestions">
-              <button class="suggestion" data-text="What is per capita food expenditure?" disabled>What is per capita food expenditure?</button>
               <button class="suggestion" data-text="Compare rural vs urban food inflation" disabled>Compare rural vs urban food inflation</button>
               <button class="suggestion" data-text="Which category has highest inflation?" disabled>Which category has highest inflation?</button>
             </div>
@@ -2003,8 +2086,13 @@ Provide 3 actionable follow-up questions that help the user move from informatio
           const contentEl = messageEl.querySelector('.message-content');
           if (!contentEl) return;
 
-          // Insert chart container
-          contentEl.insertAdjacentHTML('beforeend', chartConfig.html);
+          // Insert chart container - before followup container if it exists
+          const followupContainer = contentEl.querySelector('.followup-container');
+          if (followupContainer) {
+            followupContainer.insertAdjacentHTML('beforebegin', chartConfig.html);
+          } else {
+            contentEl.insertAdjacentHTML('beforeend', chartConfig.html);
+          }
           chatMessages.scrollTop = chatMessages.scrollHeight;
 
           // Wait for DOM to update
@@ -3042,6 +3130,14 @@ Please synthesize this information into a unified response following your format
           return placeholder;
         });
 
+        // Extract and preserve suggestion buttons before escaping
+        const suggestionPlaceholders = [];
+        processed = processed.replace(/\[suggestion:\s*([^\]]+)\]/g, (match, suggestionText) => {
+          const placeholder = `__SUGGESTION_${suggestionPlaceholders.length}__`;
+          suggestionPlaceholders.push(suggestionText.trim());
+          return placeholder;
+        });
+
         // Now escape HTML
         let formatted = escapeHtml(processed);
 
@@ -3051,14 +3147,54 @@ Please synthesize this information into a unified response following your format
             `<a href="${escapeHtml(link.url)}" target="_blank" rel="noopener" style="color: var(--gov-blue);">${escapeHtml(link.text)}</a>`);
         });
 
+        // Restore suggestions as clickable buttons (temporarily)
+        suggestionPlaceholders.forEach((suggestion, i) => {
+          formatted = formatted.replace(`__SUGGESTION_${i}__`,
+            `<button class="followup-suggestion" data-query="${escapeHtml(suggestion)}">${escapeHtml(suggestion)}</button>`);
+        });
+
         // Apply other markdown formatting
         formatted = formatted.replace(/```(\w*)\n([\s\S]*?)```/g, '<pre><code>$2</code></pre>');
         formatted = formatted.replace(/`([^`]+)`/g, '<code>$1</code>');
         formatted = formatted.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
         formatted = formatted.replace(/\*([^*]+)\*/g, '<em>$1</em>');
         formatted = formatted.replace(/\n/g, '<br>');
+
+        // Extract follow-up section and wrap in container (move to end)
+        if (suggestionPlaceholders.length > 0) {
+          // Find and extract the "Follow up questions:" heading and suggestions
+          const followupRegex = /(<strong>Follow up questions:<\/strong>)?(<br>)*(<button class="followup-suggestion"[^>]*>[^<]*<\/button>(<br>)*)+/gi;
+          const followupMatch = formatted.match(followupRegex);
+
+          if (followupMatch) {
+            // Remove original location
+            formatted = formatted.replace(followupRegex, '');
+            // Clean up trailing <br> tags
+            formatted = formatted.replace(/(<br>)+$/, '');
+
+            // Build clean followup container
+            const suggestionsHtml = suggestionPlaceholders.map(s =>
+              `<button class="followup-suggestion" data-query="${escapeHtml(s)}">${escapeHtml(s)}</button>`
+            ).join('');
+
+            // Add container at end
+            formatted += `<div class="followup-container"><div class="followup-heading">Follow up questions:</div>${suggestionsHtml}</div>`;
+          }
+        }
+
         return formatted;
       }
+
+      // Handle clicks on follow-up suggestion buttons (event delegation)
+      document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('followup-suggestion')) {
+          const query = e.target.dataset.query;
+          if (query && !isProcessing) {
+            chatInput.value = query;
+            sendMessage();
+          }
+        }
+      });
 
       function showTypingIndicator() {
         const typingEl = document.createElement('div');
