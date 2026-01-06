@@ -486,18 +486,12 @@ End EVERY response with exactly 3 clickable follow-up suggestions. These will be
       display: flex;
       flex-direction: column;
       flex-shrink: 0;
-      transform: translateX(0);
-      transition: transform 0.3s ease, width 0.3s ease;
+      margin-left: 0;
+      transition: margin-left 0.3s ease;
     }
 
     .left-sidebar.hidden {
-      transform: translateX(-100%);
-      position: absolute;
-      left: 0;
-      top: 0;
-      bottom: 0;
-      z-index: 100;
-      box-shadow: 4px 0 20px rgba(0,0,0,0.1);
+      margin-left: -320px;
     }
 
     .sidebar-header {
@@ -626,18 +620,12 @@ End EVERY response with exactly 3 clickable follow-up suggestions. These will be
       display: flex;
       flex-direction: column;
       flex-shrink: 0;
-      transform: translateX(0);
-      transition: transform 0.3s ease;
+      margin-right: 0;
+      transition: margin-right 0.3s ease;
     }
 
     .right-sidebar.hidden {
-      transform: translateX(100%);
-      position: absolute;
-      right: 0;
-      top: 0;
-      bottom: 0;
-      z-index: 100;
-      box-shadow: -4px 0 20px rgba(0,0,0,0.1);
+      margin-right: -320px;
     }
 
     .right-sidebar .settings-content {
@@ -864,62 +852,72 @@ End EVERY response with exactly 3 clickable follow-up suggestions. These will be
       display: none;
     }
 
-    /* Settings FAB */
-    .settings-fab {
-      display: none;
+    /* Edge Toggle Tab - Base */
+    .edge-toggle-tab {
       position: fixed;
-      bottom: 24px;
-      right: 24px;
-      width: 56px;
-      height: 56px;
-      border-radius: 50%;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 6px;
       background: var(--gov-blue);
       color: white;
       border: none;
       cursor: pointer;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-      z-index: 99;
-      align-items: center;
-      justify-content: center;
-      transition: transform 0.2s, box-shadow 0.2s;
+      z-index: 101;
+      transition: background 0.2s ease;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
     }
 
-    .settings-fab:hover {
-      transform: scale(1.05);
-      box-shadow: 0 6px 16px rgba(0,0,0,0.25);
+    .edge-toggle-tab svg {
+      width: 16px;
+      height: 16px;
+      transition: transform 0.3s ease;
     }
 
-    .settings-fab.visible {
-      display: flex;
+    .edge-toggle-tab .tab-label {
+      writing-mode: vertical-rl;
+      text-orientation: mixed;
+      font-size: 11px;
+      font-weight: 600;
+      margin-top: 8px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
     }
 
-    /* Tools FAB */
-    .tools-fab {
-      display: none;
-      position: fixed;
-      bottom: 24px;
-      left: 24px;
-      width: 56px;
-      height: 56px;
-      border-radius: 50%;
-      background: var(--gov-blue);
-      color: white;
-      border: none;
-      cursor: pointer;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-      z-index: 99;
-      align-items: center;
-      justify-content: center;
-      transition: transform 0.2s, box-shadow 0.2s;
+    /* Left Tab (Tools) */
+    .left-toggle-tab {
+      left: 0;
+      border-radius: 0 8px 8px 0;
     }
 
-    .tools-fab:hover {
-      transform: scale(1.05);
-      box-shadow: 0 6px 16px rgba(0,0,0,0.25);
+    .left-toggle-tab svg {
+      transform: rotate(0deg); /* Points right when closed */
     }
 
-    .tools-fab.visible {
-      display: flex;
+    .left-toggle-tab.open svg {
+      transform: rotate(180deg); /* Points left when open */
+    }
+
+    /* Right Tab (Settings) */
+    .right-toggle-tab {
+      right: 0;
+      border-radius: 8px 0 0 8px;
+    }
+
+    .right-toggle-tab svg {
+      transform: rotate(180deg); /* Points left when closed */
+    }
+
+    .right-toggle-tab.open svg {
+      transform: rotate(0deg); /* Points right when open */
+    }
+
+    /* Hover effect */
+    .edge-toggle-tab:hover {
+      background: var(--gov-blue-light);
     }
 
     /* Chat Area */
@@ -1361,9 +1359,39 @@ End EVERY response with exactly 3 clickable follow-up suggestions. These will be
     }
 
     @media (max-width: 992px) {
-      /* Hide left sidebar on tablets */
+      /* Make sidebars fixed overlays on tablets */
       .left-sidebar {
-        display: none;
+        position: fixed;
+        top: 56px;
+        left: 0;
+        bottom: 0;
+        z-index: 100;
+        box-shadow: 4px 0 20px rgba(0,0,0,0.1);
+        margin-left: 0;
+        transform: translateX(0);
+        transition: transform 0.3s ease;
+      }
+
+      .left-sidebar.hidden {
+        transform: translateX(-100%);
+        margin-left: 0;
+      }
+
+      .right-sidebar {
+        position: fixed;
+        top: 56px;
+        right: 0;
+        bottom: 0;
+        z-index: 100;
+        box-shadow: -4px 0 20px rgba(0,0,0,0.1);
+        margin-right: 0;
+        transform: translateX(0);
+        transition: transform 0.3s ease;
+      }
+
+      .right-sidebar.hidden {
+        transform: translateX(100%);
+        margin-right: 0;
       }
 
       .message-content {
@@ -1376,13 +1404,11 @@ End EVERY response with exactly 3 clickable follow-up suggestions. These will be
         height: calc(100vh - 50px);
       }
 
-      /* Hide both sidebars on mobile */
-      .left-sidebar {
-        display: none;
-      }
-
+      /* Make sidebars full-width overlays on mobile */
+      .left-sidebar,
       .right-sidebar {
-        display: none;
+        width: 100%;
+        max-width: 320px;
       }
 
       /* Smaller branding header on mobile */
@@ -1409,21 +1435,13 @@ End EVERY response with exactly 3 clickable follow-up suggestions. These will be
         display: none !important;
       }
 
-      .right-sidebar.visible {
-        display: flex;
-        position: fixed;
-        top: 0;
-        right: 0;
-        bottom: 0;
-        width: 100%;
-        max-width: 320px;
-        z-index: 1000;
-        box-shadow: -4px 0 20px rgba(0,0,0,0.15);
+      /* Edge toggle tabs on mobile - smaller */
+      .edge-toggle-tab {
+        padding: 8px 4px;
       }
 
-      /* Show settings FAB on mobile */
-      .settings-fab {
-        display: flex;
+      .edge-toggle-tab .tab-label {
+        font-size: 10px;
       }
 
       .chat-messages {
@@ -1743,19 +1761,20 @@ End EVERY response with exactly 3 clickable follow-up suggestions. These will be
     </aside>
   </div>
 
-  <!-- Settings Toggle Button (floating) -->
-  <button class="settings-fab" id="settings-fab" title="Open Settings">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <circle cx="12" cy="12" r="3"></circle>
-      <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+  <!-- Left Edge Toggle Tab (Tools) -->
+  <button class="edge-toggle-tab left-toggle-tab open" id="tools-toggle" title="Toggle Tool Activity">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <polyline points="9 18 15 12 9 6"></polyline>
     </svg>
+    <span class="tab-label">Tools</span>
   </button>
 
-  <!-- Tools Toggle Button (floating) -->
-  <button class="tools-fab" id="tools-fab" title="Open Tool Activity">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+  <!-- Right Edge Toggle Tab (Settings) -->
+  <button class="edge-toggle-tab right-toggle-tab open" id="settings-toggle" title="Toggle Settings">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <polyline points="15 18 9 12 15 6"></polyline>
     </svg>
+    <span class="tab-label">Settings</span>
   </button>
 
   <script>
@@ -2209,9 +2228,9 @@ End EVERY response with exactly 3 clickable follow-up suggestions. These will be
       const leftSidebar = document.getElementById('left-sidebar');
       const rightSidebar = document.getElementById('right-sidebar');
       const toolCallsContainer = document.getElementById('tool-calls-container');
-      const settingsFab = document.getElementById('settings-fab');
+      const toolsToggle = document.getElementById('tools-toggle');
+      const settingsToggle = document.getElementById('settings-toggle');
       const closeSettings = document.getElementById('close-settings');
-      const toolsFab = document.getElementById('tools-fab');
       const closeTools = document.getElementById('close-tools');
       const mcpStatus = document.getElementById('mcp-status');
       const kbStatus = document.getElementById('kb-status');
@@ -2250,33 +2269,35 @@ End EVERY response with exactly 3 clickable follow-up suggestions. These will be
         chatInput.addEventListener('keydown', handleKeyDown);
         chatInput.addEventListener('input', autoResize);
 
-        // Settings sidebar toggle
+        // Settings toggle tab
+        if (settingsToggle) {
+          settingsToggle.addEventListener('click', () => {
+            rightSidebar.classList.toggle('hidden');
+            settingsToggle.classList.toggle('open');
+          });
+        }
+
+        // Settings close button (secondary)
         if (closeSettings) {
           closeSettings.addEventListener('click', () => {
             rightSidebar.classList.add('hidden');
-            settingsFab.classList.add('visible');
+            settingsToggle.classList.remove('open');
           });
         }
 
-        if (settingsFab) {
-          settingsFab.addEventListener('click', () => {
-            rightSidebar.classList.remove('hidden');
-            settingsFab.classList.remove('visible');
+        // Tools toggle tab
+        if (toolsToggle) {
+          toolsToggle.addEventListener('click', () => {
+            leftSidebar.classList.toggle('hidden');
+            toolsToggle.classList.toggle('open');
           });
         }
 
-        // Tools sidebar toggle
+        // Tools close button (secondary)
         if (closeTools) {
           closeTools.addEventListener('click', () => {
             leftSidebar.classList.add('hidden');
-            toolsFab.classList.add('visible');
-          });
-        }
-
-        if (toolsFab) {
-          toolsFab.addEventListener('click', () => {
-            leftSidebar.classList.remove('hidden');
-            toolsFab.classList.remove('visible');
+            toolsToggle.classList.remove('open');
           });
         }
 
