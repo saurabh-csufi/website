@@ -24,8 +24,8 @@
   <script>
     window.CHAT_CONFIG = {
       models: {
-        MCP_MODEL: 'gemini-2.0-flash',
-        KB_MODEL: 'gemini-2.5-flash'
+        MCP_MODEL: 'gemini-3-flash-preview',
+        KB_MODEL: 'gemini-3-flash-preview'
       },
       api: {
         GEMINI_API_BASE: 'https://generativelanguage.googleapis.com/v1beta/models'
@@ -111,11 +111,15 @@ This instance includes **all public Data Commons data** plus custom India-specif
 
 **YOU CAN AND SHOULD MAKE MULTIPLE TOOL CALLS** to answer complex queries. Break down queries into steps:
 
-**Example: "What is per capita food expenditure?"**
-→ Step 1: search_indicators for "food price index" or "food CPI"
-→ Step 2: Use Count_Person directly for total population (do NOT search - use the exact variable)
-→ Step 3: get_observations for both variables (use variable=Count_Person for population)
-→ Step 4: Calculate and present the ratio
+**Example: "What is the GDP per capita?"**
+→ Step 1: search_indicators for "GDP per capita" or use Amount_EconomicActivity_GrossDomesticProduction_Nominal_PerCapita
+→ Step 2: get_observations for the GDP per capita variable
+→ Step 3: Present the data with trend analysis
+
+**Example: "Show me food price trends"**
+→ Step 1: get_observations for ConsumerPriceIndex_EconomicActivity_ConsumerFood
+→ Step 2: Present CPI trend over time
+→ Step 3: Note that CPI is an index (base 2012=100), not actual expenditure amounts
 
 **CRITICAL: Per Capita Calculations**
 For ANY per capita calculation, ALWAYS use **Count_Person** as the population variable. This is the TOTAL population count.
@@ -123,6 +127,16 @@ For ANY per capita calculation, ALWAYS use **Count_Person** as the population va
 - Do NOT use caste demographics (SC, ST, etc.)
 - Do NOT use gender-specific counts unless explicitly asked
 - Use: get_observations with variable="Count_Person" and place="country/IND"
+- Per capita calculations ONLY make sense for currency/quantity values (₹, counts), NOT for indices
+
+**CRITICAL: CPI vs Expenditure (DO NOT CONFUSE)**
+- **CPI (Consumer Price Index)**: A relative INDEX measuring price changes over time (base year = 100). This is NOT a currency amount.
+- **Expenditure**: Actual money spent in ₹ (Rupees)
+- This database has CPI data, NOT expenditure data for consumer goods
+- If user asks for "food expenditure" or "spending":
+  1. Explain that actual expenditure data is not available in this database
+  2. Offer to show CPI (price index trends) or inflation rates instead
+  3. NEVER calculate "CPI per capita" - it is mathematically meaningless (you cannot divide an index by population)
 
 **Example: "Compare rural vs urban food inflation"**
 → Step 1: get_observations for Inflation_EconomicActivity_ConsumerPriceIndex_ConsumerFood_Rural
@@ -196,6 +210,14 @@ Transform user queries to Data Commons schema:
 - For CPI/inflation: Try different categories (food, clothing, health, fuel, housing)
 - For demographics: Try country-level if state-level is unavailable, or vice versa
 - State clearly which data source was searched and suggest alternative queries
+
+**Data Type Not Available Protocol**: If the user asks for a data type that doesn't exist in this database:
+- Example: User asks for "food expenditure" but only CPI (price index) data exists
+- Response format:
+  1. Clearly state: "The specific data type you requested (expenditure) is not available in this database."
+  2. Explain what related data IS available: "However, I have Consumer Price Index (CPI) data which tracks how food prices have changed over time."
+  3. Offer an alternative: "Would you like to see the food price index trends or inflation rates instead?"
+- NEVER fabricate data or perform meaningless calculations (like CPI ÷ population)
 
 ### 4. Correlation & Insights
 
@@ -1750,8 +1772,8 @@ End EVERY response with exactly 3 clickable follow-up suggestions. These will be
       }
 
       const GEMINI_API_BASE = config?.api?.GEMINI_API_BASE || 'https://generativelanguage.googleapis.com/v1beta/models';
-      const MCP_MODEL = config?.models?.MCP_MODEL || 'gemini-2.0-flash';
-      const KB_MODEL = config?.models?.KB_MODEL || 'gemini-2.5-flash';
+      const MCP_MODEL = config?.models?.MCP_MODEL || 'gemini-3-flash-preview';
+      const KB_MODEL = config?.models?.KB_MODEL || 'gemini-3-flash-preview';
 
       // Helper function to get current date/time in Indian format
       function getCurrentDateTimeIST() {
@@ -2527,7 +2549,7 @@ End EVERY response with exactly 3 clickable follow-up suggestions. These will be
       }
 
       // ============================================================
-      // PHASE 1: MCP Tools Query (using gemini-2.0-flash)
+      // PHASE 1: MCP Tools Query (using gemini-3.0-pro)
       // ============================================================
       async function queryWithMcpTools(userMessage) {
         if (!mcpConnected || mcpTools.length === 0) {
@@ -2688,7 +2710,7 @@ End EVERY response with exactly 3 clickable follow-up suggestions. These will be
       }
 
       // ============================================================
-      // PHASE 2: Knowledge Base Query (using gemini-2.5-flash)
+      // PHASE 2: Knowledge Base Query (using gemini-3-flash-preview)
       // ============================================================
       async function queryWithKnowledgeBase(userMessage) {
         if (!kbEnabled || !kbStoreId) {
@@ -2892,7 +2914,7 @@ Please synthesize this information into a unified response following your format
               };
 
               // Use streaming for synthesis
-              finalResponse = await streamGeminiResponse(synthesisPayload, 'gemini-2.0-flash', streamingMessage);
+              finalResponse = await streamGeminiResponse(synthesisPayload, 'gemini-3-flash-preview', streamingMessage);
 
             } catch (err) {
               console.error('Synthesis streaming error:', err);
@@ -2919,7 +2941,7 @@ Please synthesize this information into a unified response following your format
                 }],
                 generationConfig: { temperature: 0.3, topP: 0.95 }
               };
-              finalResponse = await streamGeminiResponse(refinePayload, 'gemini-2.0-flash', streamingMessage);
+              finalResponse = await streamGeminiResponse(refinePayload, 'gemini-3-flash-preview', streamingMessage);
             } catch (err) {
               // Fallback to non-streamed
               finalResponse = mcpContent;
