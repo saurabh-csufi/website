@@ -2946,20 +2946,27 @@ Please synthesize this information into a unified response following your format
           } else if (mcpContent) {
             // Stream a refined response for MCP-only content with conversation context
             try {
-              let refinePrompt = '';
+              let contextString = '';
               if (conversationHistory.length > 0) {
                 const recentHistory = conversationHistory.slice(-6).map(msg =>
                   `${msg.role === 'user' ? 'User' : 'Assistant'}: ${msg.parts[0].text.substring(0, 150)}...`
                 ).join('\n');
-                refinePrompt = `Previous conversation:\n${recentHistory}\n\n---\n\nUser's latest question: ${userMessage}\n\nData retrieved:\n${mcpContent}\n\nProvide a natural, helpful response based on the data and conversation context:`;
-              } else {
-                refinePrompt = `Rephrase and present this information naturally and helpfully to the user. Keep all the data accurate but make it conversational:\n\n${mcpContent}`;
+                contextString = `Previous conversation context:\n${recentHistory}\n\n---\n\n`;
               }
+              const refinePrompt = `${contextString}User's Question: ${userMessage}
+
+---
+**STATISTICAL DATA (from India Ministry of Statistics)**:
+${mcpContent}
+
+---
+Please present this information following your formatting guidelines.`;
               const refinePayload = {
                 contents: [{
                   role: 'user',
                   parts: [{ text: refinePrompt }]
                 }],
+                systemInstruction: { parts: [{ text: injectDateTime(synthesisSystemInstruction) }] },
                 generationConfig: { temperature: 0.3, topP: 0.95 }
               };
               finalResponse = await streamGeminiResponse(refinePayload, 'gemini-3-flash-preview', streamingMessage);
@@ -2969,17 +2976,36 @@ Please synthesize this information into a unified response following your format
               streamingMessage.setText(finalResponse);
             }
           } else if (kbContent) {
-            // Stream the KB content directly (already formatted)
-            // Simulate streaming by adding text in chunks
-            const words = kbContent.split(' ');
-            finalResponse = '';
-            for (let i = 0; i < words.length; i++) {
-              finalResponse += (i > 0 ? ' ' : '') + words[i];
-              streamingMessage.setText(finalResponse);
-              // Small delay to simulate streaming effect
-              if (i % 5 === 0) {
-                await new Promise(r => setTimeout(r, 20));
+            // Refine KB content with synthesis instruction to add follow-up suggestions
+            try {
+              let contextString = '';
+              if (conversationHistory.length > 0) {
+                const recentHistory = conversationHistory.slice(-6).map(msg =>
+                  `${msg.role === 'user' ? 'User' : 'Assistant'}: ${msg.parts[0].text.substring(0, 150)}...`
+                ).join('\n');
+                contextString = `Previous conversation context:\n${recentHistory}\n\n---\n\n`;
               }
+              const refinePrompt = `${contextString}User's Question: ${userMessage}
+
+---
+**POLICY & SCHEME INFORMATION (from Government Documents)**:
+${kbContent}
+
+---
+Please present this information following your formatting guidelines.`;
+              const refinePayload = {
+                contents: [{
+                  role: 'user',
+                  parts: [{ text: refinePrompt }]
+                }],
+                systemInstruction: { parts: [{ text: injectDateTime(synthesisSystemInstruction) }] },
+                generationConfig: { temperature: 0.3, topP: 0.95 }
+              };
+              finalResponse = await streamGeminiResponse(refinePayload, 'gemini-3-flash-preview', streamingMessage);
+            } catch (err) {
+              // Fallback to non-refined KB content
+              finalResponse = kbContent;
+              streamingMessage.setText(finalResponse);
             }
           } else {
             // Neither worked
