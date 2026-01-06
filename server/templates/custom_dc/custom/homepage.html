@@ -426,7 +426,7 @@ End EVERY response with exactly 3 clickable follow-up suggestions. These will be
     };
   </script>
   <style>
-    /* Google Brand Colors + MSME Portal Styles */
+    /* Google Brand Colors + Data Agent Portal Styles */
     :root {
       /* Google Brand Colors */
       --google-blue: #4285F4;
@@ -2417,8 +2417,8 @@ End EVERY response with exactly 3 clickable follow-up suggestions. These will be
       function enableChat() {
         chatInput.disabled = false;
         chatInput.placeholder = mcpConnected
-          ? 'Ask about MSME policies, statistics, or government schemes...'
-          : 'Ask questions about policies or upload documents...';
+          ? 'Ask about Indian economic data, policies, or government schemes...'
+          : 'Ask questions about policies or economic data...';
         sendBtn.disabled = false;
         document.querySelectorAll('.suggestion').forEach(btn => {
           btn.disabled = false;
@@ -3034,7 +3034,7 @@ Please synthesize this information into a unified response following your format
         const messageEl = document.createElement('div');
         messageEl.className = `message ${role}`;
 
-        const avatar = role === 'user' ? 'You' : 'VS';
+        const avatar = role === 'user' ? 'You' : 'DA';
         const formattedContent = formatMessage(content);
 
         messageEl.innerHTML = `
@@ -3051,7 +3051,7 @@ Please synthesize this information into a unified response following your format
         const messageEl = document.createElement('div');
         messageEl.className = 'message assistant';
         messageEl.innerHTML = `
-          <div class="message-avatar">VS</div>
+          <div class="message-avatar">DA</div>
           <div class="message-content"><span class="streaming-cursor">▊</span></div>
         `;
         chatMessages.appendChild(messageEl);
@@ -3222,7 +3222,7 @@ Please synthesize this information into a unified response following your format
         const typingEl = document.createElement('div');
         typingEl.className = 'message assistant';
         typingEl.innerHTML = `
-          <div class="message-avatar">VS</div>
+          <div class="message-avatar">DA</div>
           <div class="typing-indicator">
             <span></span>
             <span></span>
