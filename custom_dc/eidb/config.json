@@ -47,6 +47,54 @@
         "unit": "unit",
         "measurementMethod": "measurementMethod"
       }
+    },
+    "GDP_Annual - custom_output.csv": {
+      "provenance": "MOSPI GDP Data",
+      "format": "variablePerRow",
+      "columnMappings": {
+        "entity": "observationAbout",
+        "date": "observationDate",
+        "value": "value",
+        "variable": "variableMeasured",
+        "unit": "unit",
+        "measurementMethod": "measurementMethod"
+      }
+    },
+    "State_wise_SDP-17032025_GSDP_Current - custom_output.csv": {
+      "provenance": "MOSPI GSDP Current Prices",
+      "format": "variablePerRow",
+      "columnMappings": {
+        "entity": "observationAbout",
+        "date": "observationDate",
+        "value": "value",
+        "variable": "variableMeasured",
+        "unit": "unit",
+        "measurementMethod": "measurementMethod"
+      }
+    },
+    "State_wise_SDP-17032025_GSDP_Constant - custom_output.csv": {
+      "provenance": "MOSPI GSDP Constant Prices",
+      "format": "variablePerRow",
+      "columnMappings": {
+        "entity": "observationAbout",
+        "date": "observationDate",
+        "value": "value",
+        "variable": "variableMeasured",
+        "unit": "unit",
+        "measurementMethod": "measurementMethod"
+      }
+    },
+    "mospi_asi_combined - mospi_asi_combined.csv": {
+      "provenance": "MOSPI ASI Data",
+      "format": "variablePerRow",
+      "columnMappings": {
+        "entity": "observationAbout",
+        "date": "observationDate",
+        "value": "value",
+        "variable": "variableMeasured",
+        "unit": "unit",
+        "measurementMethod": "measurementMethod"
+      }
     }
   },
   "sources": {
@@ -61,7 +109,11 @@
     "Ministry of Statistics and Programme Implementation": {
       "url": "https://mospi.gov.in/",
       "provenances": {
-        "MOSPI CPI Data": "https://mospi.gov.in/publication/consumer-price-index"
+        "MOSPI CPI Data": "https://mospi.gov.in/publication/consumer-price-index",
+        "MOSPI GDP Data": "https://mospi.gov.in/publication/national-accounts-statistics",
+        "MOSPI GSDP Current Prices": "https://mospi.gov.in/publication/state-domestic-product",
+        "MOSPI GSDP Constant Prices": "https://mospi.gov.in/publication/state-domestic-product",
+        "MOSPI ASI Data": "https://mospi.gov.in/publication/annual-survey-industries"
       }
     }
   }

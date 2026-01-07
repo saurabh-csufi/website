@@ -1,0 +1,8 @@
+Node: E:mospi_asi_data1->E0
+observationAbout: C:mospi_asi_data1->observationAbout
+observationDate: C:mospi_asi_data1->observationDate
+value: C:mospi_asi_data1->value
+variableMeasured: C:mospi_asi_data1->variableMeasured
+unit: C:mospi_asi_data1->unit
+measurementMethod: C:mospi_asi_data1->measurementMethod
+typeOf: dcs:StatVarObservation

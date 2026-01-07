@@ -1,0 +1,8 @@
+Node: dcid:NominalValue_GrowthRate_Amount_EconomicActivity_GrossDomesticProduction
+typeOf: dcs:StatisticalVariable
+activitySource: dcs:GrossDomesticProduction
+measuredProperty: dcs:amount
+measurementQualifier: dcs:Nominal
+name: "Growth Rate Amount of Economic Activity (Nominal Value): Gross Domestic Production"
+populationType: dcs:EconomicActivity
+statType: dcs:growthRate

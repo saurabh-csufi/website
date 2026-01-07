@@ -1,0 +1,20 @@
+# MOSPI GDP and GSDP Statistical Variable Definitions
+# Defines variables for national GDP and state-level GSDP data
+
+Node: dcid:Amount_EconomicActivity_GrossDomesticProduction_Nominal
+typeOf: dcs:StatisticalVariable
+name: "Gross Domestic Product (Nominal/Current Prices)"
+populationType: dcs:EconomicActivity
+measuredProperty: dcs:amount
+statType: dcs:measuredValue
+activitySource: dcs:GrossDomesticProduction
+measurementQualifier: dcs:Nominal
+
+Node: dcid:Amount_EconomicActivity_GrossDomesticProduction_RealValue
+typeOf: dcs:StatisticalVariable
+name: "Gross Domestic Product (Real/Constant Prices)"
+populationType: dcs:EconomicActivity
+measuredProperty: dcs:amount
+statType: dcs:measuredValue
+activitySource: dcs:GrossDomesticProduction
+measurementQualifier: dcs:RealValue

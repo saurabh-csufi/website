@@ -68,6 +68,18 @@ This instance includes **all public Data Commons data** plus custom India-specif
 - Rural/Urban Breakdown: Separate indices for Rural, Urban, Combined
 - Years: 2011-2025 (monthly data)
 
+**Custom Dataset 3: MOSPI GDP & GSDP Data**:
+- National GDP: Nominal (current prices) and Real (constant 2011-12 prices) for India
+- State-wise GSDP: All 28 states + 8 UTs with both Nominal and Real values
+- Geographic: country/IND for national, wikidataId/Q#### for states (e.g., Q1191=Maharashtra, Q1061=Gujarat)
+- Years: 2012-2022
+
+**Custom Dataset 4: MOSPI Annual Survey of Industries (ASI)**:
+- Factory Statistics: Count, employment, capital, output, value added
+- Geographic Coverage: State-wise data with Rural/Urban breakdown
+- Metrics: Number of factories, workers, emoluments, fixed capital, input/output values, productivity ratios
+- Year: 2024
+
 ### MOSPI Variable Reference (EXACT DCIDs - Use These Directly)
 
 **CPI Variables** (add _Rural or _Urban suffix for area-specific data):
@@ -106,6 +118,32 @@ This instance includes **all public Data Commons data** plus custom India-specif
 - Inflation_EconomicActivity_ConsumerPriceIndex_FuelAndLight (also _Rural, _Urban)
 - Inflation_EconomicActivity_ConsumerPriceIndex_MOSPIGeneral (General Inflation)
 - ... (all CPI categories have corresponding Inflation variables)
+
+**GDP/GSDP Variables** (National and State-level):
+- Amount_EconomicActivity_GrossDomesticProduction_Nominal (GDP/GSDP at current prices)
+- Amount_EconomicActivity_GrossDomesticProduction_RealValue (GDP/GSDP at constant 2011-12 prices)
+- Use country/IND for national GDP, wikidataId/Q#### for state GSDP (e.g., Q1191=Maharashtra, Q1061=Gujarat, Q22424=Rajasthan)
+
+**ASI Factory Variables** (Annual Survey of Industries):
+- Count_Establishment_Factory (Number of factories)
+- Count_Establishment_Factory_Rural (Factories in rural areas)
+- Count_Person_Factory_TotalEngaged (Total persons engaged in factories)
+- Count_Person_Factory_TotalEngaged_Rural (Persons in rural factories)
+- Count_Worker_Factory (Number of factory workers)
+- NetValueAdded_EconomicActivity_Factory (Net value added by factories)
+- Amount_EconomicActivity_Factory_FixedCapital (Fixed capital of factories)
+- Amount_EconomicActivity_Factory_FixedCapital_Rural (Fixed capital in rural factories)
+- Amount_EconomicActivity_Factory_GrossValueAdded (Gross value added by factories)
+- Amount_EconomicActivity_Factory_Input (Total input value for factories)
+- Amount_EconomicActivity_Factory_Input_Rural (Input value for rural factories)
+- Amount_EconomicActivity_Factory_Output (Total output value for factories)
+- Amount_EconomicActivity_Factory_Output_Rural (Output value for rural factories)
+- Amount_EconomicActivity_Factory_Emolument (Total emoluments paid by factories)
+- Amount_EconomicActivity_Factory_Emolument_Rural (Emoluments in rural factories)
+- Wages_Worker_AsAFractionOf_Count_Worker (Average wages per worker)
+- Amount_EconomicActivity_Factory_FixedCapital_AsAFractionOf_Count_Establishment_Factory (Average fixed capital per factory)
+- Amount_EconomicActivity_Factory_GrossValueAdded_AsAFractionOf_Count_Person_Factory_TotalEngaged (GVA per person engaged)
+- Count_Person_Factory_TotalEngaged_AsAFractionOf_Count_Establishment_Factory (Average persons per factory)
 
 ### 1. Chain-of-Thought Query Processing (CRITICAL)
 
@@ -165,10 +203,26 @@ Transform user queries to Data Commons schema:
 - "CPI rural" → ConsumerPriceIndex_EconomicActivity_*_Rural
 - "Price index cereals" → ConsumerPriceIndex_EconomicActivity_CerealsAndProducts
 
+**GDP/GSDP Data (MOSPI):**
+- "GDP India" → Amount_EconomicActivity_GrossDomesticProduction_Nominal for country/IND
+- "Real GDP" → Amount_EconomicActivity_GrossDomesticProduction_RealValue for country/IND
+- "GSDP Maharashtra" → Amount_EconomicActivity_GrossDomesticProduction_Nominal for wikidataId/Q1191
+- "State GDP" → Use wikidataId format (Q1191=Maharashtra, Q1061=Gujarat, Q22424=Rajasthan, Q1185=Karnataka, Q1445=Tamil Nadu)
+
+**ASI Factory Data (MOSPI):**
+- "Number of factories" → Count_Establishment_Factory
+- "Factory workers" → Count_Worker_Factory
+- "Factory employment" → Count_Person_Factory_TotalEngaged
+- "Factory output" → Amount_EconomicActivity_Factory_Output
+- "Factory capital" → Amount_EconomicActivity_Factory_FixedCapital
+- "Factory value added" → Amount_EconomicActivity_Factory_GrossValueAdded
+- "Factory wages" → Amount_EconomicActivity_Factory_Emolument
+- "Factory productivity" → Amount_EconomicActivity_Factory_GrossValueAdded_AsAFractionOf_Count_Person_Factory_TotalEngaged
+
 **Public Data Commons:**
 - "Population" → Count_Person (ALWAYS use this for total population - never use religious/caste demographics)
 - "Per capita" calculations → MUST use Count_Person for denominator
-- "GDP" → Amount_EconomicActivity_GrossDomesticProduction
+- "GDP" → Amount_EconomicActivity_GrossDomesticProduction_Nominal
 - "Unemployment rate" → UnemploymentRate_Person
 
 **Step B: Geo-Tagging**: Identify the specific dcid for locations:

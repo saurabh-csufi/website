@@ -1,0 +1,175 @@
+Node: dcid:Count_Establishment_Factory
+typeOf: dcid:StatisticalVariable
+name: "Count Establishment: Establishment Type Factory"
+populationType: dcid:Establishment
+measuredProperty: dcid:count
+statType: dcid:measuredValue
+establishmentType: dcid:Factory
+
+Node: dcid:NetValueAdded_EconomicActivity_Factory
+typeOf: dcid:StatisticalVariable
+name: "Net value added by factories"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:netValueAdded
+statType: dcid:measuredValue
+activitySource: dcid:Factory
+
+Node: dcid:Count_Person_Factory_TotalEngaged
+typeOf: dcid:StatisticalVariable
+name: "Population engaged in factories"
+populationType: dcid:Person
+measuredProperty: dcid:count
+statType: dcid:measuredValue
+employedEstablishment: dcid:Factory
+employmentCategory: dcid:TotalEngaged
+
+Node: dcid:Count_Worker_Factory
+typeOf: dcid:StatisticalVariable
+name: "Number of factory workers"
+populationType: dcid:Worker
+measuredProperty: dcid:count
+statType: dcid:measuredValue
+employedEstablishment: dcid:Factory
+
+Node: dcid:Amount_EconomicActivity_Factory_Emolument
+typeOf: dcid:StatisticalVariable
+name: "Total emoluments paid by factories"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:amount
+statType: dcid:measuredValue
+activitySource: dcid:Factory
+activityType: dcid:Emolument
+
+Node: dcid:Amount_EconomicActivity_Factory_FixedCapital
+typeOf: dcid:StatisticalVariable
+name: "Fixed capital of factories"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:amount
+statType: dcid:measuredValue
+activitySource: dcid:Factory
+activityType: dcid:FixedCapital
+
+Node: dcid:Amount_EconomicActivity_Factory_GrossValueAdded
+typeOf: dcid:StatisticalVariable
+name: "Gross value added by factories"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:amount
+statType: dcid:measuredValue
+activitySource: dcid:Factory
+activityType: dcid:GrossValueAdded
+
+Node: dcid:Amount_EconomicActivity_Factory_Input
+typeOf: dcid:StatisticalVariable
+name: "Total input value for factories"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:amount
+statType: dcid:measuredValue
+activitySource: dcid:Factory
+activityType: dcid:Input
+
+Node: dcid:Amount_EconomicActivity_Factory_Output
+typeOf: dcid:StatisticalVariable
+name: "Total output value for factories"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:amount
+statType: dcid:measuredValue
+activitySource: dcid:Factory
+activityType: dcid:Output
+
+Node: dcid:Amount_EconomicActivity_Factory_Emolument_Rural
+typeOf: dcid:StatisticalVariable
+name: "Total emoluments paid by factories in rural area"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:amount
+statType: dcid:measuredValue
+activitySource: dcid:Factory
+activityType: dcid:Emolument
+placeOfResidenceClassification: dcid:Rural
+
+Node: dcid:Amount_EconomicActivity_Factory_FixedCapital_Rural
+typeOf: dcid:StatisticalVariable
+name: "Fixed capital of factories in rural area"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:amount
+statType: dcid:measuredValue
+activitySource: dcid:Factory
+activityType: dcid:FixedCapital
+placeOfResidenceClassification: dcid:Rural
+
+Node: dcid:Amount_EconomicActivity_Factory_Input_Rural
+typeOf: dcid:StatisticalVariable
+name: "Total input value of factories in rural area"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:amount
+statType: dcid:measuredValue
+activitySource: dcid:Factory
+activityType: dcid:Input
+placeOfResidenceClassification: dcid:Rural
+
+Node: dcid:Amount_EconomicActivity_Factory_Output_Rural
+typeOf: dcid:StatisticalVariable
+name: "Total output value of factories in rural area"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:amount
+statType: dcid:measuredValue
+activitySource: dcid:Factory
+activityType: dcid:Output
+placeOfResidenceClassification: dcid:Rural
+
+Node: dcid:Count_Establishment_Factory_Rural
+typeOf: dcid:StatisticalVariable
+name: "Number of factories in rural area"
+populationType: dcid:Establishment
+measuredProperty: dcid:count
+statType: dcid:measuredValue
+establishmentType: dcid:Factory
+placeOfResidenceClassification: dcid:Rural
+
+Node: dcid:Count_Person_Factory_TotalEngaged_Rural
+typeOf: dcid:StatisticalVariable
+name: "Total persons engaged in factories in rural area"
+populationType: dcid:Person
+measuredProperty: dcid:count
+statType: dcid:measuredValue
+employedEstablishment: dcid:Factory
+employmentCategory: dcid:TotalEngaged
+placeOfResidenceClassification: dcid:Rural
+
+Node: dcid:Amount_EconomicActivity_Factory_FixedCapital_AsAFractionOf_Count_Establishment_Factory
+typeOf: dcid:StatisticalVariable
+name: "Average fixed capital per factory"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:amount
+statType: dcid:measuredValue
+measurementDenominator: dcid:Count_Establishment_Factory
+activitySource: dcid:Factory
+activityType: dcid:FixedCapital
+
+Node: dcid:Amount_EconomicActivity_Factory_GrossValueAdded_AsAFractionOf_Count_Person_Factory_TotalEngaged
+typeOf: dcid:StatisticalVariable
+name: "Gross value added per person engaged in factories"
+populationType: dcid:EconomicActivity
+measuredProperty: dcid:amount
+statType: dcid:measuredValue
+measurementDenominator: dcid:Count_Person_Factory_TotalEngaged
+activitySource: dcid:Factory
+activityType: dcid:GrossValueAdded
+
+Node: dcid:Count_Person_Factory_TotalEngaged_AsAFractionOf_Count_Establishment_Factory
+typeOf: dcid:StatisticalVariable
+name: "Average number of persons engaged per factory"
+populationType: dcid:Person
+measuredProperty: dcid:count
+statType: dcid:measuredValue
+measurementDenominator: dcid:Count_Establishment_Factory
+employedEstablishment: dcid:Factory
+employmentCategory: dcid:TotalEngaged
+
+Node: dcid:Wages_Worker_AsAFractionOf_Count_Worker
+typeOf: dcid:StatisticalVariable
+name: "Average wages per worker"
+populationType: dcid:Worker
+measuredProperty: dcid:wages
+statType: dcid:measuredValue
+measurementDenominator: dcid:Count_Worker
+
