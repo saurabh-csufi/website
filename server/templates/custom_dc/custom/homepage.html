@@ -21,6 +21,8 @@
 
 {% block head %}
   {{ super() }}
+  <!-- Marked.js for markdown rendering -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <script>
     window.CHAT_CONFIG = {
       PROMPT_VERSION: '1.0.1',  // Increment when prompts change to auto-invalidate localStorage
@@ -1103,6 +1105,62 @@ End EVERY response with exactly 3 clickable follow-up suggestions. These will be
       padding: 2px 6px;
       border-radius: 3px;
       color: var(--gov-blue);
+    }
+
+    /* Markdown table styles */
+    .message-content table {
+      border-collapse: collapse;
+      width: 100%;
+      margin: 12px 0;
+      font-size: 0.9rem;
+    }
+
+    .message-content th,
+    .message-content td {
+      border: 1px solid #ddd;
+      padding: 8px 12px;
+      text-align: left;
+    }
+
+    .message-content th {
+      background: #f5f5f5;
+      font-weight: 600;
+    }
+
+    .message-content tr:nth-child(even) {
+      background: #f9f9f9;
+    }
+
+    /* Markdown heading styles */
+    .message-content h1, .message-content h2, .message-content h3,
+    .message-content h4, .message-content h5, .message-content h6 {
+      margin: 16px 0 8px 0;
+      font-weight: 600;
+      color: var(--gov-blue);
+    }
+
+    .message-content h1 { font-size: 1.4rem; }
+    .message-content h2 { font-size: 1.2rem; }
+    .message-content h3 { font-size: 1.1rem; }
+    .message-content h4 { font-size: 1rem; }
+
+    /* Markdown blockquote styles */
+    .message-content blockquote {
+      border-left: 3px solid var(--gov-blue);
+      margin: 12px 0;
+      padding: 8px 16px;
+      background: #f5f8ff;
+      color: #555;
+    }
+
+    /* Markdown list styles */
+    .message-content ul, .message-content ol {
+      margin: 8px 0;
+      padding-left: 24px;
+    }
+
+    .message-content li {
+      margin: 4px 0;
     }
 
     @keyframes pulse {
@@ -3302,55 +3360,56 @@ Please present this information following your formatting guidelines.`;
       }
 
       function formatMessage(content) {
-        // First extract and preserve markdown links before escaping
-        const linkPlaceholders = [];
-        let processed = content.replace(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g, (match, text, url) => {
-          const placeholder = `__LINK_${linkPlaceholders.length}__`;
-          linkPlaceholders.push({ text, url });
-          return placeholder;
-        });
+        // Configure marked for GitHub Flavored Markdown
+        if (typeof marked !== 'undefined') {
+          marked.setOptions({
+            breaks: true,       // Convert \n to <br> in paragraphs
+            gfm: true,          // Enable GitHub Flavored Markdown (tables, etc.)
+            headerIds: false,   // Don't add IDs to headers
+            mangle: false       // Don't mangle email addresses
+          });
+        }
 
-        // Extract and preserve suggestion buttons before escaping
+        // Extract and preserve suggestion buttons before markdown parsing
+        // Note: Using %%PLACEHOLDER%% format to avoid marked interpreting __text__ as bold
         const suggestionPlaceholders = [];
-        processed = processed.replace(/\[suggestion:\s*([^\]]+)\]/g, (match, suggestionText) => {
-          const placeholder = `__SUGGESTION_${suggestionPlaceholders.length}__`;
+        let processed = content.replace(/\[suggestion:\s*([^\]]+)\]/g, (match, suggestionText) => {
+          const placeholder = `%%SUGGESTION_${suggestionPlaceholders.length}%%`;
           suggestionPlaceholders.push(suggestionText.trim());
           return placeholder;
         });
 
-        // Now escape HTML
-        let formatted = escapeHtml(processed);
+        // Use marked to parse markdown (handles tables, headings, code, bold, italic, lists, etc.)
+        let formatted;
+        if (typeof marked !== 'undefined') {
+          formatted = marked.parse(processed);
+        } else {
+          // Fallback if marked not loaded: basic formatting
+          formatted = escapeHtml(processed);
+          formatted = formatted.replace(/```(\w*)\n([\s\S]*?)```/g, '<pre><code>$2</code></pre>');
+          formatted = formatted.replace(/`([^`]+)`/g, '<code>$1</code>');
+          formatted = formatted.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+          formatted = formatted.replace(/\*([^*]+)\*/g, '<em>$1</em>');
+          formatted = formatted.replace(/\n/g, '<br>');
+        }
 
-        // Restore links as proper HTML anchors
-        linkPlaceholders.forEach((link, i) => {
-          formatted = formatted.replace(`__LINK_${i}__`,
-            `<a href="${escapeHtml(link.url)}" target="_blank" rel="noopener" style="color: var(--gov-blue);">${escapeHtml(link.text)}</a>`);
-        });
-
-        // Restore suggestions as clickable buttons (temporarily)
+        // Restore suggestions as clickable buttons
         suggestionPlaceholders.forEach((suggestion, i) => {
-          formatted = formatted.replace(`__SUGGESTION_${i}__`,
+          formatted = formatted.replace(`%%SUGGESTION_${i}%%`,
             `<button class="followup-suggestion" data-query="${escapeHtml(suggestion)}">${escapeHtml(suggestion)}</button>`);
         });
-
-        // Apply other markdown formatting
-        formatted = formatted.replace(/```(\w*)\n([\s\S]*?)```/g, '<pre><code>$2</code></pre>');
-        formatted = formatted.replace(/`([^`]+)`/g, '<code>$1</code>');
-        formatted = formatted.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
-        formatted = formatted.replace(/\*([^*]+)\*/g, '<em>$1</em>');
-        formatted = formatted.replace(/\n/g, '<br>');
 
         // Extract follow-up section and wrap in container (move to end)
         if (suggestionPlaceholders.length > 0) {
           // Find and extract the "Follow up questions:" heading and suggestions
-          const followupRegex = /(<strong>Follow up questions:<\/strong>)?(<br>)*(<button class="followup-suggestion"[^>]*>[^<]*<\/button>(<br>)*)+/gi;
+          const followupRegex = /(<strong>Follow up questions:<\/strong>)?(<p>)?(<button class="followup-suggestion"[^>]*>[^<]*<\/button>\s*)+(<\/p>)?/gi;
           const followupMatch = formatted.match(followupRegex);
 
           if (followupMatch) {
             // Remove original location
             formatted = formatted.replace(followupRegex, '');
-            // Clean up trailing <br> tags
-            formatted = formatted.replace(/(<br>)+$/, '');
+            // Clean up trailing whitespace and empty paragraphs
+            formatted = formatted.replace(/<p>\s*<\/p>/g, '');
 
             // Build clean followup container
             const suggestionsHtml = suggestionPlaceholders.map(s =>
