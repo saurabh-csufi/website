@@ -1238,6 +1238,37 @@ End EVERY response with exactly 3 clickable follow-up suggestions. These will be
       display: inline;
     }
 
+    /* New Chat Button */
+    .new-chat-btn {
+      display: none;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      background: var(--gov-blue);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.2s;
+      margin-left: auto;
+    }
+
+    .new-chat-btn:hover {
+      background: #1a4a8a;
+      transform: scale(1.02);
+    }
+
+    .new-chat-btn svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    .branding-header:not(.inactive) .new-chat-btn {
+      display: flex;
+    }
+
     /* Welcome Message - Suggestions Only */
     .welcome-message {
       text-align: center;
@@ -1772,6 +1803,13 @@ End EVERY response with exactly 3 clickable follow-up suggestions. These will be
           <p class="branding-tagline">Your Intelligent Companion | आपका बुद्धिमान सहायक</p>
         </div>
         <span class="branding-status">• Configure settings</span>
+        <button class="new-chat-btn" id="new-chat-btn" title="Start a new conversation">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          New Chat
+        </button>
       </div>
 
       <div class="chat-area">
@@ -2458,6 +2496,46 @@ End EVERY response with exactly 3 clickable follow-up suggestions. These will be
             }
           });
         });
+
+        // New Chat button
+        const newChatBtn = document.getElementById('new-chat-btn');
+        if (newChatBtn) {
+          newChatBtn.addEventListener('click', () => {
+            // Clear chat messages
+            chatMessages.innerHTML = '';
+
+            // Restore welcome message with suggestions
+            const welcomeHtml = `
+              <div class="welcome-message" id="welcome-message">
+                <div class="suggestions">
+                  <button class="suggestion" data-text="Compare rural vs urban food inflation">Compare rural vs urban food inflation</button>
+                  <button class="suggestion" data-text="Which category has highest inflation?">Which category has highest inflation?</button>
+                </div>
+              </div>
+            `;
+            chatMessages.innerHTML = welcomeHtml;
+
+            // Re-attach suggestion button listeners
+            document.querySelectorAll('.suggestion').forEach(btn => {
+              btn.addEventListener('click', () => {
+                if (!btn.disabled) {
+                  chatInput.value = btn.dataset.text;
+                  sendMessage();
+                }
+              });
+            });
+
+            // Clear conversation history
+            conversationHistory = [];
+
+            // Clear input
+            chatInput.value = '';
+            chatInput.style.height = 'auto';
+
+            // Focus input
+            chatInput.focus();
+          });
+        }
 
         // Auto-connect if config exists
         if (geminiApiKey) {
