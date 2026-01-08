@@ -2279,10 +2279,9 @@ End EVERY response with exactly 3 clickable follow-up suggestions. These will be
           }
         }
 
-        // Create chart container HTML
+        // Create chart container HTML (title removed - legend is sufficient)
         const containerHtml = `
           <div class="dc-chart-container" id="${chartId}-container">
-            <div class="dc-chart-title">${escapeHtml(variableName)}</div>
             <canvas id="${chartId}" style="max-height: 300px;"></canvas>
             <div class="dc-chart-footer">
               ${unit ? `<span class="dc-chart-unit">Unit: ${escapeHtml(unit)}</span>` : ''}
