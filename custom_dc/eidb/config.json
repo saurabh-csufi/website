@@ -107,13 +107,13 @@
       }
     },
     "Ministry of Statistics and Programme Implementation": {
-      "url": "https://mospi.gov.in/",
+      "url": "https://esankhyiki.mospi.gov.in/",
       "provenances": {
-        "MOSPI CPI Data": "https://mospi.gov.in/publication/consumer-price-index",
-        "MOSPI GDP Data": "https://mospi.gov.in/publication/national-accounts-statistics",
-        "MOSPI GSDP Current Prices": "https://mospi.gov.in/publication/state-domestic-product",
-        "MOSPI GSDP Constant Prices": "https://mospi.gov.in/publication/state-domestic-product",
-        "MOSPI ASI Data": "https://mospi.gov.in/publication/annual-survey-industries"
+        "MOSPI CPI Data": "https://esankhyiki.mospi.gov.in/macroindicators?product=cpi",
+        "MOSPI GDP Data": "https://esankhyiki.mospi.gov.in/catalogue-main/catalogue?page=0&search=&q=Gross+Domestic+Product+%28GDP%29",
+        "MOSPI GSDP Current Prices": "https://esankhyiki.mospi.gov.in/catalogue-main/catalogue?page=0&search=&q=GSDP",
+        "MOSPI GSDP Constant Prices": "https://esankhyiki.mospi.gov.in/catalogue-main/catalogue?page=0&search=&q=GSDP",
+        "MOSPI ASI Data": "https://esankhyiki.mospi.gov.in/catalogue-main/catalogue?page=0&search=&product=ASI"
       }
     }
   }

@@ -2147,14 +2147,19 @@ End EVERY response with exactly 3 clickable follow-up suggestions. These will be
           const sourceName = sourceMetadata.import_name || sourceMetadata.source_name || 'Data Commons';
           const sourceUrl = sourceMetadata.provenance_url || sourceMetadata.source_url || '';
 
+          // Store sources as a map (name → url) for proper linking
+          const sources = {};
+          if (sourceName) {
+            sources[sourceName] = sourceUrl || '';
+          }
+
           console.log('Chart analysis complete:', {
             chartType,
             variableName,
             labels,
             datasetsCount: datasets.length,
             unit,
-            sourceName,
-            sourceUrl
+            sources
           });
 
           return {
@@ -2163,8 +2168,7 @@ End EVERY response with exactly 3 clickable follow-up suggestions. These will be
             labels,
             datasets,
             unit,
-            sourceName,
-            sourceUrl
+            sources
           };
         } catch (e) {
           console.error('Error analyzing chart data:', e);
@@ -2219,9 +2223,8 @@ End EVERY response with exactly 3 clickable follow-up suggestions. These will be
         // Combine datasets
         const mergedDatasets = [...reindexedExisting, ...reindexedNew];
 
-        // Combine source info (deduplicated)
-        const sourceNames = [existing.sourceName, newData.sourceName]
-          .filter((s, i, arr) => s && arr.indexOf(s) === i);
+        // Merge sources maps (deduplicated by source name)
+        const mergedSources = { ...(existing.sources || {}), ...(newData.sources || {}) };
 
         console.log('Merged chart data:', {
           variableName: combinedVariableName,
@@ -2236,8 +2239,7 @@ End EVERY response with exactly 3 clickable follow-up suggestions. These will be
           labels: mergedLabels,
           datasets: mergedDatasets,
           unit: existing.unit || newData.unit,
-          sourceName: sourceNames.join(' | '),
-          sourceUrl: existing.sourceUrl || newData.sourceUrl
+          sources: mergedSources
         };
       }
 
@@ -2269,16 +2271,19 @@ End EVERY response with exactly 3 clickable follow-up suggestions. These will be
         if (!chartData) return '';
 
         const chartId = `chart-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-        const { chartType, variableName, labels, datasets, unit, sourceName, sourceUrl } = chartData;
+        const { chartType, variableName, labels, datasets, unit, sources } = chartData;
 
-        // Build source attribution HTML
+        // Build source attribution HTML with separate links for each source
         let sourceHtml = '';
-        if (sourceName || sourceUrl) {
-          if (sourceUrl) {
-            sourceHtml = `<div class="dc-chart-source">Source: <a href="${escapeHtml(sourceUrl)}" target="_blank" rel="noopener">${escapeHtml(sourceName || sourceUrl)}</a></div>`;
-          } else {
-            sourceHtml = `<div class="dc-chart-source">Source: ${escapeHtml(sourceName)}</div>`;
-          }
+        if (sources && Object.keys(sources).length > 0) {
+          const sourceLinks = Object.entries(sources).map(([name, url]) => {
+            if (url) {
+              return `<a href="${escapeHtml(url)}" target="_blank" rel="noopener">${escapeHtml(name)}</a>`;
+            } else {
+              return escapeHtml(name);
+            }
+          });
+          sourceHtml = `<div class="dc-chart-source">Source: ${sourceLinks.join(' | ')}</div>`;
         }
 
         // Create chart container HTML (title removed - legend is sufficient)
@@ -2789,11 +2794,8 @@ End EVERY response with exactly 3 clickable follow-up suggestions. These will be
               }
 
               // Also store source info for text responses
-              if (chartData.sourceName || chartData.sourceUrl) {
-                lastDataSource = {
-                  name: chartData.sourceName,
-                  url: chartData.sourceUrl
-                };
+              if (chartData.sources && Object.keys(chartData.sources).length > 0) {
+                lastDataSource = chartData.sources;
                 console.log('Data source stored:', lastDataSource);
               }
             }
@@ -2809,8 +2811,7 @@ End EVERY response with exactly 3 clickable follow-up suggestions. These will be
             // search_indicators doesn't return source directly, but we note it's from Data Commons
             if (data.variables || data.topics) {
               lastDataSource = {
-                name: 'Data Commons',
-                url: 'https://datacommons.org'
+                'Data Commons': 'https://datacommons.org'
               };
             }
           } catch (e) {
@@ -3270,12 +3271,14 @@ Please present this information following your formatting guidelines.`;
           // Add sources at the end if available
           const allSources = [];
 
-          // Add MCP/Data Commons source
-          if (lastDataSource) {
-            if (lastDataSource.url) {
-              allSources.push(`[${lastDataSource.name || 'Data Commons'}](${lastDataSource.url})`);
-            } else if (lastDataSource.name) {
-              allSources.push(lastDataSource.name);
+          // Add MCP/Data Commons sources (lastDataSource is a map: name → url)
+          if (lastDataSource && typeof lastDataSource === 'object') {
+            for (const [name, url] of Object.entries(lastDataSource)) {
+              if (url) {
+                allSources.push(`[${name}](${url})`);
+              } else if (name) {
+                allSources.push(name);
+              }
             }
           }
 
