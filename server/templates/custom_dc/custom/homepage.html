@@ -23,6 +23,8 @@
   {{ super() }}
   <!-- Marked.js for markdown rendering -->
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <!-- Data Commons Web Components -->
+  <script src="https://datacommons.org/datacommons.js"></script>
   <script>
     window.CHAT_CONFIG = {
       PROMPT_VERSION: '1.0.1',  // Increment when prompts change to auto-invalidate localStorage
@@ -1706,19 +1708,51 @@ End EVERY response with exactly 3 clickable follow-up suggestions. These will be
       animation: pulse 1.5s infinite;
     }
 
+    /* All Data Commons Web Components */
     .dc-chart-container datacommons-line,
     .dc-chart-container datacommons-bar,
     .dc-chart-container datacommons-map,
-    .dc-chart-container datacommons-highlight {
+    .dc-chart-container datacommons-highlight,
+    .dc-chart-container datacommons-ranking,
+    .dc-chart-container datacommons-pie,
+    .dc-chart-container datacommons-gauge,
+    .dc-chart-container datacommons-scatter,
+    .dc-chart-container datacommons-slider {
       --dc-headings-font-family: inherit;
       --dc-font-family: inherit;
       width: 100%;
       min-height: 280px;
     }
 
+    /* Map component needs more height for geographic visualizations */
+    .dc-chart-container datacommons-map {
+      min-height: 400px;
+    }
+
+    /* Ranking component styling */
+    .dc-chart-container datacommons-ranking {
+      min-height: 350px;
+    }
+
+    /* Gauge and highlight are typically smaller */
+    .dc-chart-container datacommons-gauge,
+    .dc-chart-container datacommons-highlight {
+      min-height: 150px;
+    }
+
+    /* Pie chart sizing */
+    .dc-chart-container datacommons-pie {
+      min-height: 320px;
+    }
+
     .message-content .dc-chart-container {
       max-width: 100%;
       overflow-x: auto;
+    }
+
+    /* Multiple charts spacing */
+    .message-content .dc-chart-container + .dc-chart-container {
+      margin-top: 20px;
     }
 
     .dc-chart-error {
@@ -2065,7 +2099,335 @@ End EVERY response with exactly 3 clickable follow-up suggestions. These will be
         return chartJsLoadPromise;
       }
 
-      // Chart Data Analyzer - extracts actual data from tool results for Chart.js
+      // Current user query for visualization detection
+      let currentUserQuery = '';
+
+      // Detect the best visualization type based on query and data
+      function detectVisualizationType(query, dataInfo) {
+        const q = (query || '').toLowerCase();
+
+        // MAP: Multiple states/districts for single variable with no time series
+        if (dataInfo.multiplePlaces && dataInfo.isStateLevel && !dataInfo.hasTimeSeries) {
+          return 'map';
+        }
+
+        // MAP: Keywords indicating geographic comparison
+        if (q.match(/across states|state-wise|by state|statewise|map|geographic|regional|gsdp|state gdp/i) && dataInfo.isStateLevel) {
+          return 'map';
+        }
+
+        // RANKING: Top/bottom/highest/lowest queries
+        if (q.match(/top \d+|bottom \d+|highest|lowest|rank|best|worst|leading|most|least/i)) {
+          return 'ranking';
+        }
+
+        // LINE: Time series with trends
+        if (dataInfo.hasTimeSeries && dataInfo.labels && dataInfo.labels.length > 2) {
+          return 'line';
+        }
+
+        // PIE: Distribution/breakdown queries
+        if (q.match(/distribution|breakdown|share|composition|split|proportion/i)) {
+          return 'pie';
+        }
+
+        // GAUGE: Percentage/rate for single place
+        if (q.match(/rate|percentage|%|ratio/i) && !dataInfo.multiplePlaces) {
+          return 'gauge';
+        }
+
+        // HIGHLIGHT: Single metric queries (single place, single time point)
+        if (!dataInfo.multiplePlaces && !dataInfo.hasTimeSeries) {
+          return 'highlight';
+        }
+
+        // SCATTER: Correlation queries with 2 variables
+        if (q.match(/correlation|vs|versus|relationship|compare.*with|scatter/i) && dataInfo.multipleVariables) {
+          return 'scatter';
+        }
+
+        // BAR: Default for comparisons (multiple places or single date)
+        if (dataInfo.multiplePlaces || !dataInfo.hasTimeSeries) {
+          return 'bar';
+        }
+
+        return 'line'; // Default fallback
+      }
+
+      // Detect parent place from place DCIDs
+      function detectParentPlace(placeDcids) {
+        if (!placeDcids || placeDcids.length === 0) return 'country/IND';
+
+        // If all places are Indian states (wikidataId format)
+        if (placeDcids.every(p => p && p.startsWith('wikidataId/'))) {
+          return 'country/IND';
+        }
+        // If all places are US states (geoId/XX format - 2 digits)
+        if (placeDcids.every(p => p && p.match(/^geoId\/\d{2}$/))) {
+          return 'country/USA';
+        }
+        // If country/IND is in the list
+        if (placeDcids.some(p => p === 'country/IND')) {
+          return 'country/IND';
+        }
+        return 'country/IND'; // Default to India
+      }
+
+      // Detect child place type from place DCIDs
+      function detectChildPlaceType(placeDcids) {
+        if (!placeDcids || placeDcids.length === 0) return 'State';
+
+        // Indian states use wikidataId
+        if (placeDcids.some(p => p && p.startsWith('wikidataId/'))) {
+          return 'State';
+        }
+        // US states (2 digit geoId)
+        if (placeDcids.some(p => p && p.match(/^geoId\/\d{2}$/))) {
+          return 'State';
+        }
+        // US counties (5 digit geoId)
+        if (placeDcids.some(p => p && p.match(/^geoId\/\d{5}$/))) {
+          return 'County';
+        }
+        return 'State'; // Default
+      }
+
+      // Use Gemini to intelligently determine the best visualization type
+      async function detectVisualizationTypeWithGemini(query, dataInfo) {
+        // If no API key, fall back to rule-based detection
+        if (!geminiApiKey) {
+          return detectVisualizationType(query, dataInfo);
+        }
+
+        try {
+          const prompt = `You are a data visualization expert. Given a user query and data characteristics, determine the single best visualization type.
+
+USER QUERY: "${query}"
+
+DATA CHARACTERISTICS:
+- Variable: ${dataInfo.variableName || 'Unknown'}
+- Number of places: ${dataInfo.placeDcids?.length || 0}
+- Place names: ${dataInfo.placeNames?.slice(0, 5).join(', ') || 'None'}${dataInfo.placeNames?.length > 5 ? '...' : ''}
+- Is state-level data: ${dataInfo.isStateLevel ? 'Yes' : 'No'}
+- Has time series: ${dataInfo.hasTimeSeries ? 'Yes' : 'No'}
+- Number of time points: ${dataInfo.labels?.length || 0}
+- Unit: ${dataInfo.unit || 'None'}
+
+AVAILABLE VISUALIZATION TYPES:
+1. "map" - Choropleth map for geographic comparison across states/regions. Best when comparing a single variable across multiple geographic areas.
+2. "line" - Line chart for trends over time. Best for time series data showing change over time.
+3. "bar" - Bar chart for comparing values across categories. Best for comparing multiple places or variables at a point in time.
+4. "ranking" - Ranked list showing top/bottom values. Best when user asks for "top", "highest", "lowest", "ranking".
+5. "pie" - Pie/donut chart for showing proportions. Best for distribution or breakdown queries.
+6. "gauge" - Gauge chart for single percentage/rate values. Best for showing a single metric as percentage.
+7. "highlight" - Single value highlight. Best for displaying one key metric.
+8. "scatter" - Scatter plot for correlation between two variables.
+
+DECISION RULES:
+- If multiple Indian states are being compared for a single metric → prefer "map"
+- If the query mentions "across states", "state-wise", "by state", "regional" → prefer "map"
+- If there's time series data with clear temporal aspect → prefer "line"
+- If query asks for "top", "bottom", "highest", "lowest", "rank" → prefer "ranking"
+- If query asks for "distribution", "breakdown", "share" → prefer "pie"
+- If single value for single place → prefer "highlight"
+
+Respond with ONLY the visualization type (one word): map, line, bar, ranking, pie, gauge, highlight, or scatter`;
+
+          const payload = {
+            contents: [{ role: 'user', parts: [{ text: prompt }] }],
+            generationConfig: {
+              temperature: 0.1,
+              maxOutputTokens: 20
+            }
+          };
+
+          const response = await fetch(
+            `${GEMINI_API_BASE}/gemini-2.0-flash:generateContent?key=${geminiApiKey}`,
+            {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload)
+            }
+          );
+
+          const data = await response.json();
+
+          if (data.candidates && data.candidates[0]?.content?.parts?.[0]?.text) {
+            const vizType = data.candidates[0].content.parts[0].text.trim().toLowerCase();
+            const validTypes = ['map', 'line', 'bar', 'ranking', 'pie', 'gauge', 'highlight', 'scatter'];
+
+            if (validTypes.includes(vizType)) {
+              console.log(`Gemini detected visualization type: ${vizType}`);
+              return vizType;
+            }
+          }
+
+          // Fall back to rule-based if Gemini response is invalid
+          console.log('Gemini response invalid, falling back to rule-based detection');
+          return detectVisualizationType(query, dataInfo);
+
+        } catch (err) {
+          console.error('Gemini visualization detection error:', err);
+          // Fall back to rule-based detection on error
+          return detectVisualizationType(query, dataInfo);
+        }
+      }
+
+      // Render Data Commons Web Component based on chart data
+      function renderDCComponent(chartData) {
+        if (!chartData || !chartData.variableDcid) {
+          console.log('renderDCComponent: Missing chartData or variableDcid');
+          return '';
+        }
+
+        const { vizType, variableDcid, variableName, placeDcids, unit, parentPlace, childPlaceType, labels, variableDcids } = chartData;
+        const containerId = `dc-viz-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+        const latestDate = labels && labels.length > 0 ? labels[labels.length - 1] : '';
+        const safeHeader = escapeHtml(variableName || 'Data Visualization');
+        const safePlaces = (placeDcids || []).filter(Boolean).join(' ');
+        const safeParentPlace = parentPlace || 'country/IND';
+        const safeChildPlaceType = childPlaceType || 'State';
+
+        let componentHtml = '';
+
+        console.log(`renderDCComponent: vizType=${vizType}, variableDcid=${variableDcid}, places=${safePlaces}`);
+
+        // Use local custom DC API endpoint
+        const apiRoot = window.location.origin;
+
+        switch (vizType) {
+          case 'map':
+            componentHtml = `
+              <datacommons-map
+                apiRoot="${apiRoot}"
+                header="${safeHeader}"
+                variable="${variableDcid}"
+                parentPlace="${safeParentPlace}"
+                childPlaceType="${safeChildPlaceType}"
+                ${latestDate ? `date="${latestDate}"` : ''}
+                colors="#f0f9e8 #08589e"
+                allowZoom
+              ></datacommons-map>`;
+            break;
+
+          case 'line':
+            componentHtml = `
+              <datacommons-line
+                apiRoot="${apiRoot}"
+                header="${safeHeader}"
+                variables="${variableDcid}"
+                places="${safePlaces || safeParentPlace}"
+              ></datacommons-line>`;
+            break;
+
+          case 'bar':
+            if (safePlaces && safePlaces.length > 0) {
+              componentHtml = `
+                <datacommons-bar
+                  apiRoot="${apiRoot}"
+                  header="${safeHeader}"
+                  variables="${variableDcid}"
+                  places="${safePlaces}"
+                  sort="descending"
+                ></datacommons-bar>`;
+            } else {
+              componentHtml = `
+                <datacommons-bar
+                  apiRoot="${apiRoot}"
+                  header="${safeHeader}"
+                  variables="${variableDcid}"
+                  parentPlace="${safeParentPlace}"
+                  childPlaceType="${safeChildPlaceType}"
+                  sort="descending"
+                ></datacommons-bar>`;
+            }
+            break;
+
+          case 'ranking':
+            componentHtml = `
+              <datacommons-ranking
+                apiRoot="${apiRoot}"
+                header="${safeHeader}"
+                variable="${variableDcid}"
+                parentPlace="${safeParentPlace}"
+                childPlaceType="${safeChildPlaceType}"
+                rankingCount="10"
+                showHighestLowest
+              ></datacommons-ranking>`;
+            break;
+
+          case 'pie':
+            componentHtml = `
+              <datacommons-pie
+                apiRoot="${apiRoot}"
+                header="${safeHeader}"
+                place="${(placeDcids && placeDcids[0]) || safeParentPlace}"
+                variables="${variableDcid}"
+                donut
+              ></datacommons-pie>`;
+            break;
+
+          case 'gauge':
+            componentHtml = `
+              <datacommons-gauge
+                apiRoot="${apiRoot}"
+                header="${safeHeader}"
+                place="${(placeDcids && placeDcids[0]) || safeParentPlace}"
+                variable="${variableDcid}"
+                min="0"
+                max="100"
+              ></datacommons-gauge>`;
+            break;
+
+          case 'highlight':
+            componentHtml = `
+              <datacommons-highlight
+                apiRoot="${apiRoot}"
+                header="${safeHeader}"
+                place="${(placeDcids && placeDcids[0]) || safeParentPlace}"
+                variable="${variableDcid}"
+              ></datacommons-highlight>`;
+            break;
+
+          case 'scatter':
+            // Needs 2 variables
+            const scatterVars = variableDcids && variableDcids.length >= 2
+              ? variableDcids.slice(0, 2).join(' ')
+              : variableDcid;
+            componentHtml = `
+              <datacommons-scatter
+                apiRoot="${apiRoot}"
+                header="${safeHeader}"
+                variables="${scatterVars}"
+                parentPlace="${safeParentPlace}"
+                childPlaceType="${safeChildPlaceType}"
+                showPlaceLabels
+              ></datacommons-scatter>`;
+            break;
+
+          default:
+            // Default to line chart
+            componentHtml = `
+              <datacommons-line
+                apiRoot="${apiRoot}"
+                header="${safeHeader}"
+                variables="${variableDcid}"
+                places="${safePlaces || safeParentPlace}"
+              ></datacommons-line>`;
+        }
+
+        // Wrap in container with source attribution
+        return `
+          <div class="dc-chart-container" id="${containerId}">
+            ${componentHtml}
+            <div class="dc-chart-footer">
+              ${unit ? `<span class="dc-chart-unit">Unit: ${escapeHtml(unit)}</span>` : ''}
+              <span class="dc-chart-source">Source: <a href="https://datacommons.org" target="_blank" rel="noopener">Data Commons</a></span>
+            </div>
+          </div>`;
+      }
+
+      // Chart Data Analyzer - extracts actual data from tool results for DC Web Components
       function analyzeChartData(toolName, result) {
         if (toolName !== 'get_observations') return null;
 
@@ -2082,6 +2444,8 @@ End EVERY response with exactly 3 clickable follow-up suggestions. These will be
             return null;
           }
 
+          // EXTRACT DCIDs for DC Web Components
+          const variableDcid = data.variable?.dcid;
           const variableName = data.variable.name || data.variable.dcid;
           const places = data.place_observations;
 
@@ -2089,6 +2453,10 @@ End EVERY response with exactly 3 clickable follow-up suggestions. These will be
             console.log('No places found');
             return null;
           }
+
+          // Extract place DCIDs
+          const placeDcids = places.map(p => p.place?.dcid).filter(Boolean);
+          const placeNames = places.map(p => p.place?.name || p.place?.dcid || 'Unknown');
 
           // Extract time series data
           const datasets = [];
@@ -2110,13 +2478,10 @@ End EVERY response with exactly 3 clickable follow-up suggestions. These will be
               const values = timeSeries.map(point => point[1]);
 
               // Smart label: use variableName if single place, placeName if multiple places
-              // This ensures proper labels when comparing variables vs comparing places
               let datasetLabel;
               if (places.length === 1) {
-                // Single place - use variable name (for comparing different variables)
                 datasetLabel = variableName;
               } else {
-                // Multiple places - use place name (for comparing same variable across places)
                 datasetLabel = placeName;
               }
 
@@ -2136,39 +2501,67 @@ End EVERY response with exactly 3 clickable follow-up suggestions. These will be
             return null;
           }
 
-          // Determine chart type
+          // Determine data characteristics
           const hasTimeSeries = labels.length > 1;
-          const multiplePlaces = datasets.length > 1;
-          let chartType = hasTimeSeries ? 'line' : 'bar';
+          const multiplePlaces = placeDcids.length > 1;
+          const isStateLevel = placeDcids.some(p => p && (p.startsWith('wikidataId/') || p.match(/^geoId\/\d{2}$/)));
+          const isCountryLevel = placeDcids.some(p => p && p.startsWith('country/'));
 
-          // Extract source metadata - fields from Data Commons MCP
+          // Detect best visualization type using user query
+          const vizType = detectVisualizationType(currentUserQuery, {
+            variableDcid,
+            placeDcids,
+            hasTimeSeries,
+            multiplePlaces,
+            isStateLevel,
+            isCountryLevel,
+            labels
+          });
+
+          // Detect geographic hierarchy
+          const parentPlace = detectParentPlace(placeDcids);
+          const childPlaceType = detectChildPlaceType(placeDcids);
+
+          // Extract source metadata
           const sourceMetadata = data.source_metadata || {};
           const unit = sourceMetadata.unit || '';
           const sourceName = sourceMetadata.import_name || sourceMetadata.source_name || 'Data Commons';
           const sourceUrl = sourceMetadata.provenance_url || sourceMetadata.source_url || '';
 
-          // Store sources as a map (name → url) for proper linking
+          // Store sources as a map (name → url)
           const sources = {};
           if (sourceName) {
             sources[sourceName] = sourceUrl || '';
           }
 
           console.log('Chart analysis complete:', {
-            chartType,
+            vizType,
+            variableDcid,
             variableName,
+            placeDcids,
             labels,
             datasetsCount: datasets.length,
             unit,
+            parentPlace,
+            childPlaceType,
             sources
           });
 
           return {
-            chartType,
+            vizType,
+            variableDcid,
             variableName,
+            placeDcids,
+            placeNames,
             labels,
             datasets,
             unit,
-            sources
+            sources,
+            parentPlace,
+            childPlaceType,
+            hasTimeSeries,
+            multiplePlaces,
+            isStateLevel
           };
         } catch (e) {
           console.error('Error analyzing chart data:', e);
@@ -2176,71 +2569,107 @@ End EVERY response with exactly 3 clickable follow-up suggestions. These will be
         }
       }
 
-      // Merge chart data from multiple get_observations calls (for multi-curve charts)
+      // Merge chart data from multiple get_observations calls
+      // Groups by UNIT - same unit data goes into one chart, different units get separate charts
       function mergeChartData(existing, newData) {
-        if (!existing) return newData;
-        if (!newData) return existing;
+        // Handle initial case - return as array
+        if (!existing) return newData ? [newData] : [];
+        if (!newData) return Array.isArray(existing) ? existing : [existing];
+
+        // Ensure existing is an array
+        const allCharts = Array.isArray(existing) ? [...existing] : [existing];
 
         console.log('Merging chart data:', {
-          existingDatasets: existing.datasets.length,
-          existingLabels: existing.labels.length,
-          newDatasets: newData.datasets.length,
-          newLabels: newData.labels.length
+          existingCharts: allCharts.length,
+          newDataUnit: newData.unit,
+          newDataVariable: newData.variableName
         });
 
-        // Combine variable names if different
-        let combinedVariableName = existing.variableName;
-        if (newData.variableName && newData.variableName !== existing.variableName) {
-          combinedVariableName = `${existing.variableName} vs ${newData.variableName}`;
+        // Find chart with same unit to merge into
+        const sameUnitIndex = allCharts.findIndex(c => c.unit === newData.unit);
+
+        if (sameUnitIndex !== -1) {
+          // SAME UNIT - merge into existing chart
+          const existingChart = allCharts[sameUnitIndex];
+
+          // Combine variable names
+          let combinedVariableName = existingChart.variableName;
+          if (newData.variableName && newData.variableName !== existingChart.variableName) {
+            combinedVariableName = `${existingChart.variableName} vs ${newData.variableName}`;
+          }
+
+          // Merge labels (union of all dates, sorted)
+          const allLabelsSet = new Set([...(existingChart.labels || []), ...(newData.labels || [])]);
+          const mergedLabels = Array.from(allLabelsSet).sort();
+
+          // Reindex existing datasets to new merged labels
+          const reindexedExisting = (existingChart.datasets || []).map(ds => ({
+            ...ds,
+            data: mergedLabels.map(label => {
+              const idx = (existingChart.labels || []).indexOf(label);
+              return idx !== -1 ? ds.data[idx] : null;
+            })
+          }));
+
+          // Reindex new datasets to merged labels with new colors
+          const colorOffset = (existingChart.datasets || []).length;
+          const reindexedNew = (newData.datasets || []).map((ds, i) => ({
+            ...ds,
+            data: mergedLabels.map(label => {
+              const idx = (newData.labels || []).indexOf(label);
+              return idx !== -1 ? ds.data[idx] : null;
+            }),
+            borderColor: getChartColor(colorOffset + i),
+            backgroundColor: getChartColor(colorOffset + i, 0.7)
+          }));
+
+          // Merge place DCIDs
+          const mergedPlaceDcids = [...new Set([
+            ...(existingChart.placeDcids || []),
+            ...(newData.placeDcids || [])
+          ])];
+
+          // Merge variable DCIDs for scatter plots
+          const mergedVariableDcids = [...new Set([
+            existingChart.variableDcid,
+            newData.variableDcid
+          ].filter(Boolean))];
+
+          // Update the chart in place
+          allCharts[sameUnitIndex] = {
+            ...existingChart,
+            variableName: combinedVariableName,
+            variableDcids: mergedVariableDcids,
+            placeDcids: mergedPlaceDcids,
+            labels: mergedLabels,
+            datasets: [...reindexedExisting, ...reindexedNew],
+            sources: { ...(existingChart.sources || {}), ...(newData.sources || {}) },
+            // Re-detect viz type with merged data
+            vizType: detectVisualizationType(currentUserQuery, {
+              variableDcid: existingChart.variableDcid,
+              placeDcids: mergedPlaceDcids,
+              hasTimeSeries: mergedLabels.length > 1,
+              multiplePlaces: mergedPlaceDcids.length > 1,
+              isStateLevel: mergedPlaceDcids.some(p => p && (p.startsWith('wikidataId/') || p.match(/^geoId\/\d{2}$/))),
+              isCountryLevel: mergedPlaceDcids.some(p => p && p.startsWith('country/')),
+              labels: mergedLabels,
+              multipleVariables: mergedVariableDcids.length > 1
+            })
+          };
+
+          console.log('Merged into existing chart (same unit):', {
+            unit: existingChart.unit,
+            variableName: combinedVariableName,
+            datasetsCount: allCharts[sameUnitIndex].datasets.length
+          });
+
+        } else {
+          // DIFFERENT UNIT - add as separate chart
+          console.log('Adding as separate chart (different unit):', newData.unit);
+          allCharts.push(newData);
         }
 
-        // Merge labels (union of all dates, sorted)
-        const allLabelsSet = new Set([...existing.labels, ...newData.labels]);
-        const mergedLabels = Array.from(allLabelsSet).sort();
-
-        // Reindex existing datasets to new merged labels
-        const reindexedExisting = existing.datasets.map(ds => ({
-          ...ds,
-          data: mergedLabels.map(label => {
-            const idx = existing.labels.indexOf(label);
-            return idx !== -1 ? ds.data[idx] : null;
-          })
-        }));
-
-        // Reindex new datasets to merged labels with new colors
-        const colorOffset = existing.datasets.length;
-        const reindexedNew = newData.datasets.map((ds, i) => ({
-          ...ds,
-          data: mergedLabels.map(label => {
-            const idx = newData.labels.indexOf(label);
-            return idx !== -1 ? ds.data[idx] : null;
-          }),
-          // Assign new colors to avoid duplicates
-          borderColor: getChartColor(colorOffset + i),
-          backgroundColor: getChartColor(colorOffset + i, 0.7)
-        }));
-
-        // Combine datasets
-        const mergedDatasets = [...reindexedExisting, ...reindexedNew];
-
-        // Merge sources maps (deduplicated by source name)
-        const mergedSources = { ...(existing.sources || {}), ...(newData.sources || {}) };
-
-        console.log('Merged chart data:', {
-          variableName: combinedVariableName,
-          labelsCount: mergedLabels.length,
-          datasetsCount: mergedDatasets.length,
-          datasetLabels: mergedDatasets.map(ds => ds.label)
-        });
-
-        return {
-          chartType: existing.chartType,
-          variableName: combinedVariableName,
-          labels: mergedLabels,
-          datasets: mergedDatasets,
-          unit: existing.unit || newData.unit,
-          sources: mergedSources
-        };
+        return allCharts;
       }
 
       // Chart color palette
@@ -2300,96 +2729,60 @@ End EVERY response with exactly 3 clickable follow-up suggestions. These will be
         return { html: containerHtml, chartId, chartType, labels, datasets, variableName };
       }
 
-      // Inject chart into message after finalization
-      async function injectChartIntoMessage(messageEl, chartData) {
-        if (!chartData) return;
+      // Inject chart(s) into message using Data Commons Web Components
+      // Now handles array of charts (one per unique unit)
+      async function injectChartIntoMessage(messageEl, chartDataArray) {
+        if (!chartDataArray) return;
+
+        // Ensure it's an array
+        const charts = Array.isArray(chartDataArray) ? chartDataArray : [chartDataArray];
+
+        if (charts.length === 0) return;
 
         try {
-          console.log('Injecting chart with data:', chartData);
-
-          await loadChartJs();
-
-          const chartConfig = await renderChart(chartData);
-          if (!chartConfig) return;
+          console.log('Injecting DC charts:', charts.length, 'chart(s)');
 
           const contentEl = messageEl.querySelector('.message-content');
           if (!contentEl) return;
 
-          // Insert chart container - before followup container if it exists
-          const followupContainer = contentEl.querySelector('.followup-container');
-          if (followupContainer) {
-            followupContainer.insertAdjacentHTML('beforebegin', chartConfig.html);
-          } else {
-            contentEl.insertAdjacentHTML('beforeend', chartConfig.html);
-          }
-          chatMessages.scrollTop = chatMessages.scrollHeight;
+          // Render each chart (grouped by unit)
+          for (const chartData of charts) {
+            if (!chartData || !chartData.variableDcid) {
+              console.log('Skipping chart - missing variableDcid');
+              continue;
+            }
 
-          // Wait for DOM to update
-          await new Promise(r => setTimeout(r, 100));
+            // Use Gemini to determine the best visualization type
+            const originalVizType = chartData.vizType;
+            chartData.vizType = await detectVisualizationTypeWithGemini(currentUserQuery, chartData);
 
-          // Create the chart
-          const canvas = document.getElementById(chartConfig.chartId);
-          if (!canvas) {
-            console.error('Canvas not found:', chartConfig.chartId);
-            return;
-          }
+            console.log('Rendering DC component:', {
+              originalVizType: originalVizType,
+              geminiVizType: chartData.vizType,
+              variableDcid: chartData.variableDcid,
+              unit: chartData.unit,
+              placesCount: chartData.placeDcids?.length
+            });
 
-          const ctx = canvas.getContext('2d');
+            // Render DC web component
+            const componentHtml = renderDCComponent(chartData);
 
-          new Chart(ctx, {
-            type: chartConfig.chartType,
-            data: {
-              labels: chartConfig.labels,
-              datasets: chartConfig.datasets
-            },
-            options: {
-              responsive: true,
-              maintainAspectRatio: true,
-              spanGaps: false,  // Don't connect lines across null values (for merged datasets)
-              plugins: {
-                legend: {
-                  display: chartConfig.datasets.length > 1,
-                  position: 'bottom',
-                  labels: {
-                    usePointStyle: true,
-                    padding: 15
-                  }
-                },
-                title: {
-                  display: false
-                },
-                tooltip: {
-                  callbacks: {
-                    label: function(context) {
-                      const value = context.parsed.y;
-                      if (value === null) return null;  // Skip null values in tooltip
-                      return `${context.dataset.label}: ${formatNumber(value)}`;
-                    }
-                  }
-                }
-              },
-              scales: {
-                y: {
-                  beginAtZero: false,
-                  ticks: {
-                    callback: function(value) {
-                      return formatNumber(value);
-                    }
-                  }
-                }
-              },
-              interaction: {
-                intersect: false,
-                mode: 'index'  // Show all datasets at same x-position in tooltip
+            if (componentHtml) {
+              // Insert before followup container if it exists
+              const followupContainer = contentEl.querySelector('.followup-container');
+              if (followupContainer) {
+                followupContainer.insertAdjacentHTML('beforebegin', componentHtml);
+              } else {
+                contentEl.insertAdjacentHTML('beforeend', componentHtml);
               }
             }
-          });
+          }
 
-          console.log('Chart rendered successfully');
           chatMessages.scrollTop = chatMessages.scrollHeight;
+          console.log('DC charts injected successfully');
 
         } catch (err) {
-          console.error('Failed to inject chart:', err);
+          console.error('Failed to inject DC charts:', err);
           const contentEl = messageEl.querySelector('.message-content');
           if (contentEl) {
             contentEl.insertAdjacentHTML('beforeend',
@@ -2784,14 +3177,10 @@ End EVERY response with exactly 3 clickable follow-up suggestions. These will be
           try {
             const chartData = analyzeChartData(toolName, result);
             if (chartData) {
-              // Accumulate chart data from multiple get_observations calls (for multi-curve charts)
-              if (lastChartAnalysis) {
-                lastChartAnalysis = mergeChartData(lastChartAnalysis, chartData);
-                console.log('Chart data merged (multi-curve):', lastChartAnalysis);
-              } else {
-                lastChartAnalysis = chartData;
-                console.log('Chart data extracted:', chartData);
-              }
+              // Accumulate chart data from multiple get_observations calls
+              // mergeChartData handles array conversion and unit-based grouping
+              lastChartAnalysis = mergeChartData(lastChartAnalysis, chartData);
+              console.log('Chart data accumulated:', lastChartAnalysis);
 
               // Also store source info for text responses
               if (chartData.sources && Object.keys(chartData.sources).length > 0) {
@@ -3084,8 +3473,12 @@ End EVERY response with exactly 3 clickable follow-up suggestions. These will be
         // Clear previous tool calls from left sidebar
         clearToolCalls();
 
-        // Reset data source tracking for new query
+        // Reset data tracking for new query
         lastDataSource = null;
+        lastChartAnalysis = null;
+
+        // Set current user query for visualization detection
+        currentUserQuery = message;
 
         // Show user message
         addMessage('user', message);
