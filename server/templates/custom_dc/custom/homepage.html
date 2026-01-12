@@ -21,6 +21,10 @@
 
 {% block head %}
   {{ super() }}
+  <!-- Prevent browser caching - always fetch fresh content -->
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <!-- Marked.js for markdown rendering -->
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <!-- Data Commons Web Components - use local custom DC version for proper API routing -->
