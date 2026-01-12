@@ -2883,10 +2883,10 @@ Respond with ONLY the visualization type (one word): map, line, bar, ranking, pi
             ...(newData.placeDcids || [])
           ])];
 
-          // Merge variable DCIDs for scatter plots
+          // Merge ALL variable DCIDs (for comparison charts, pie charts, etc.)
           const mergedVariableDcids = [...new Set([
-            existingChart.variableDcid,
-            newData.variableDcid
+            ...(existingChart.variableDcids || [existingChart.variableDcid]),
+            ...(newData.variableDcids || [newData.variableDcid])
           ].filter(Boolean))];
 
           // Update the chart in place
@@ -3103,12 +3103,14 @@ Respond with ONLY the visualization type (one word): map, line, bar, ranking, pi
               continue;
             }
 
-            // PRE-CHECK: Validate variables have data in DC API
-            chartData = await filterValidVariables(chartData);
-            if (!chartData) {
-              console.log('Skipping chart - no valid variables after API check');
-              continue;
-            }
+            // NOTE: Skipping pre-validation - DC components handle missing data gracefully
+            // and pre-validation was filtering out valid variables due to place DCID mismatches
+            // If you need to re-enable, uncomment the filterValidVariables call below:
+            // chartData = await filterValidVariables(chartData);
+            // if (!chartData) {
+            //   console.log('Skipping chart - no valid variables after API check');
+            //   continue;
+            // }
 
             // Use Gemini to determine the best visualization type
             const originalVizType = chartData.vizType;
