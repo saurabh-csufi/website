@@ -23,8 +23,8 @@
   {{ super() }}
   <!-- Marked.js for markdown rendering -->
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-  <!-- Data Commons Web Components -->
-  <script src="https://datacommons.org/datacommons.js"></script>
+  <!-- Data Commons Web Components - use local custom DC version for proper API routing -->
+  <script src="/datacommons.js"></script>
   <script>
     window.CHAT_CONFIG = {
       PROMPT_VERSION: '1.0.1',  // Increment when prompts change to auto-invalidate localStorage
@@ -1805,6 +1805,92 @@ End EVERY response with exactly 3 clickable follow-up suggestions. These will be
     .dc-chart-source a:hover {
       text-decoration: underline;
     }
+
+    /* Chart.js container styles */
+    .chart-container {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 16px;
+      margin: 16px 0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+
+    .chart-container canvas {
+      max-height: 350px !important;
+    }
+
+    .chart-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--gov-blue);
+      margin: 0 0 12px 0;
+    }
+
+    .chart-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 12px;
+      padding-top: 8px;
+      border-top: 1px solid var(--border-color);
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .chart-unit, .chart-source {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .chart-error {
+      background: #fdf2f2;
+      border: 1px solid #fecaca;
+      border-radius: 8px;
+      padding: 16px;
+      margin-top: 16px;
+      color: var(--danger);
+      font-size: 0.9rem;
+    }
+
+    /* Highlight card style */
+    .highlight-container {
+      text-align: center;
+      padding: 24px;
+    }
+
+    .highlight-value {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--gov-blue);
+      margin: 16px 0 8px;
+    }
+
+    .highlight-unit {
+      font-size: 1rem;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+
+    /* Multiple Chart.js charts spacing */
+    .message-content .chart-container + .chart-container {
+      margin-top: 20px;
+    }
+
+    /* Hybrid chart wrapper */
+    .hybrid-chart-wrapper {
+      margin: 16px 0;
+    }
+
+    .hybrid-chart-wrapper.chartjs-fallback .dc-chart-container {
+      display: none;
+    }
+
+    .hybrid-chart-wrapper .chart-container {
+      margin: 0;
+    }
   </style>
 {% endblock %}
 
@@ -2275,8 +2361,8 @@ Respond with ONLY the visualization type (one word): map, line, bar, ranking, pi
 
       // Render Data Commons Web Component based on chart data
       function renderDCComponent(chartData) {
-        if (!chartData || !chartData.variableDcid) {
-          console.log('renderDCComponent: Missing chartData or variableDcid');
+        if (!chartData || (!chartData.variableDcid && (!chartData.variableDcids || chartData.variableDcids.length === 0))) {
+          console.log('renderDCComponent: Missing chartData or variableDcid(s)');
           return '';
         }
 
@@ -2288,9 +2374,17 @@ Respond with ONLY the visualization type (one word): map, line, bar, ranking, pi
         const safeParentPlace = parentPlace || 'country/IND';
         const safeChildPlaceType = childPlaceType || 'State';
 
+        // Support multiple variables for comparison charts (space-separated)
+        // Use variableDcids array if available, otherwise fall back to single variableDcid
+        const allVariableDcids = variableDcids && variableDcids.length > 0
+          ? variableDcids.filter(Boolean)
+          : [variableDcid].filter(Boolean);
+        const safeVariables = allVariableDcids.join(' ');
+        const isComparison = allVariableDcids.length > 1;
+
         let componentHtml = '';
 
-        console.log(`renderDCComponent: vizType=${vizType}, variableDcid=${variableDcid}, places=${safePlaces}`);
+        console.log(`renderDCComponent: vizType=${vizType}, variables=${safeVariables}, places=${safePlaces}, isComparison=${isComparison}`);
 
         // Use local custom DC API endpoint
         const apiRoot = window.location.origin;
@@ -2299,7 +2393,7 @@ Respond with ONLY the visualization type (one word): map, line, bar, ranking, pi
           case 'map':
             componentHtml = `
               <datacommons-map
-                apiRoot="${apiRoot}"
+                apiroot="${apiRoot}"
                 header="${safeHeader}"
                 variable="${variableDcid}"
                 parentPlace="${safeParentPlace}"
@@ -2313,9 +2407,9 @@ Respond with ONLY the visualization type (one word): map, line, bar, ranking, pi
           case 'line':
             componentHtml = `
               <datacommons-line
-                apiRoot="${apiRoot}"
+                apiroot="${apiRoot}"
                 header="${safeHeader}"
-                variables="${variableDcid}"
+                variables="${safeVariables}"
                 places="${safePlaces || safeParentPlace}"
               ></datacommons-line>`;
             break;
@@ -2324,18 +2418,18 @@ Respond with ONLY the visualization type (one word): map, line, bar, ranking, pi
             if (safePlaces && safePlaces.length > 0) {
               componentHtml = `
                 <datacommons-bar
-                  apiRoot="${apiRoot}"
+                  apiroot="${apiRoot}"
                   header="${safeHeader}"
-                  variables="${variableDcid}"
+                  variables="${safeVariables}"
                   places="${safePlaces}"
                   sort="descending"
                 ></datacommons-bar>`;
             } else {
               componentHtml = `
                 <datacommons-bar
-                  apiRoot="${apiRoot}"
+                  apiroot="${apiRoot}"
                   header="${safeHeader}"
-                  variables="${variableDcid}"
+                  variables="${safeVariables}"
                   parentPlace="${safeParentPlace}"
                   childPlaceType="${safeChildPlaceType}"
                   sort="descending"
@@ -2346,7 +2440,7 @@ Respond with ONLY the visualization type (one word): map, line, bar, ranking, pi
           case 'ranking':
             componentHtml = `
               <datacommons-ranking
-                apiRoot="${apiRoot}"
+                apiroot="${apiRoot}"
                 header="${safeHeader}"
                 variable="${variableDcid}"
                 parentPlace="${safeParentPlace}"
@@ -2359,10 +2453,10 @@ Respond with ONLY the visualization type (one word): map, line, bar, ranking, pi
           case 'pie':
             componentHtml = `
               <datacommons-pie
-                apiRoot="${apiRoot}"
+                apiroot="${apiRoot}"
                 header="${safeHeader}"
                 place="${(placeDcids && placeDcids[0]) || safeParentPlace}"
-                variables="${variableDcid}"
+                variables="${safeVariables}"
                 donut
               ></datacommons-pie>`;
             break;
@@ -2370,7 +2464,7 @@ Respond with ONLY the visualization type (one word): map, line, bar, ranking, pi
           case 'gauge':
             componentHtml = `
               <datacommons-gauge
-                apiRoot="${apiRoot}"
+                apiroot="${apiRoot}"
                 header="${safeHeader}"
                 place="${(placeDcids && placeDcids[0]) || safeParentPlace}"
                 variable="${variableDcid}"
@@ -2382,7 +2476,7 @@ Respond with ONLY the visualization type (one word): map, line, bar, ranking, pi
           case 'highlight':
             componentHtml = `
               <datacommons-highlight
-                apiRoot="${apiRoot}"
+                apiroot="${apiRoot}"
                 header="${safeHeader}"
                 place="${(placeDcids && placeDcids[0]) || safeParentPlace}"
                 variable="${variableDcid}"
@@ -2396,7 +2490,7 @@ Respond with ONLY the visualization type (one word): map, line, bar, ranking, pi
               : variableDcid;
             componentHtml = `
               <datacommons-scatter
-                apiRoot="${apiRoot}"
+                apiroot="${apiRoot}"
                 header="${safeHeader}"
                 variables="${scatterVars}"
                 parentPlace="${safeParentPlace}"
@@ -2406,12 +2500,12 @@ Respond with ONLY the visualization type (one word): map, line, bar, ranking, pi
             break;
 
           default:
-            // Default to line chart
+            // Default to line chart with multiple variables support
             componentHtml = `
               <datacommons-line
-                apiRoot="${apiRoot}"
+                apiroot="${apiRoot}"
                 header="${safeHeader}"
-                variables="${variableDcid}"
+                variables="${safeVariables}"
                 places="${safePlaces || safeParentPlace}"
               ></datacommons-line>`;
         }
@@ -2425,6 +2519,166 @@ Respond with ONLY the visualization type (one word): map, line, bar, ranking, pi
               <span class="dc-chart-source">Source: <a href="https://datacommons.org" target="_blank" rel="noopener">Data Commons</a></span>
             </div>
           </div>`;
+      }
+
+      // Chart.js fallback renderer - uses actual data from MCP results
+      // Returns { html, chartId, config } or { html } for highlight
+      function renderChartWithChartJS(chartData) {
+        if (!chartData || !chartData.datasets || chartData.datasets.length === 0) {
+          console.log('renderChartWithChartJS: No data to render');
+          return null;
+        }
+
+        const { vizType, variableName, labels, datasets, unit, sources } = chartData;
+        const chartId = `chart-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
+        // Color palette for multiple datasets
+        const colors = [
+          { bg: 'rgba(59, 130, 246, 0.6)', border: 'rgb(59, 130, 246)' },
+          { bg: 'rgba(16, 185, 129, 0.6)', border: 'rgb(16, 185, 129)' },
+          { bg: 'rgba(245, 158, 11, 0.6)', border: 'rgb(245, 158, 11)' },
+          { bg: 'rgba(239, 68, 68, 0.6)', border: 'rgb(239, 68, 68)' },
+          { bg: 'rgba(139, 92, 246, 0.6)', border: 'rgb(139, 92, 246)' },
+          { bg: 'rgba(236, 72, 153, 0.6)', border: 'rgb(236, 72, 153)' },
+          { bg: 'rgba(34, 197, 94, 0.6)', border: 'rgb(34, 197, 94)' },
+          { bg: 'rgba(249, 115, 22, 0.6)', border: 'rgb(249, 115, 22)' }
+        ];
+
+        // Map vizType to Chart.js type
+        let chartType = 'line';
+        let chartOptions = {};
+        let chartDatasets = [];
+
+        switch (vizType) {
+          case 'bar':
+          case 'ranking':
+            chartType = 'bar';
+            chartDatasets = datasets.map((ds, i) => ({
+              label: ds.label,
+              data: ds.data,
+              backgroundColor: colors[i % colors.length].bg,
+              borderColor: colors[i % colors.length].border,
+              borderWidth: 1
+            }));
+            chartOptions = {
+              indexAxis: vizType === 'ranking' ? 'y' : 'x',
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: { display: datasets.length > 1 },
+                title: { display: true, text: variableName }
+              },
+              scales: {
+                x: { title: { display: true, text: vizType === 'ranking' ? (unit || 'Value') : '' } },
+                y: { title: { display: true, text: vizType !== 'ranking' ? (unit || 'Value') : '' } }
+              }
+            };
+            break;
+
+          case 'pie':
+            // Delegate to pie chart helper
+            return renderPieChart(chartId, variableName, datasets, colors, unit, sources);
+
+          case 'highlight':
+            // Render as a simple value display (no Chart.js needed)
+            const highlightValue = datasets[0]?.data?.[datasets[0].data.length - 1] || datasets[0]?.data?.[0] || 'N/A';
+            return {
+              html: `
+                <div class="chart-container highlight-container" id="${chartId}">
+                  <h4 class="chart-title">${escapeHtml(variableName)}</h4>
+                  <div class="highlight-value">${formatNumber(highlightValue)}</div>
+                  <div class="highlight-unit">${unit ? escapeHtml(unit) : ''}</div>
+                  <div class="chart-footer">
+                    <span class="chart-source">Source: ${sources?.join(', ') || 'Data Commons'}</span>
+                  </div>
+                </div>`,
+              chartId: null,
+              config: null
+            };
+
+          case 'line':
+          default:
+            chartType = 'line';
+            chartDatasets = datasets.map((ds, i) => ({
+              label: ds.label,
+              data: ds.data,
+              borderColor: colors[i % colors.length].border,
+              backgroundColor: colors[i % colors.length].bg,
+              fill: false,
+              tension: 0.1
+            }));
+            chartOptions = {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: { display: datasets.length > 1 },
+                title: { display: true, text: variableName }
+              },
+              scales: {
+                x: { title: { display: true, text: 'Year' } },
+                y: { title: { display: true, text: unit || 'Value' } }
+              }
+            };
+        }
+
+        // Build config object
+        const chartConfig = {
+          type: chartType,
+          data: { labels: labels, datasets: chartDatasets },
+          options: chartOptions
+        };
+
+        const html = `
+          <div class="chart-container" id="${chartId}-container">
+            <canvas id="${chartId}" style="width: 100%; height: 300px;"></canvas>
+            <div class="chart-footer">
+              ${unit ? `<span class="chart-unit">Unit: ${escapeHtml(unit)}</span>` : ''}
+              <span class="chart-source">Source: ${sources?.join(', ') || 'Data Commons'}</span>
+            </div>
+          </div>`;
+
+        return { html, chartId, config: chartConfig };
+      }
+
+      // Helper for pie chart - returns {html, chartId, config}
+      function renderPieChart(chartId, title, datasets, colors, unit, sources) {
+        const pieLabels = datasets.map(ds => ds.label);
+        const pieData = datasets.map(ds => {
+          const data = ds.data;
+          return data[data.length - 1] || data[0] || 0;
+        });
+
+        const chartConfig = {
+          type: 'doughnut',
+          data: {
+            labels: pieLabels,
+            datasets: [{
+              data: pieData,
+              backgroundColor: colors.slice(0, datasets.length).map(c => c.bg),
+              borderColor: colors.slice(0, datasets.length).map(c => c.border),
+              borderWidth: 1
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: true, position: 'right' },
+              title: { display: true, text: title }
+            }
+          }
+        };
+
+        const html = `
+          <div class="chart-container" id="${chartId}-container">
+            <canvas id="${chartId}" style="width: 100%; height: 300px;"></canvas>
+            <div class="chart-footer">
+              ${unit ? `<span class="chart-unit">Unit: ${escapeHtml(unit)}</span>` : ''}
+              <span class="chart-source">Source: ${sources?.join(', ') || 'Data Commons'}</span>
+            </div>
+          </div>`;
+
+        return { html, chartId, config: chartConfig };
       }
 
       // Chart Data Analyzer - extracts actual data from tool results for DC Web Components
@@ -2729,8 +2983,105 @@ Respond with ONLY the visualization type (one word): map, line, bar, ranking, pi
         return { html: containerHtml, chartId, chartType, labels, datasets, variableName };
       }
 
-      // Inject chart(s) into message using Data Commons Web Components
-      // Now handles array of charts (one per unique unit)
+      // Check if data exists for a variable in Data Commons API
+      async function checkVariableHasData(variableDcid, placeDcid) {
+        if (!variableDcid) return false;
+
+        try {
+          const apiRoot = window.location.origin;
+          const place = placeDcid || 'country/IND';
+
+          // Use the observations/series API to check if data exists
+          const url = `${apiRoot}/api/observations/series?variables=${encodeURIComponent(variableDcid)}&entities=${encodeURIComponent(place)}`;
+
+          const response = await fetch(url, {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' }
+          });
+
+          if (!response.ok) {
+            console.log(`API check failed for ${variableDcid}: ${response.status}`);
+            return false;
+          }
+
+          const result = await response.json();
+
+          // Response format: { data: { variableDcid: { placeDcid: { series: [...] } } } }
+          const hasData = result?.data?.[variableDcid]?.[place]?.series?.length > 0;
+
+          console.log(`Variable ${variableDcid} hasData: ${hasData}`, hasData ? `(${result.data[variableDcid][place].series.length} observations)` : '');
+          return hasData;
+        } catch (err) {
+          console.error(`Error checking variable ${variableDcid}:`, err);
+          return false;
+        }
+      }
+
+      // Filter chart data to only include variables with actual data
+      async function filterValidVariables(chartData) {
+        if (!chartData) return null;
+
+        // Get all variable DCIDs
+        const allVariableDcids = chartData.variableDcids && chartData.variableDcids.length > 0
+          ? chartData.variableDcids
+          : [chartData.variableDcid].filter(Boolean);
+
+        if (allVariableDcids.length === 0) return null;
+
+        // Get a place to check against
+        const checkPlace = chartData.placeDcids?.[0] || chartData.parentPlace || 'country/IND';
+
+        console.log(`Validating ${allVariableDcids.length} variables against DC API...`);
+
+        // Check each variable in parallel
+        const validityChecks = await Promise.all(
+          allVariableDcids.map(async (dcid) => ({
+            dcid,
+            hasData: await checkVariableHasData(dcid, checkPlace)
+          }))
+        );
+
+        // Filter to only valid variables
+        const validVariables = validityChecks.filter(v => v.hasData).map(v => v.dcid);
+        const invalidVariables = validityChecks.filter(v => !v.hasData).map(v => v.dcid);
+
+        console.log(`Valid variables: ${validVariables.length}, Invalid: ${invalidVariables.length}`);
+        if (invalidVariables.length > 0) {
+          console.log('Removed variables without data:', invalidVariables);
+        }
+
+        if (validVariables.length === 0) {
+          console.log('No valid variables found - skipping chart');
+          return null;
+        }
+
+        // Update chartData with only valid variables
+        const filteredData = { ...chartData };
+        filteredData.variableDcids = validVariables;
+        filteredData.variableDcid = validVariables[0]; // Primary variable
+
+        // Update variable name if we removed some
+        if (invalidVariables.length > 0 && validVariables.length < allVariableDcids.length) {
+          // Find the corresponding dataset labels for valid variables
+          const validDatasets = (chartData.datasets || []).filter((ds, idx) => {
+            const dcid = allVariableDcids[idx];
+            return validVariables.includes(dcid);
+          });
+          filteredData.datasets = validDatasets;
+
+          // Update variable name
+          if (validDatasets.length > 0) {
+            filteredData.variableName = validDatasets.map(ds => ds.label).join(' vs ');
+          }
+        }
+
+        return filteredData;
+      }
+
+      // Inject chart(s) into message - with pre-validation
+      // 1. Validate variables have data in DC API
+      // 2. Render DC Web Components for valid variables
+      // 3. Fall back to Chart.js if DC components fail
       async function injectChartIntoMessage(messageEl, chartDataArray) {
         if (!chartDataArray) return;
 
@@ -2740,15 +3091,22 @@ Respond with ONLY the visualization type (one word): map, line, bar, ranking, pi
         if (charts.length === 0) return;
 
         try {
-          console.log('Injecting DC charts:', charts.length, 'chart(s)');
+          console.log('Injecting charts:', charts.length, 'chart(s)');
 
           const contentEl = messageEl.querySelector('.message-content');
           if (!contentEl) return;
 
           // Render each chart (grouped by unit)
-          for (const chartData of charts) {
-            if (!chartData || !chartData.variableDcid) {
-              console.log('Skipping chart - missing variableDcid');
+          for (let chartData of charts) {
+            if (!chartData || (!chartData.variableDcid && !chartData.datasets?.length)) {
+              console.log('Skipping chart - no data');
+              continue;
+            }
+
+            // PRE-CHECK: Validate variables have data in DC API
+            chartData = await filterValidVariables(chartData);
+            if (!chartData) {
+              console.log('Skipping chart - no valid variables after API check');
               continue;
             }
 
@@ -2756,38 +3114,182 @@ Respond with ONLY the visualization type (one word): map, line, bar, ranking, pi
             const originalVizType = chartData.vizType;
             chartData.vizType = await detectVisualizationTypeWithGemini(currentUserQuery, chartData);
 
-            console.log('Rendering DC component:', {
-              originalVizType: originalVizType,
-              geminiVizType: chartData.vizType,
-              variableDcid: chartData.variableDcid,
+            console.log('Rendering chart:', {
+              vizType: chartData.vizType,
+              variableName: chartData.variableName,
+              variableDcids: chartData.variableDcids,
               unit: chartData.unit,
-              placesCount: chartData.placeDcids?.length
+              datasetsCount: chartData.datasets?.length
             });
 
-            // Render DC web component
-            const componentHtml = renderDCComponent(chartData);
+            // Create a unique container ID for this chart
+            const containerId = `hybrid-chart-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
-            if (componentHtml) {
-              // Insert before followup container if it exists
-              const followupContainer = contentEl.querySelector('.followup-container');
-              if (followupContainer) {
-                followupContainer.insertAdjacentHTML('beforebegin', componentHtml);
-              } else {
-                contentEl.insertAdjacentHTML('beforeend', componentHtml);
-              }
+            // Render DC Web Component
+            const dcHtml = renderDCComponent(chartData);
+
+            // Create wrapper div to monitor DC component
+            const wrapperHtml = `<div id="${containerId}" class="hybrid-chart-wrapper">${dcHtml}</div>`;
+
+            // Insert the DC component
+            const followupContainer = contentEl.querySelector('.followup-container');
+            if (followupContainer) {
+              followupContainer.insertAdjacentHTML('beforebegin', wrapperHtml);
+            } else {
+              contentEl.insertAdjacentHTML('beforeend', wrapperHtml);
             }
+
+            // Monitor the DC component for failures and fall back to Chart.js if needed
+            monitorDCComponentAndFallback(containerId, chartData);
           }
 
           chatMessages.scrollTop = chatMessages.scrollHeight;
-          console.log('DC charts injected successfully');
+          console.log('Charts injected successfully');
 
         } catch (err) {
-          console.error('Failed to inject DC charts:', err);
+          console.error('Failed to inject charts:', err);
           const contentEl = messageEl.querySelector('.message-content');
           if (contentEl) {
             contentEl.insertAdjacentHTML('beforeend',
-              `<div class="dc-chart-error">Unable to load visualization: ${err.message}</div>`
+              `<div class="chart-error">Unable to load visualization: ${err.message}</div>`
             );
+          }
+        }
+      }
+
+      // Monitor DC component and fall back to Chart.js if it fails
+      async function monitorDCComponentAndFallback(containerId, chartData) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+
+        // Wait a bit for DC component to initialize
+        await new Promise(resolve => setTimeout(resolve, 800));
+
+        // Check for failure indicators
+        const checkForFailure = () => {
+          // Check for "No data available" text
+          const noDataText = container.textContent.includes('No data available');
+
+          // Check for error elements
+          const hasErrorEl = container.querySelector('.error, [class*="error"]');
+
+          // Check SVG viewBox for negative values (the specific error we're seeing)
+          const svgs = container.querySelectorAll('svg');
+          let svgViewBoxError = false;
+          svgs.forEach(svg => {
+            const viewBox = svg.getAttribute('viewBox');
+            if (viewBox && viewBox.includes('-')) {
+              svgViewBoxError = true;
+            }
+          });
+
+          // Check if SVG exists but is essentially empty (no paths, rects, etc.)
+          const hasSvg = svgs.length > 0;
+          const hasChartContent = container.querySelector('svg path, svg rect, svg circle, svg line');
+          const emptySvg = hasSvg && !hasChartContent;
+
+          // Check for loading state stuck
+          const stillLoading = container.querySelector('.loading, [class*="loading"]');
+
+          return {
+            failed: noDataText || hasErrorEl || svgViewBoxError || emptySvg,
+            noDataText,
+            hasErrorEl: !!hasErrorEl,
+            svgViewBoxError,
+            emptySvg,
+            stillLoading: !!stillLoading,
+            hasSvg,
+            hasChartContent: !!hasChartContent
+          };
+        };
+
+        // Check multiple times over 3 seconds
+        const checkIntervals = [0, 500, 1000, 1500, 2000];
+        let fallbackTriggered = false;
+
+        for (let i = 0; i < checkIntervals.length; i++) {
+          if (i > 0) {
+            await new Promise(resolve => setTimeout(resolve, 500));
+          }
+
+          if (fallbackTriggered) break;
+
+          const status = checkForFailure();
+          console.log(`DC component check [${containerId}] at ${checkIntervals[i]}ms:`, status);
+
+          // If DC component failed, fall back to Chart.js
+          if (status.failed) {
+            console.log(`DC component failed for ${containerId}, falling back to Chart.js`);
+            fallbackTriggered = true;
+
+            // Load Chart.js if needed
+            if (typeof Chart === 'undefined') {
+              await new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = 'https://cdn.jsdelivr.net/npm/chart.js';
+                script.onload = resolve;
+                script.onerror = reject;
+                document.head.appendChild(script);
+              });
+            }
+
+            // Get Chart.js render result (returns object with html, chartId, config)
+            const chartResult = renderChartWithChartJS(chartData);
+            if (chartResult && chartResult.html) {
+              // Replace container content with Chart.js HTML
+              container.innerHTML = chartResult.html;
+              container.classList.add('chartjs-fallback');
+
+              // Initialize Chart.js if config provided
+              if (chartResult.chartId && chartResult.config) {
+                // Small delay to ensure DOM is updated
+                await new Promise(resolve => setTimeout(resolve, 50));
+                const canvas = document.getElementById(chartResult.chartId);
+                if (canvas) {
+                  new Chart(canvas, chartResult.config);
+                  console.log(`Chart.js initialized for ${chartResult.chartId}`);
+                }
+              }
+              console.log(`Fallback to Chart.js successful for ${containerId}`);
+            }
+            break;
+          }
+
+          // If we have valid chart content, stop checking - DC component succeeded
+          if (status.hasChartContent) {
+            console.log(`DC component loaded successfully for ${containerId}`);
+            break;
+          }
+        }
+
+        // Final check after all intervals - if still no content, fall back
+        if (!fallbackTriggered) {
+          const finalStatus = checkForFailure();
+          if (!finalStatus.hasChartContent) {
+            console.log(`DC component still empty after timeout for ${containerId}, falling back to Chart.js`);
+
+            if (typeof Chart === 'undefined') {
+              await new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = 'https://cdn.jsdelivr.net/npm/chart.js';
+                script.onload = resolve;
+                script.onerror = reject;
+                document.head.appendChild(script);
+              });
+            }
+
+            const chartResult = renderChartWithChartJS(chartData);
+            if (chartResult && chartResult.html) {
+              container.innerHTML = chartResult.html;
+              container.classList.add('chartjs-fallback');
+              if (chartResult.chartId && chartResult.config) {
+                await new Promise(resolve => setTimeout(resolve, 50));
+                const canvas = document.getElementById(chartResult.chartId);
+                if (canvas) {
+                  new Chart(canvas, chartResult.config);
+                }
+              }
+            }
           }
         }
       }
