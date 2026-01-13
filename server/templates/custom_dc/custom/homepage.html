@@ -1996,6 +1996,14 @@ End EVERY response with exactly 3 clickable follow-up suggestions. These will be
         </div>
 
         <div class="config-section">
+          <label for="model-select">Gemini Model</label>
+          <select id="model-select" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 8px; background: white; color: var(--text-dark); font-size: 0.9rem;">
+            <option value="gemini-3-flash-preview">Gemini 3 Flash Preview (Default)</option>
+            <option value="gemini-3-pro-preview">Gemini 3 Pro Preview</option>
+          </select>
+        </div>
+
+        <div class="config-section">
           <label for="mcp-url-input">MCP Proxy URL</label>
           <input type="text" id="mcp-url-input" placeholder="http://localhost:5001" value="http://localhost:5001">
           <div class="config-toggle">
@@ -2128,8 +2136,7 @@ End EVERY response with exactly 3 clickable follow-up suggestions. These will be
       // Console log configuration on load
       console.group('🔧 Chat Configuration Loaded');
       console.log('API Base:', GEMINI_API_BASE);
-      console.log('MCP Model:', MCP_MODEL);
-      console.log('KB Model:', KB_MODEL);
+      console.log('Selected Model:', localStorage.getItem('selected_model') || 'gemini-3-flash-preview');
       console.log('Default MCP Proxy URL:', config?.defaults?.mcpProxyUrl);
       console.log('Default KB Store ID:', config?.defaults?.kbStoreId);
       console.groupEnd();
@@ -2159,6 +2166,7 @@ End EVERY response with exactly 3 clickable follow-up suggestions. These will be
       let mcpEnabled = localStorage.getItem('mcp_enabled') !== 'false';
       let kbStoreId = localStorage.getItem('kb_store_id') || config.defaults?.kbStoreId || 'fileSearchStores/msmepolicies-8pibj9lwmrws';
       let kbEnabled = localStorage.getItem('kb_enabled') !== 'false';
+      let selectedModel = localStorage.getItem('selected_model') || 'gemini-3-flash-preview';
       let mcpTools = [];
       let mcpConnected = false;
       let conversationHistory = [];
@@ -2332,7 +2340,7 @@ Respond with ONLY the visualization type (one word): map, line, bar, ranking, pi
           };
 
           const response = await fetch(
-            `${GEMINI_API_BASE}/gemini-2.0-flash:generateContent?key=${geminiApiKey}`,
+            `${GEMINI_API_BASE}/${selectedModel}:generateContent?key=${geminiApiKey}`,
             {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
@@ -3306,6 +3314,7 @@ Respond with ONLY the visualization type (one word): map, line, bar, ranking, pi
       const sendBtn = document.getElementById('send-btn');
       const welcomeMessage = document.getElementById('welcome-message');
       const apiKeyInput = document.getElementById('api-key-input');
+      const modelSelect = document.getElementById('model-select');
       const mcpUrlInput = document.getElementById('mcp-url-input');
       const mcpEnabledCheckbox = document.getElementById('mcp-enabled');
       const kbStoreInput = document.getElementById('kb-store-input');
@@ -3342,6 +3351,7 @@ Respond with ONLY the visualization type (one word): map, line, bar, ranking, pi
       function init() {
         // Load saved config
         if (geminiApiKey) apiKeyInput.value = geminiApiKey;
+        if (modelSelect) modelSelect.value = selectedModel;
         if (mcpProxyUrl) mcpUrlInput.value = mcpProxyUrl;
         mcpEnabledCheckbox.checked = mcpEnabled;
         if (kbStoreId) kbStoreInput.value = kbStoreId;
@@ -3455,6 +3465,7 @@ Respond with ONLY the visualization type (one word): map, line, bar, ranking, pi
       // Save configuration and connect
       async function saveConfig() {
         const key = apiKeyInput.value.trim();
+        const model = modelSelect?.value || 'gemini-3-flash-preview';
         const url = mcpUrlInput.value.trim();
         const enabled = mcpEnabledCheckbox.checked;
         const kbStore = kbStoreInput.value.trim();
@@ -3467,12 +3478,14 @@ Respond with ONLY the visualization type (one word): map, line, bar, ranking, pi
         }
 
         geminiApiKey = key;
+        selectedModel = model;
         mcpProxyUrl = url;
         mcpEnabled = enabled;
         kbStoreId = kbStore;
         kbEnabled = kbOn;
 
         localStorage.setItem('gemini_api_key', key);
+        localStorage.setItem('selected_model', model);
         localStorage.setItem('mcp_proxy_url', url);
         localStorage.setItem('mcp_enabled', enabled.toString());
         localStorage.setItem('kb_store_id', kbStore);
@@ -3494,8 +3507,9 @@ Respond with ONLY the visualization type (one word): map, line, bar, ranking, pi
         localStorage.setItem('synthesis_system_prompt', newSynthesisPrompt);
         localStorage.setItem('prompt_version', config?.PROMPT_VERSION || '1.0.0');
 
-        // Console log the updated prompts
-        console.group('📝 Prompts Updated (at ' + getCurrentDateTimeIST() + ')');
+        // Console log the updated config
+        console.group('📝 Config Updated (at ' + getCurrentDateTimeIST() + ')');
+        console.log('Selected Model:', selectedModel);
         console.log('MCP System Prompt (with DateTime):', injectDateTime(mcpSystemInstruction));
         console.log('KB System Prompt (with DateTime):', injectDateTime(kbSystemInstruction));
         console.log('Synthesis Prompt (with DateTime):', injectDateTime(synthesisSystemInstruction));
@@ -3718,7 +3732,7 @@ Respond with ONLY the visualization type (one word): map, line, bar, ranking, pi
       }
 
       // ============================================================
-      // PHASE 1: MCP Tools Query (using gemini-3.0-pro)
+      // PHASE 1: MCP Tools Query (using selected model)
       // ============================================================
       async function queryWithMcpTools(userMessage) {
         if (!mcpConnected || mcpTools.length === 0) {
@@ -3792,11 +3806,11 @@ Respond with ONLY the visualization type (one word): map, line, bar, ranking, pi
               };
             }
 
-            // Call Gemini with MCP_MODEL (2.0-flash)
+            // Call Gemini with selected model
             console.log('MCP Request payload:', JSON.stringify(payload, null, 2));
 
             const response = await fetch(
-              `${GEMINI_API_BASE}/${MCP_MODEL}:generateContent?key=${geminiApiKey}`,
+              `${GEMINI_API_BASE}/${selectedModel}:generateContent?key=${geminiApiKey}`,
               {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -3879,7 +3893,7 @@ Respond with ONLY the visualization type (one word): map, line, bar, ranking, pi
       }
 
       // ============================================================
-      // PHASE 2: Knowledge Base Query (using gemini-3-flash-preview)
+      // PHASE 2: Knowledge Base Query (using selected model)
       // ============================================================
       async function queryWithKnowledgeBase(userMessage) {
         if (!kbEnabled || !kbStoreId) {
@@ -3919,7 +3933,7 @@ Respond with ONLY the visualization type (one word): map, line, bar, ranking, pi
           console.log('KB Request payload:', JSON.stringify(payload, null, 2));
 
           const response = await fetch(
-            `${GEMINI_API_BASE}/${KB_MODEL}:generateContent?key=${geminiApiKey}`,
+            `${GEMINI_API_BASE}/${selectedModel}:generateContent?key=${geminiApiKey}`,
             {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
@@ -4087,7 +4101,7 @@ Please synthesize this information into a unified response following your format
               };
 
               // Use streaming for synthesis
-              finalResponse = await streamGeminiResponse(synthesisPayload, 'gemini-3-flash-preview', streamingMessage);
+              finalResponse = await streamGeminiResponse(synthesisPayload, selectedModel, streamingMessage);
 
             } catch (err) {
               console.error('Synthesis streaming error:', err);
@@ -4121,7 +4135,7 @@ Please present this information following your formatting guidelines.`;
                 systemInstruction: { parts: [{ text: injectDateTime(synthesisSystemInstruction) }] },
                 generationConfig: { temperature: 0.3, topP: 0.95 }
               };
-              finalResponse = await streamGeminiResponse(refinePayload, 'gemini-3-flash-preview', streamingMessage);
+              finalResponse = await streamGeminiResponse(refinePayload, selectedModel, streamingMessage);
             } catch (err) {
               // Fallback to non-streamed
               finalResponse = mcpContent;
@@ -4153,7 +4167,7 @@ Please present this information following your formatting guidelines.`;
                 systemInstruction: { parts: [{ text: injectDateTime(synthesisSystemInstruction) }] },
                 generationConfig: { temperature: 0.3, topP: 0.95 }
               };
-              finalResponse = await streamGeminiResponse(refinePayload, 'gemini-3-flash-preview', streamingMessage);
+              finalResponse = await streamGeminiResponse(refinePayload, selectedModel, streamingMessage);
             } catch (err) {
               // Fallback to non-refined KB content
               finalResponse = kbContent;
