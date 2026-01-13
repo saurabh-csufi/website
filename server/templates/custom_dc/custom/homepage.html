@@ -2021,9 +2021,9 @@ End EVERY response with exactly 3 clickable follow-up suggestions. These will be
           <input type="text" id="kb-store-input" placeholder="fileSearchStores/your-store-id" value="fileSearchStores/msmepolicies-8pibj9lwmrws">
           <div class="config-toggle">
             <span>Knowledge Base</span>
-            <span class="status-badge active" id="kb-status">Active</span>
+            <span class="status-badge" id="kb-status">Inactive</span>
             <label class="switch">
-              <input type="checkbox" id="kb-enabled" checked>
+              <input type="checkbox" id="kb-enabled">
               <span class="slider"></span>
             </label>
           </div>
@@ -2165,7 +2165,7 @@ End EVERY response with exactly 3 clickable follow-up suggestions. These will be
       let mcpProxyUrl = localStorage.getItem('mcp_proxy_url') || config.defaults?.mcpProxyUrl || 'http://localhost:5001';
       let mcpEnabled = localStorage.getItem('mcp_enabled') !== 'false';
       let kbStoreId = localStorage.getItem('kb_store_id') || config.defaults?.kbStoreId || 'fileSearchStores/msmepolicies-8pibj9lwmrws';
-      let kbEnabled = localStorage.getItem('kb_enabled') !== 'false';
+      let kbEnabled = localStorage.getItem('kb_enabled') === 'true';
       let selectedModel = localStorage.getItem('selected_model') || 'gemini-3-flash-preview';
       let mcpTools = [];
       let mcpConnected = false;
