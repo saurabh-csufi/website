@@ -1889,7 +1889,6 @@ End every response with 2-4 relevant follow-up suggestions that would genuinely 
           <div class="welcome-message" id="welcome-message">
             <div class="suggestions">
               <button class="suggestion" data-text="Has factory employment grown faster than GDP in the last 5 years?" disabled>Has factory employment grown faster than GDP in the last 5 years?</button>
-              <button class="suggestion" data-text="Which state has the highest factory productivity?" disabled>Which state has the highest factory productivity?</button>
               <button class="suggestion" data-text="Track food inflation alongside agricultural export growth" disabled>Track food inflation alongside agricultural export growth</button>
               <button class="suggestion" data-text="Compare North vs South India: GSDP, factory count, and inflation" disabled>Compare North vs South India: GSDP, factory count, and inflation</button>
             </div>
@@ -3063,6 +3062,23 @@ Respond with ONLY the visualization type (one word): map, line, bar, ranking, pi
               continue;
             }
 
+            // Skip charts where datasets have no actual values
+            if (chartData.datasets && chartData.datasets.length > 0) {
+              const hasRealData = chartData.datasets.some(ds =>
+                ds.data && ds.data.length > 0 && ds.data.some(v => v !== null && v !== undefined)
+              );
+              if (!hasRealData) {
+                console.log('Skipping chart - datasets have no real values');
+                continue;
+              }
+            }
+
+            // Skip if labels are empty
+            if (chartData.labels && chartData.labels.length === 0) {
+              console.log('Skipping chart - no labels/time points');
+              continue;
+            }
+
             // NOTE: Skipping pre-validation - DC components handle missing data gracefully
             // and pre-validation was filtering out valid variables due to place DCID mismatches
             // If you need to re-enable, uncomment the filterValidVariables call below:
@@ -3179,10 +3195,28 @@ Respond with ONLY the visualization type (one word): map, line, bar, ranking, pi
           const status = checkForFailure();
           console.log(`DC component check [${containerId}] at ${checkIntervals[i]}ms:`, status);
 
-          // If DC component failed, fall back to Chart.js
+          // If DC component failed, check if we have actual data for Chart.js fallback
           if (status.failed) {
-            console.log(`DC component failed for ${containerId}, falling back to Chart.js`);
+            console.log(`DC component failed for ${containerId}`, status);
             fallbackTriggered = true;
+
+            // If "No data available" was shown, just remove the chart - don't try Chart.js fallback
+            if (status.noDataText) {
+              console.log(`No data available - removing chart container ${containerId}`);
+              container.remove();
+              break;
+            }
+
+            // Only fall back to Chart.js if we have actual data in datasets
+            const hasRealData = chartData.datasets && chartData.datasets.some(ds =>
+              ds.data && ds.data.length > 0 && ds.data.some(v => v !== null && v !== undefined)
+            );
+
+            if (!hasRealData) {
+              console.log(`No real data for Chart.js fallback - removing container ${containerId}`);
+              container.remove();
+              break;
+            }
 
             // Load Chart.js if needed
             if (typeof Chart === 'undefined') {
@@ -3213,6 +3247,10 @@ Respond with ONLY the visualization type (one word): map, line, bar, ranking, pi
                 }
               }
               console.log(`Fallback to Chart.js successful for ${containerId}`);
+            } else {
+              // Chart.js also couldn't render - remove the container
+              console.log(`Chart.js also failed - removing container ${containerId}`);
+              container.remove();
             }
             break;
           }
@@ -3224,11 +3262,31 @@ Respond with ONLY the visualization type (one word): map, line, bar, ranking, pi
           }
         }
 
-        // Final check after all intervals - if still no content, fall back
+        // Final check after all intervals - if still no content, fall back or remove
         if (!fallbackTriggered) {
           const finalStatus = checkForFailure();
           if (!finalStatus.hasChartContent) {
-            console.log(`DC component still empty after timeout for ${containerId}, falling back to Chart.js`);
+            console.log(`DC component still empty after timeout for ${containerId}`);
+
+            // If "No data available" was shown, just remove the container
+            if (finalStatus.noDataText) {
+              console.log(`No data available - removing chart container ${containerId}`);
+              container.remove();
+              return;
+            }
+
+            // Check if we have actual data for Chart.js fallback
+            const hasRealData = chartData.datasets && chartData.datasets.some(ds =>
+              ds.data && ds.data.length > 0 && ds.data.some(v => v !== null && v !== undefined)
+            );
+
+            if (!hasRealData) {
+              console.log(`No real data - removing chart container ${containerId}`);
+              container.remove();
+              return;
+            }
+
+            console.log(`Falling back to Chart.js for ${containerId}`);
 
             if (typeof Chart === 'undefined') {
               await new Promise((resolve, reject) => {
@@ -3251,6 +3309,10 @@ Respond with ONLY the visualization type (one word): map, line, bar, ranking, pi
                   new Chart(canvas, chartResult.config);
                 }
               }
+            } else {
+              // Chart.js also couldn't render - remove the container
+              console.log(`Chart.js also failed - removing container ${containerId}`);
+              container.remove();
             }
           }
         }
@@ -3929,6 +3991,44 @@ Respond with ONLY the visualization type (one word): map, line, bar, ranking, pi
       }
 
       // ============================================================
+      // Generate query suggestions when data retrieval fails
+      // ============================================================
+      async function generateQuerySuggestions(userQuery) {
+        const suggestionPrompt = `The user asked: "${userQuery}"
+
+This query couldn't find data in our database. Based on available datasets, suggest 3 alternative queries that would likely return results.
+
+Available data topics:
+- Export data: Commodity exports by HS code, country-wise exports, growth rates (EIDB 2020-2025)
+- CPI/Inflation: Consumer price indices, inflation rates by category - Food, Clothing, Health, Education, Fuel (MOSPI 2011-2025)
+- GDP/GSDP: National GDP, state-wise GSDP - nominal and real values (MOSPI 2012-2022)
+- Factory statistics: ASI data - factory count, workers, output, value added by state (2024)
+
+Format EXACTLY as (one per line, no bullets):
+[suggestion: query text here]
+
+Keep suggestions concise and relevant to what the user was trying to ask.`;
+
+        try {
+          const payload = {
+            contents: [{ role: 'user', parts: [{ text: suggestionPrompt }] }],
+            generationConfig: { temperature: 0.7, maxOutputTokens: 200 }
+          };
+
+          const response = await fetch(
+            `${GEMINI_API_BASE}/${selectedModel}:generateContent?key=${geminiApiKey}`,
+            { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }
+          );
+
+          const data = await response.json();
+          return data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+        } catch (e) {
+          console.error('Failed to generate suggestions:', e);
+          return '';
+        }
+      }
+
+      // ============================================================
       // MAIN: Send message - calls BOTH MCP and KB, combines results
       // ============================================================
       async function sendMessage() {
@@ -4124,12 +4224,39 @@ Please present this information following your formatting guidelines.`;
               streamingMessage.setText(finalResponse);
             }
           } else {
-            // Neither worked
-            if (mcpResult.error && kbResult.error) {
-              finalResponse = 'I was unable to retrieve information for your query. Please try rephrasing your question.';
-            } else {
-              finalResponse = 'No relevant information found for your query.';
+            // Neither worked - show helpful error with suggestions and data request link
+            const dataRequestUrl = 'https://issuetracker.google.com/issues/new?component=1660823&template=2053232&pli=1';
+
+            // Clear chart and data source since there's no meaningful data to visualize
+            lastChartAnalysis = null;
+            lastDataSource = null;
+
+            // Build error message with data request link
+            let errorMessage = `I couldn't find data for your specific query. If you'd like to see insights on this topic, [submit a data request](${dataRequestUrl}).\n\n`;
+
+            // Try to generate AI suggestions based on the failed query
+            let suggestions = '';
+            try {
+              suggestions = await generateQuerySuggestions(userMessage);
+
+              if (!suggestions || !suggestions.includes('[suggestion:')) {
+                // Fallback static suggestions based on common topics
+                suggestions = "[suggestion: Show food inflation trend]\n";
+                suggestions += "[suggestion: Compare state-wise GSDP]\n";
+                suggestions += "[suggestion: Top export commodities]";
+              }
+            } catch (e) {
+              console.error('Error generating suggestions:', e);
+              // Fallback static suggestions
+              suggestions = "[suggestion: Show food inflation trend]\n";
+              suggestions += "[suggestion: Compare state-wise GSDP]\n";
+              suggestions += "[suggestion: Top export commodities]";
             }
+
+            // Add suggestions - they will be rendered as clickable buttons by formatMessage
+            errorMessage += suggestions.trim();
+
+            finalResponse = errorMessage;
             streamingMessage.setText(finalResponse);
           }
 
