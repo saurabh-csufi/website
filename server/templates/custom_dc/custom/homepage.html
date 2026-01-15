@@ -2548,7 +2548,7 @@ Respond with ONLY the visualization type (one word): map, line, bar, ranking, pi
                   <div class="highlight-value">${formatNumber(highlightValue)}</div>
                   <div class="highlight-unit">${unit ? escapeHtml(unit) : ''}</div>
                   <div class="chart-footer">
-                    <span class="chart-source">Source: ${sources?.join(', ') || 'Data Commons'}</span>
+                    <span class="chart-source">Source: ${(sources && Object.keys(sources).length > 0) ? Object.keys(sources).join(', ') : 'Data Commons'}</span>
                   </div>
                 </div>`,
               chartId: null,
@@ -2592,7 +2592,7 @@ Respond with ONLY the visualization type (one word): map, line, bar, ranking, pi
             <canvas id="${chartId}" style="width: 100%; height: 300px;"></canvas>
             <div class="chart-footer">
               ${unit ? `<span class="chart-unit">Unit: ${escapeHtml(unit)}</span>` : ''}
-              <span class="chart-source">Source: ${sources?.join(', ') || 'Data Commons'}</span>
+              <span class="chart-source">Source: ${(sources && Object.keys(sources).length > 0) ? Object.keys(sources).join(', ') : 'Data Commons'}</span>
             </div>
           </div>`;
 
@@ -2633,7 +2633,7 @@ Respond with ONLY the visualization type (one word): map, line, bar, ranking, pi
             <canvas id="${chartId}" style="width: 100%; height: 300px;"></canvas>
             <div class="chart-footer">
               ${unit ? `<span class="chart-unit">Unit: ${escapeHtml(unit)}</span>` : ''}
-              <span class="chart-source">Source: ${sources?.join(', ') || 'Data Commons'}</span>
+              <span class="chart-source">Source: ${(sources && Object.keys(sources).length > 0) ? Object.keys(sources).join(', ') : 'Data Commons'}</span>
             </div>
           </div>`;
 
