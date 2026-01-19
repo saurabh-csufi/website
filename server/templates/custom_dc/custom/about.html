@@ -18,7 +18,7 @@
 
 {% set main_id = 'standard-insights' %}
 {% set page_id = 'page-standard-insights' %}
-{% set title = 'India Price & Inflation Insights' %}
+{% set title = 'India Economic Data Insights' %}
 
 {% block head %}
 {{ super() }}
@@ -299,6 +299,65 @@
     --dc-highlight-text-color: #333;
   }
 
+  /* Tab Navigation Styles */
+  .tabs-container {
+    margin-bottom: 2rem;
+  }
+
+  .tabs-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    border-bottom: 3px solid #e9ecef;
+    margin-bottom: 2rem;
+    padding-bottom: 0;
+  }
+
+  .tab-button {
+    background: transparent;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #666;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    margin-bottom: -3px;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+  }
+
+  .tab-button:hover {
+    color: var(--navy);
+    background: rgba(23, 78, 166, 0.05);
+  }
+
+  .tab-button.active {
+    color: var(--navy);
+    border-bottom-color: var(--navy);
+    font-weight: 600;
+  }
+
+  .tab-content {
+    display: none;
+  }
+
+  .tab-content.active {
+    display: block;
+    animation: fadeIn 0.3s ease;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
   /* Responsive */
   @media (max-width: 1200px) {
     .highlight-section {
@@ -342,11 +401,22 @@
 <div class="insights-container">
   <!-- Header -->
   <div class="insights-header">
-    <h1>India Price & Inflation Insights</h1>
-    <p>Consumer Price Index and Inflation Data from MOSPI</p>
+    <h1>India Economic Data Insights</h1>
+    <p>Comprehensive Economic Indicators from MOSPI and Government Sources</p>
     <span class="badge">Data: 2011-2025 | Source: Ministry of Statistics and Programme Implementation</span>
   </div>
 
+  <!-- Tab Navigation -->
+  <div class="tabs-container">
+    <div class="tabs-nav">
+      <button class="tab-button active" data-tab="cpi-inflation">CPI & Inflation</button>
+      <button class="tab-button" data-tab="gdp-gsdp">GDP & State GSDP</button>
+      <button class="tab-button" data-tab="exports">Export Data</button>
+      <button class="tab-button" data-tab="industrial">Industrial Stats</button>
+    </div>
+
+  <!-- Tab Content: CPI & Inflation -->
+  <div id="tab-cpi-inflation" class="tab-content active">
   <!-- Key Highlights Section -->
   <div class="section-header">
     <div class="icon">📊</div>
@@ -585,6 +655,408 @@
       ></datacommons-map>
     </div>
   </div>
+  </div>
+
+  <!-- Tab Content: GDP & State GSDP -->
+  <div id="tab-gdp-gsdp" class="tab-content">
+    <!-- Key GDP Indicators -->
+    <div class="section-header">
+      <div class="icon">📊</div>
+      <h2>Key GDP Indicators</h2>
+    </div>
+
+    <div class="highlight-section">
+      <div class="highlight-card">
+        <datacommons-highlight
+          apiRoot="/"
+          header="GDP (Nominal/Current Prices)"
+          place="country/IND"
+          variable="Amount_EconomicActivity_GrossDomesticProduction_Nominal"
+          unit="INR"
+        ></datacommons-highlight>
+      </div>
+      <div class="highlight-card saffron">
+        <datacommons-highlight
+          apiRoot="/"
+          header="GDP (Real/Constant Prices)"
+          place="country/IND"
+          variable="Amount_EconomicActivity_GrossDomesticProduction_RealValue"
+          unit="INR"
+        ></datacommons-highlight>
+      </div>
+    </div>
+    
+    <p style="color: #666; font-size: 0.9rem; margin: 1rem 0; font-style: italic;">
+      Note: Nominal GDP reflects current market prices, while Real GDP is adjusted for inflation using constant base year prices. Values shown are for the latest available year from each data source. When MOSPI data is updated with newer years, both indicators will automatically display the latest available year.
+    </p>
+
+    <!-- GDP Trends Over Time -->
+    <div class="section-header">
+      <div class="icon">📈</div>
+      <h2>GDP Trends Over Time</h2>
+    </div>
+
+    <div class="insights-grid">
+      <div class="insight-card full-width-card">
+        <h3>GDP Trends: Nominal vs Real (2012-2022)</h3>
+        <datacommons-line
+          apiRoot="/"
+          header="Gross Domestic Product Comparison (INR)"
+          places="country/IND"
+          variables="Amount_EconomicActivity_GrossDomesticProduction_Nominal Amount_EconomicActivity_GrossDomesticProduction_RealValue"
+        ></datacommons-line>
+      </div>
+    </div>
+
+    <!-- State GSDP Section -->
+    <!-- Top States Ranking Section -->
+    <div class="section-header">
+      <div class="icon">📊</div>
+      <h2>Top States by GSDP (Current Prices)</h2>
+    </div>
+
+    <div class="insights-grid" style="margin-bottom: 1.5rem;">
+      <div class="insight-card full-width-card">
+        <h3>Top 10 States by GSDP Ranking</h3>
+        <datacommons-ranking
+          apiRoot="/"
+          header="State-wise GSDP Ranking (Current Prices)"
+          parentPlace="country/IND"
+          childPlaceType="AdministrativeArea1"
+          variable="Amount_EconomicActivity_GrossDomesticProduction_Nominal"
+          rankingCount="10"
+          showHighest
+        ></datacommons-ranking>
+      </div>
+    </div>
+
+    <!-- GSDP Trends Over Time -->
+    <div class="section-header">
+      <div class="icon">📈</div>
+      <h2>GSDP Trends Over Time</h2>
+    </div>
+
+    <div class="insights-grid">
+      <div class="insight-card full-width-card">
+        <h3>Top States by GSDP (Latest Year)</h3>
+        <datacommons-bar
+          apiRoot="/"
+          header="Top States by GSDP (Current Prices, INR)"
+          parentPlace="country/IND"
+          childPlaceType="AdministrativeArea1"
+          variables="Amount_EconomicActivity_GrossDomesticProduction_Nominal"
+          sort="descending"
+        ></datacommons-bar>
+      </div>
+    </div>
+
+    <!-- State-wise GSDP Map Section -->
+    <div class="section-header">
+      <div class="icon">🗺️</div>
+      <h2>State-wise Gross State Domestic Product</h2>
+    </div>
+
+    <div class="insights-grid">
+      <div class="insight-card">
+        <h3>GSDP by State (Current Prices)</h3>
+        <datacommons-map
+          apiRoot="/"
+          header="Gross State Domestic Product - Current Prices (INR)"
+          parentPlace="country/IND"
+          childPlaceType="AdministrativeArea1"
+          variable="Amount_EconomicActivity_GrossDomesticProduction_Nominal"
+        ></datacommons-map>
+      </div>
+      <div class="insight-card saffron-border">
+        <h3>GSDP by State (Constant Prices)</h3>
+        <datacommons-map
+          apiRoot="/"
+          header="Gross State Domestic Product - Constant Prices (INR)"
+          parentPlace="country/IND"
+          childPlaceType="AdministrativeArea1"
+          variable="Amount_EconomicActivity_GrossDomesticProduction_RealValue"
+        ></datacommons-map>
+      </div>
+      <div class="insight-card full-width-card green-border">
+        <h3>GSDP Growth Rate by State</h3>
+        <datacommons-map
+          apiRoot="/"
+          header="GSDP Growth Rate (%)"
+          parentPlace="country/IND"
+          childPlaceType="AdministrativeArea1"
+          variable="NominalValue_GrowthRate_Amount_EconomicActivity_GrossDomesticProduction"
+        ></datacommons-map>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab Content: Export Data -->
+  <div id="tab-exports" class="tab-content">
+    <!-- Top Export Destinations -->
+    <div class="section-header">
+      <div class="icon">📊</div>
+      <h2>Top Export Destinations</h2>
+    </div>
+
+    <div class="insights-grid" style="margin-bottom: 1.5rem;">
+      <div class="insight-card full-width-card">
+        <h3>Top 15 Export Destinations</h3>
+        <p style="color: #666; font-size: 0.9rem; margin-bottom: 1rem;">
+          Top countries receiving exports from India, ranked by export value in Indian Rupees. Note: "India" appearing in the list likely represents total exports or a data classification issue, as a country cannot export to itself.
+        </p>
+        <datacommons-ranking
+          apiRoot="/"
+          header="Top Export Destinations from India (INR)"
+          parentPlace="Earth"
+          childPlaceType="Country"
+          variable="Exports_EconomicActivity_ExportSourceIndia"
+          rankingCount="15"
+          showHighest
+        ></datacommons-ranking>
+      </div>
+    </div>
+
+    <!-- Export Trends -->
+    <div class="section-header">
+      <div class="icon">📈</div>
+      <h2>Export Trends</h2>
+    </div>
+
+    <div class="insights-grid">
+      <div class="insight-card full-width-card">
+        <h3>Top Export Destinations (Latest Year)</h3>
+        <p style="color: #666; font-size: 0.9rem; margin-bottom: 1rem;">
+          Major export destinations from India by value. Note: "India" appearing here likely represents total exports or a data classification issue, not actual exports to India.
+        </p>
+        <datacommons-bar
+          apiRoot="/"
+          header="Top Countries by Export Value (INR)"
+          parentPlace="Earth"
+          childPlaceType="Country"
+          variables="Exports_EconomicActivity_ExportSourceIndia"
+          sort="descending"
+          maxPlaces="15"
+        ></datacommons-bar>
+      </div>
+    </div>
+
+    <!-- Export Destinations Map -->
+    <div class="section-header">
+      <div class="icon">🗺️</div>
+      <h2>Export Destinations by Country</h2>
+    </div>
+
+    <div class="insights-grid">
+      <div class="insight-card full-width-card">
+        <h3>Export Value by Destination Country</h3>
+        <datacommons-map
+          apiRoot="/"
+          header="Exports from India by Destination Country (INR)"
+          parentPlace="Earth"
+          childPlaceType="Country"
+          variable="Exports_EconomicActivity_ExportSourceIndia"
+        ></datacommons-map>
+      </div>
+    </div>
+
+    <!-- Commodity Exports Section -->
+    <div class="section-header">
+      <div class="icon">📦</div>
+      <h2>Top Exported Commodities</h2>
+    </div>
+
+    <p style="color: #666; font-size: 0.9rem; margin-bottom: 1.5rem;">
+      Major commodities exported from India, ranked by export value in Indian Rupees.
+    </p>
+
+    <div class="insights-grid" style="margin-bottom: 1.5rem;">
+      <div class="insight-card full-width-card">
+        <h3>Commodity Export Trends Over Time</h3>
+        <datacommons-line
+          apiRoot="/"
+          header="Major Commodity Exports (INR)"
+          places="country/IND"
+          variables="Exports_EconomicActivity_Cereals Exports_EconomicActivity_CoffeeTeaMateAndSpices Exports_EconomicActivity_FishAndCrustaceansMolluscsAndOtherAquatic Exports_EconomicActivity_SugarsAndSugarConfectionery"
+        ></datacommons-line>
+      </div>
+    </div>
+
+    <!-- Key Commodity Highlights -->
+    <div class="section-header">
+      <div class="icon">💎</div>
+      <h2>Key Commodity Highlights</h2>
+    </div>
+
+    <div class="highlight-section">
+      <div class="highlight-card">
+        <datacommons-highlight
+          apiRoot="/"
+          header="Cereals Exports"
+          place="country/IND"
+          variable="Exports_EconomicActivity_Cereals"
+          unit="INR"
+        ></datacommons-highlight>
+      </div>
+      <div class="highlight-card saffron">
+        <datacommons-highlight
+          apiRoot="/"
+          header="Coffee, Tea & Spices"
+          place="country/IND"
+          variable="Exports_EconomicActivity_CoffeeTeaMateAndSpices"
+          unit="INR"
+        ></datacommons-highlight>
+      </div>
+      <div class="highlight-card green">
+        <datacommons-highlight
+          apiRoot="/"
+          header="Fish & Seafood"
+          place="country/IND"
+          variable="Exports_EconomicActivity_FishAndCrustaceansMolluscsAndOtherAquatic"
+          unit="INR"
+        ></datacommons-highlight>
+      </div>
+      <div class="highlight-card">
+        <datacommons-highlight
+          apiRoot="/"
+          header="Sugar & Confectionery"
+          place="country/IND"
+          variable="Exports_EconomicActivity_SugarsAndSugarConfectionery"
+          unit="INR"
+        ></datacommons-highlight>
+      </div>
+      <div class="highlight-card saffron">
+        <datacommons-highlight
+          apiRoot="/"
+          header="Fats & Oils"
+          place="country/IND"
+          variable="Exports_EconomicActivity_AnimalVegetableOrMicrobialFatsAndOilsAndTheir15"
+          unit="INR"
+        ></datacommons-highlight>
+      </div>
+      <div class="highlight-card green">
+        <datacommons-highlight
+          apiRoot="/"
+          header="Fruits & Nuts"
+          place="country/IND"
+          variable="Exports_EconomicActivity_FruitAndNutsEdiblePeelOfCitrusFruitOrMelons"
+          unit="INR"
+        ></datacommons-highlight>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab Content: Industrial Stats -->
+  <div id="tab-industrial" class="tab-content">
+    <!-- Key Industrial Indicators -->
+    <div class="section-header">
+      <div class="icon">📊</div>
+      <h2>Key Industrial Indicators</h2>
+    </div>
+
+    <div class="highlight-section">
+      <div class="highlight-card">
+        <datacommons-highlight
+          apiRoot="/"
+          header="Total Factories"
+          place="country/IND"
+          variable="Count_Establishment_Factory"
+        ></datacommons-highlight>
+      </div>
+      <div class="highlight-card saffron">
+        <datacommons-highlight
+          apiRoot="/"
+          header="Gross Value Added"
+          place="country/IND"
+          variable="Amount_EconomicActivity_Factory_GrossValueAdded"
+        ></datacommons-highlight>
+      </div>
+      <div class="highlight-card green">
+        <datacommons-highlight
+          apiRoot="/"
+          header="Total Workers"
+          place="country/IND"
+          variable="Count_Worker_Factory"
+        ></datacommons-highlight>
+      </div>
+      <div class="highlight-card">
+        <datacommons-highlight
+          apiRoot="/"
+          header="Fixed Capital"
+          place="country/IND"
+          variable="Amount_EconomicActivity_Factory_FixedCapital"
+        ></datacommons-highlight>
+      </div>
+      <div class="highlight-card saffron">
+        <datacommons-highlight
+          apiRoot="/"
+          header="Total Emoluments"
+          place="country/IND"
+          variable="Amount_EconomicActivity_Factory_Emolument"
+        ></datacommons-highlight>
+      </div>
+    </div>
+
+    <!-- Top States by Factory Count -->
+    <div class="section-header">
+      <div class="icon">📈</div>
+      <h2>Top States by Factory Count</h2>
+    </div>
+
+    <div class="insights-grid" style="margin-bottom: 1.5rem;">
+      <div class="insight-card full-width-card">
+        <h3>Top 10 States by Number of Factories</h3>
+        <datacommons-ranking
+          apiRoot="/"
+          header="States Ranked by Factory Count"
+          parentPlace="country/IND"
+          childPlaceType="AdministrativeArea1"
+          variable="Count_Establishment_Factory"
+          rankingCount="10"
+          showHighest
+        ></datacommons-ranking>
+      </div>
+    </div>
+
+    <!-- Industrial Trends -->
+    <div class="section-header">
+      <div class="icon">📉</div>
+      <h2>Industrial Trends</h2>
+    </div>
+
+    <div class="insights-grid">
+      <div class="insight-card full-width-card">
+        <h3>Top States by Factory Count (Latest Year)</h3>
+        <datacommons-bar
+          apiRoot="/"
+          header="Top States by Number of Factories"
+          parentPlace="country/IND"
+          childPlaceType="AdministrativeArea1"
+          variables="Count_Establishment_Factory"
+          sort="descending"
+          maxPlaces="10"
+        ></datacommons-bar>
+      </div>
+    </div>
+
+    <!-- State-wise Industrial Maps -->
+    <div class="section-header">
+      <div class="icon">🗺️</div>
+      <h2>State-wise Industrial Statistics</h2>
+    </div>
+
+    <div class="insights-grid">
+      <div class="insight-card full-width-card">
+        <h3>Factory Count by State</h3>
+        <datacommons-map
+          apiRoot="/"
+          header="Number of Factories by State"
+          parentPlace="country/IND"
+          childPlaceType="AdministrativeArea1"
+          variable="Count_Establishment_Factory"
+        ></datacommons-map>
+      </div>
+    </div>
+  </div>
 
   <!-- Footer -->
   <div class="insights-footer">
@@ -799,7 +1271,31 @@ function drawInflationBarChart() {
   container.innerHTML = html;
 }
 
+// Tab Navigation Functionality
+function initTabs() {
+  const tabButtons = document.querySelectorAll('.tab-button');
+  const tabContents = document.querySelectorAll('.tab-content');
+
+  tabButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      const targetTab = button.getAttribute('data-tab');
+
+      // Remove active class from all buttons and contents
+      tabButtons.forEach(btn => btn.classList.remove('active'));
+      tabContents.forEach(content => content.classList.remove('active'));
+
+      // Add active class to clicked button and corresponding content
+      button.classList.add('active');
+      const targetContent = document.getElementById(`tab-${targetTab}`);
+      if (targetContent) {
+        targetContent.classList.add('active');
+      }
+    });
+  });
+}
+
 document.addEventListener('DOMContentLoaded', function() {
+  initTabs();
   initCustomGauges();
   drawInflationBarChart();
 });
