@@ -41,7 +41,8 @@
       },
       defaults: {
         mcpProxyUrl: 'http://localhost:5001',
-        kbStoreId: 'fileSearchStores/msmepolicies-8pibj9lwmrws'
+        kbStoreId: 'fileSearchStores/msmepolicies-8pibj9lwmrws',
+        kbEnabled: false  // Knowledge base is OFF by default
       },
       systemInstructions: {
         mcp: `## Data Agent: Strategic Data Intelligence
@@ -2181,12 +2182,20 @@ End EVERY response with exactly 3 clickable follow-up suggestions. These will be
       console.log('With DateTime:', injectDateTime(synthesisSystemInstruction));
       console.groupEnd();
 
+      // Migration: Reset KB to OFF by default (one-time migration)
+      const KB_DEFAULT_VERSION = 'kb_default_v2';
+      if (!localStorage.getItem(KB_DEFAULT_VERSION)) {
+        localStorage.removeItem('kb_enabled');  // Clear old setting
+        localStorage.setItem(KB_DEFAULT_VERSION, 'true');  // Mark migration complete
+      }
+
       // State
       let geminiApiKey = localStorage.getItem('gemini_api_key') || '';
       let mcpProxyUrl = localStorage.getItem('mcp_proxy_url') || config.defaults?.mcpProxyUrl || 'http://localhost:5001';
       let mcpEnabled = localStorage.getItem('mcp_enabled') !== 'false';
       let kbStoreId = localStorage.getItem('kb_store_id') || config.defaults?.kbStoreId || 'fileSearchStores/msmepolicies-8pibj9lwmrws';
-      let kbEnabled = localStorage.getItem('kb_enabled') === 'true';
+      // Knowledge base is OFF by default - only enable if explicitly set to 'true' in localStorage
+      let kbEnabled = localStorage.getItem('kb_enabled') === 'true' ? true : (config.defaults?.kbEnabled ?? false);
       let selectedModel = localStorage.getItem('selected_model') || 'gemini-3-flash-preview';
       let mcpTools = [];
       let mcpConnected = false;
@@ -2194,6 +2203,57 @@ End EVERY response with exactly 3 clickable follow-up suggestions. These will be
       let isProcessing = false;
       let lastChartAnalysis = null;
       let lastDataSource = null;  // Track the data source from MCP responses
+
+      // PDF Knowledge Base Source URLs - maps PDF filenames to their URLs
+      const kbSourceUrls = {
+        "02-Trade-in-Goods.pdf": "https://commerce.gov.in/wp-content/uploads/2022/06/02-Trade-in-Goods.pdf",
+        "02A-1-Notes-for-Schedule-Australia.pdf": "https://commerce.gov.in/wp-content/uploads/2022/06/02A-1-Notes-for-Schedule-Australia.pdf",
+        "02A-3-NOTES-FOR-SPECIFIC-TARIFF-SCHEDULE-OF-INDIA.pdf": "https://commerce.gov.in/wp-content/uploads/2022/06/02A-3-NOTES-FOR-SPECIFIC-TARIFF-SCHEDULE-OF-INDIA.pdf",
+        "02A-2-Schedule-Australia.pdf": "https://commerce.gov.in/wp-content/uploads/2022/06/02A-2-Schedule-Australia.pdf",
+        "02A-Schedule-India-1.pdf": "https://commerce.gov.in/wp-content/uploads/2022/12/02A-Schedule-India-1.pdf",
+        "03-Trade-Remedies.pdf": "https://commerce.gov.in/wp-content/uploads/2022/06/03-Trade-Remedies.pdf",
+        "04-Rules-of-Origin.pdf": "https://commerce.gov.in/wp-content/uploads/2022/06/04-Rules-of-Origin.pdf",
+        "04A-AN_1.pdf": "https://commerce.gov.in/wp-content/uploads/2022/06/04A-AN_1.pdf",
+        "04B-AN_1.pdf": "https://commerce.gov.in/wp-content/uploads/2022/06/04B-AN_1.pdf",
+        "05-CUS_1.pdf": "https://commerce.gov.in/wp-content/uploads/2022/06/05-CUS_1.pdf",
+        "06-Sanitary-and-Phytosanitary-Measures.pdf": "https://commerce.gov.in/wp-content/uploads/2022/06/06-Sanitary-and-Phytosanitary-Measures.pdf",
+        "07-Technical-Barriers-to-Trade.pdf": "https://commerce.gov.in/wp-content/uploads/2022/06/07-Technical-Barriers-to-Trade.pdf",
+        "07A-Annex-7A-Pharmaceuticals.pdf": "https://commerce.gov.in/wp-content/uploads/2022/06/07A-Annex-7A-Pharmaceuticals.pdf",
+        "08-Trade-in-Services.pdf": "https://commerce.gov.in/wp-content/uploads/2022/06/08-Trade-in-Services.pdf",
+        "08A-Annex-8A-Financial-Services.pdf": "https://commerce.gov.in/wp-content/uploads/2022/06/08A-Annex-8A-Financial-Services.pdf",
+        "08B-Annex-8B-Telecommunications-Services.pdf": "https://commerce.gov.in/wp-content/uploads/2022/06/08B-Annex-8B-Telecommunications-Services.pdf",
+        "08C-Annex-8C-Professional-Services.pdf": "https://commerce.gov.in/wp-content/uploads/2022/06/08C-Annex-8C-Professional-Services.pdf",
+        "08D-Annex-8D-Foreign-Investment-framework.pdf": "https://commerce.gov.in/wp-content/uploads/2022/06/08D-Annex-8D-Foreign-Investment-framework.pdf",
+        "08E-Schedule-of-Specific-Commitments-India.pdf": "https://commerce.gov.in/wp-content/uploads/2022/06/08E-Schedule-of-Specific-Commitments-India.pdf",
+        "08F-Schedule-of-non-conforming-measures-Australia.pdf": "https://commerce.gov.in/wp-content/uploads/2022/06/08F-Schedule-of-non-conforming-measures-Australia.pdf",
+        "09-Temporary-Movement-of-Natural-Persons.pdf": "https://commerce.gov.in/wp-content/uploads/2022/06/09-Temporary-Movement-of-Natural-Persons.pdf",
+        "09A-Scedule-of-Specific-Commitments-India.pdf": "https://commerce.gov.in/wp-content/uploads/2022/06/09A-Scedule-of-Specific-Commitments-India.pdf",
+        "09A-Schedule-of-Specific-Commitment-Australia-.pdf": "https://commerce.gov.in/wp-content/uploads/2022/06/09A-Schedule-of-Specific-Commitment-Australia-.pdf",
+        "1-INITIAL-PROVISIONS-AND-GENERAL-DEFINITIONS.pdf": "https://commerce.gov.in/wp-content/uploads/2022/06/1-INITIAL-PROVISIONS-AND-GENERAL-DEFINITIONS.pdf",
+        "10-Transparency.pdf": "https://commerce.gov.in/wp-content/uploads/2022/06/10-Transparency.pdf",
+        "11-General-Provisions-and-Exceptions.pdf": "https://commerce.gov.in/wp-content/uploads/2022/06/11-General-Provisions-and-Exceptions.pdf",
+        "12-Administrative-and-Institutional-Provisions.pdf": "https://commerce.gov.in/wp-content/uploads/2022/06/12-Administrative-and-Institutional-Provisions.pdf",
+        "13-Dispute-Settlement.pdf": "https://commerce.gov.in/wp-content/uploads/2022/06/13-Dispute-Settlement.pdf",
+        "14-Final-Provisions.pdf": "https://commerce.gov.in/wp-content/uploads/2022/06/14-Final-Provisions.pdf",
+        "14-WINEM2.pdf": "https://commerce.gov.in/wp-content/uploads/2022/06/2-TRADEA2.pdf",
+        "5-POST-S1.pdf": "https://commerce.gov.in/wp-content/uploads/2022/06/5-POST-S1.pdf",
+        "6-POST-S2.pdf": "https://commerce.gov.in/wp-content/uploads/2022/06/6-POST-S2.pdf",
+        "7-Taxation-Australia-to-India.pdf": "https://commerce.gov.in/wp-content/uploads/2022/06/7-Taxation-Australia-to-India.pdf",
+        "8-Taxation-India-to-Australia.pdf": "https://commerce.gov.in/wp-content/uploads/2022/06/8-Taxation-India-to-Australia.pdf",
+        "9-WORKAN1.pdf": "https://commerce.gov.in/wp-content/uploads/2022/06/9-WORKAN1.pdf",
+        "HBP2023_Chapter01.pdf": "https://content.dgft.gov.in/Website/dgftprod/52b992a3-b3a2-4a40-b4c2-56d96ffdb654/HBP2023_Chapter01.pdf",
+        "HBP Chapter 2 .pdf": "https://content.dgft.gov.in/Website/HBP%20Chapter%202%20.pdf",
+        "HBP2023_Chapter03.pdf": "https://content.dgft.gov.in/Website/dgftprod/405f01bf-444e-4277-81ef-b76ac6c8395d/HBP2023_Chapter03.pdf",
+        "HBP2023_Chapter04 as on 13.02.2025.pdf": "https://content.dgft.gov.in/Website/dgftprod/401a37ca-b78e-4677-8b68-b1f3aed7266d/HBP2023_Chn%2013.02.2025.pdf",
+        "HBP Chapter 5.pdf": "https://content.dgft.gov.in/Website/HBP%20Chapter%205.pdf",
+        "HBP2023_Chapter06.pdf": "https://content.dgft.gov.in/Website/dgftprod/4256fc65-8698-4eed-bfd3-228aa9532467/HBP2023_Chapter06.pdf",
+        "HBP2023_Chapter07.pdf": "https://content.dgft.gov.in/Website/Chapter-7-of-HBP-2023.pdf",
+        "HBP2023_Chapter08.pdf": "https://content.dgft.gov.in/Website/dgftprod/a28207ef-6792-4d97-a291-7d443eb8e51c/HBP2023_Chapter08.pdf",
+        "HBP2023_Chapter09.pdf": "https://content.dgft.gov.in/Website/dgftprod/96f78b2e-6c59-46a5-aabf-e8379828686a/HBP2023_Chapter09.pdf",
+        "HBP2023 Chapter10 as on 05062025.pdf": "https://content.dgft.gov.in/Website/dgftprod/897c5d3d-2f16-4fad-bc3d-2362b46770ca/HBP2023%20Chapter10%20as%20on%2005062025.pdf",
+        "HBP2023_Chapter11.pdf": "https://content.dgft.gov.in/Website/dgftprod/58ccb855-a92c-4dd7-8d4f-98e9d882da4d/HBP2023_Chapter11.pdf",
+        "MSME_Schemes_English_0.pdf": "https://msme.gov.in/sites/default/files/MSME_Schemes_English_0.pdf"
+      };
 
       // Chart.js Script Loader
       let chartJsLoaded = false;
@@ -4218,9 +4278,17 @@ Please present this information following your formatting guidelines.`;
             }
           }
 
-          // Add KB sources
+          // Add KB sources with hyperlinks for known PDFs
           if (sources.length > 0) {
-            allSources.push(...sources);
+            sources.forEach(source => {
+              // Check if this source has a known URL in our mapping
+              const url = kbSourceUrls[source];
+              if (url) {
+                allSources.push(`[${source}](${url})`);
+              } else {
+                allSources.push(source);
+              }
+            });
           }
 
           if (allSources.length > 0) {
