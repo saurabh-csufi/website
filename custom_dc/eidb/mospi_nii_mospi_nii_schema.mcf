@@ -1,0 +1,56 @@
+Node: dcid:MospiNIIUnadjusted
+name: "MospiNIIUnadjusted"
+subClassOf: dcs:MeasurementMethodEnum
+typeOf: schema:Class
+
+Node: dcid:MospiNIIAdjusted
+name: "MospiNIIAdjusted"
+subClassOf: dcs:MeasurementMethodEnum
+typeOf: schema:Class
+
+Node: dcid:ConsumerUnit
+name: "ConsumerUnit"
+subClassOf: dcs:Thing
+typeOf: schema:Class
+
+Node: dcid:Fat
+name: "Fat"
+typeOf: schema:Class
+subClassOf: schema:Thing
+
+Node: dcid:dietaryIntake
+name: "dietaryIntake"
+typeOf: schema:Property
+domainIncludes: schema:Class
+
+Node: dcid:nutrientSource
+name: "nutrientSource"
+typeOf: schema:Property
+domainIncludes: schema:Class
+
+Node: dcid:KiloCalorie
+typeOf: dcid:UnitOfMeasure
+name: "KiloCalorie"
+
+Node: dcid:MealPer30Day
+typeOf: dcid:UnitOfMeasure
+name: "MealPer30Day"
+
+Node: dcid:EggFishMeat
+name: "EggFishMeat"
+typeOf: schema:Class
+subClassOf: schema:Thing
+
+Node: dcid:NII_OtherFood
+name: "NII_OtherFood"
+typeOf: dcs:NutrientSourceEnum
+
+Node: dcid:NutrientSourceEnum
+name: "NutrientSourceEnum"
+typeOf: schema:Class
+subClassOf: schema:Enumeration
+
+
+Node: dcid:Pulse
+name: "Pulse"
+typeOf: dcs:NutrientSourceEnum

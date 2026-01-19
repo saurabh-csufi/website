@@ -1,0 +1,331 @@
+Node: dcid:Daily_Mean_DietaryIntake_Energy_Rural_AsAFractionOf_Count_ConsumerUnit
+typeOf: dcid:StatisticalVariable
+name: "Average daily calorie intake per consumer unit in rural areas"
+populationType: dcid:Energy
+measuredProperty: dcid:dietaryIntake
+measurementQualifier: dcid:Daily
+statType: dcid:meanValue
+measurementDenominator: dcid:Count_ConsumerUnit
+placeOfResidenceClassification: dcid:Rural
+
+Node: dcid:Daily_Mean_DietaryIntake_Energy_Rural_AsAFractionOf_Count_Person
+typeOf: dcid:StatisticalVariable
+name: "Average daily calorie intake per person in rural areas"
+populationType: dcid:Energy
+measuredProperty: dcid:dietaryIntake
+measurementQualifier: dcid:Daily
+statType: dcid:meanValue
+measurementDenominator: dcid:Count_Person
+placeOfResidenceClassification: dcid:Rural
+
+Node: dcid:Daily_Mean_DietaryIntake_Energy_Urban_AsAFractionOf_Count_ConsumerUnit
+typeOf: dcid:StatisticalVariable
+name: "Average daily calorie intake per consumer unit in urban areas"
+populationType: dcid:Energy
+measuredProperty: dcid:dietaryIntake
+measurementQualifier: dcid:Daily
+statType: dcid:meanValue
+measurementDenominator: dcid:Count_ConsumerUnit
+placeOfResidenceClassification: dcid:Urban
+
+Node: dcid:Daily_Mean_DietaryIntake_Energy_Urban_AsAFractionOf_Count_Person
+typeOf: dcid:StatisticalVariable
+name: "Average daily calorie intake per person in urban areas"
+populationType: dcid:Energy
+measuredProperty: dcid:dietaryIntake
+measurementQualifier: dcid:Daily
+statType: dcid:meanValue
+measurementDenominator: dcid:Count_Person
+placeOfResidenceClassification: dcid:Urban
+
+Node: dcid:Daily_Mean_DietaryIntake_Fat_Rural_AsAFractionOf_Count_ConsumerUnit
+typeOf: dcid:StatisticalVariable
+name: "Average daily fat intake per consumer unit in rural areas"
+populationType: dcid:Fat
+measuredProperty: dcid:dietaryIntake
+measurementQualifier: dcid:Daily
+statType: dcid:meanValue
+measurementDenominator: dcid:Count_ConsumerUnit
+placeOfResidenceClassification: dcid:Rural
+
+Node: dcid:Daily_Mean_DietaryIntake_Fat_Rural_AsAFractionOf_Count_Person
+typeOf: dcid:StatisticalVariable
+name: "Average daily fat intake per person in rural areas"
+populationType: dcid:Fat
+measuredProperty: dcid:dietaryIntake
+measurementQualifier: dcid:Daily
+statType: dcid:meanValue
+measurementDenominator: dcid:Count_Person
+placeOfResidenceClassification: dcid:Rural
+
+Node: dcid:Daily_Mean_DietaryIntake_Fat_Urban_AsAFractionOf_Count_ConsumerUnit
+typeOf: dcid:StatisticalVariable
+name: "Average daily fat intake per consumer unit in urban areas"
+populationType: dcid:Fat
+measuredProperty: dcid:dietaryIntake
+measurementQualifier: dcid:Daily
+statType: dcid:meanValue
+measurementDenominator: dcid:Count_ConsumerUnit
+placeOfResidenceClassification: dcid:Urban
+
+Node: dcid:Daily_Mean_DietaryIntake_Fat_Urban_AsAFractionOf_Count_Person
+typeOf: dcid:StatisticalVariable
+name: "Average daily fat intake per person in urban areas"
+populationType: dcid:Fat
+measuredProperty: dcid:dietaryIntake
+measurementQualifier: dcid:Daily
+statType: dcid:meanValue
+measurementDenominator: dcid:Count_Person
+placeOfResidenceClassification: dcid:Urban
+
+
+Node: dcid:Daily_Mean_DietaryIntake_Protein_Rural_AsAFractionOf_Count_ConsumerUnit
+typeOf: dcid:StatisticalVariable
+name: "Average daily protein intake per consumer unit in rural areas"
+populationType: dcid:Protein
+measuredProperty: dcid:dietaryIntake
+measurementQualifier: dcid:Daily
+statType: dcid:meanValue
+measurementDenominator: dcid:Count_ConsumerUnit
+placeOfResidenceClassification: dcid:Rural
+
+Node: dcid:Daily_Mean_DietaryIntake_Protein_Rural_AsAFractionOf_Count_Person
+typeOf: dcid:StatisticalVariable
+name: "Average daily protein intake per person in rural areas"
+populationType: dcid:Protein
+measuredProperty: dcid:dietaryIntake
+measurementQualifier: dcid:Daily
+statType: dcid:meanValue
+measurementDenominator: dcid:Count_Person
+placeOfResidenceClassification: dcid:Rural
+
+Node: dcid:Daily_Mean_DietaryIntake_Protein_Urban_AsAFractionOf_Count_ConsumerUnit
+typeOf: dcid:StatisticalVariable
+name: "Average daily protein intake per consumer unit in urban areas"
+populationType: dcid:Protein
+measuredProperty: dcid:dietaryIntake
+measurementQualifier: dcid:Daily
+statType: dcid:meanValue
+measurementDenominator: dcid:Count_ConsumerUnit
+placeOfResidenceClassification: dcid:Urban
+
+Node: dcid:Daily_Mean_DietaryIntake_Protein_Urban_AsAFractionOf_Count_Person
+typeOf: dcid:StatisticalVariable
+name: "Average daily protein intake per person in urban areas"
+populationType: dcid:Protein
+measuredProperty: dcid:dietaryIntake
+measurementQualifier: dcid:Daily
+statType: dcid:meanValue
+measurementDenominator: dcid:Count_Person
+placeOfResidenceClassification: dcid:Urban
+
+Node: dcid:DietaryIntake_Energy_Cereal_Rural_AsAFractionOf_DietaryIntake_Energy_Rural
+typeOf: dcid:StatisticalVariable
+name: "Percentage of energy intake from cereal in rural area"
+populationType: dcid:Energy
+measuredProperty: dcid:dietaryIntake
+statType: dcid:measuredValue
+measurementDenominator: dcid:DietaryIntake_Energy_Rural
+energySource: dcid:Cereal
+placeOfResidenceClassification: dcid:Rural
+
+Node: dcid:DietaryIntake_Energy_Cereal_Urban_AsAFractionOf_DietaryIntake_Energy_Urban
+typeOf: dcid:StatisticalVariable
+name: "Percentage of energy intake from cereal in urban area"
+populationType: dcid:Energy
+measuredProperty: dcid:dietaryIntake
+statType: dcid:measuredValue
+measurementDenominator: dcid:DietaryIntake_Energy_Urban
+energySource: dcid:Cereal
+placeOfResidenceClassification: dcid:Urban
+
+Node: dcid:DietaryIntake_Protein_Cereal_Rural_AsAFractionOf_DietaryIntake_Protein_Rural
+typeOf: dcid:StatisticalVariable
+name: "Percentage of protein intake from cereal in rural area"
+populationType: dcid:Protein
+measuredProperty: dcid:dietaryIntake
+statType: dcid:measuredValue
+measurementDenominator: dcid:DietaryIntake_Protein_Rural
+nutrientSource: dcid:Cereal
+placeOfResidenceClassification: dcid:Rural
+
+Node: dcid:DietaryIntake_Protein_Cereal_Urban_AsAFractionOf_DietaryIntake_Protein_Urban
+typeOf: dcid:StatisticalVariable
+name: "Percentage of protein intake from cereal in urban area"
+populationType: dcid:Protein
+measuredProperty: dcid:dietaryIntake
+statType: dcid:measuredValue
+measurementDenominator: dcid:DietaryIntake_Protein_Urban
+nutrientSource: dcid:Cereal
+placeOfResidenceClassification: dcid:Urban
+
+Node: dcid:DietaryIntake_Protein_EggFishMeat_Rural_AsAFractionOf_DietaryIntake_Protein_Rural
+typeOf: dcid:StatisticalVariable
+name: "Percentage of protein intake from egg,fish and meat in rural area"
+populationType: dcid:Protein
+measuredProperty: dcid:dietaryIntake
+statType: dcid:measuredValue
+measurementDenominator: dcid:DietaryIntake_Protein_Rural
+nutrientSource: dcid:EggFishMeat
+placeOfResidenceClassification: dcid:Rural
+
+Node: dcid:DietaryIntake_Protein_EggFishMeat_Urban_AsAFractionOf_DietaryIntake_Protein_Urban
+typeOf: dcid:StatisticalVariable
+name: "Percentage of protein intake from egg,fish and meat in urban area"
+populationType: dcid:Protein
+measuredProperty: dcid:dietaryIntake
+statType: dcid:measuredValue
+measurementDenominator: dcid:DietaryIntake_Protein_Urban
+nutrientSource: dcid:EggFishMeat
+placeOfResidenceClassification: dcid:Urban
+
+Node: dcid:DietaryIntake_Protein_Milk_Rural_AsAFractionOf_DietaryIntake_Protein_Rural
+typeOf: dcid:StatisticalVariable
+name: "Percentage of protein intake from milk in rural area"
+populationType: dcid:Protein
+measuredProperty: dcid:dietaryIntake
+statType: dcid:measuredValue
+measurementDenominator: dcid:DietaryIntake_Protein_Rural
+nutrientSource: dcid:Milk
+placeOfResidenceClassification: dcid:Rural
+
+Node: dcid:DietaryIntake_Protein_Milk_Urban_AsAFractionOf_DietaryIntake_Protein_Urban
+typeOf: dcid:StatisticalVariable
+name: "Percentage of protein intake from milk in urban area"
+populationType: dcid:Protein
+measuredProperty: dcid:dietaryIntake
+statType: dcid:measuredValue
+measurementDenominator: dcid:DietaryIntake_Protein_Urban
+nutrientSource: dcid:Milk
+placeOfResidenceClassification: dcid:Urban
+
+Node: dcid:DietaryIntake_Protein_NIIOtherFood_Rural_AsAFractionOf_DietaryIntake_Protein_Rural
+typeOf: dcid:StatisticalVariable
+name: "Percentage of protein intake from other food sources in rural area"
+populationType: dcid:Protein
+measuredProperty: dcid:dietaryIntake
+statType: dcid:measuredValue
+measurementDenominator: dcid:DietaryIntake_Protein_Rural
+nutrientSource: dcid:NII_OtherFood
+placeOfResidenceClassification: dcid:Rural
+
+Node: dcid:DietaryIntake_Protein_NIIOtherFood_Urban_AsAFractionOf_DietaryIntake_Protein_Urban
+typeOf: dcid:StatisticalVariable
+name: "Percentage of protein intake from other food sources in urban area"
+populationType: dcid:Protein
+measuredProperty: dcid:dietaryIntake
+statType: dcid:measuredValue
+measurementDenominator: dcid:DietaryIntake_Protein_Urban
+nutrientSource: dcid:NII_OtherFood
+placeOfResidenceClassification: dcid:Urban
+
+Node: dcid:DietaryIntake_Protein_Pulse_Rural_AsAFractionOf_DietaryIntake_Protein_Rural
+typeOf: dcid:StatisticalVariable
+name: "Percentage of protein intake from pulses in rural area"
+populationType: dcid:Protein
+measuredProperty: dcid:dietaryIntake
+statType: dcid:measuredValue
+measurementDenominator: dcid:DietaryIntake_Protein_Rural
+nutrientSource: dcid:Pulse
+placeOfResidenceClassification: dcid:Rural
+
+Node: dcid:DietaryIntake_Protein_Pulse_Urban_AsAFractionOf_DietaryIntake_Protein_Urban
+typeOf: dcid:StatisticalVariable
+name: "Percentage of protein intake from pulses in urban area"
+populationType: dcid:Protein
+measuredProperty: dcid:dietaryIntake
+statType: dcid:measuredValue
+measurementDenominator: dcid:DietaryIntake_Protein_Urban
+nutrientSource: dcid:Pulse
+placeOfResidenceClassification: dcid:Urban
+
+Node: dcid:Mean_Count_Meal_Rural_AsAFractionOf_Count_Household
+typeOf: dcid:StatisticalVariable
+name: "Average number of meals per household in rural area"
+populationType: dcid:Meal
+measuredProperty: dcid:count
+statType: dcid:meanValue
+measurementDenominator: dcid:Count_Household
+placeOfResidenceClassification: dcid:Rural
+
+Node: dcid:Mean_Count_Meal_Rural_AsAFractionOf_Count_Person
+typeOf: dcid:StatisticalVariable
+name: "Average number of meals per person in rural area"
+populationType: dcid:Meal
+measuredProperty: dcid:count
+statType: dcid:meanValue
+measurementDenominator: dcid:Count_Person
+placeOfResidenceClassification: dcid:Rural
+
+Node: dcid:Mean_Count_Meal_Urban_AsAFractionOf_Count_Household
+typeOf: dcid:StatisticalVariable
+name: "Average number of meals per household in urban area"
+populationType: dcid:Meal
+measuredProperty: dcid:count
+statType: dcid:meanValue
+measurementDenominator: dcid:Count_Household
+placeOfResidenceClassification: dcid:Urban
+
+Node: dcid:Mean_Count_Meal_Urban_AsAFractionOf_Count_Person
+typeOf: dcid:StatisticalVariable
+name: "Average number of meals per person in urban area"
+populationType: dcid:Meal
+measuredProperty: dcid:count
+statType: dcid:meanValue
+measurementDenominator: dcid:Count_Person
+placeOfResidenceClassification: dcid:Urban
+
+Node: dcid:Count_ConsumerUnit
+typeOf: dcid:StatisticalVariable
+name: "Number of consumer units"
+populationType: dcid:ConsumerUnit
+measuredProperty: dcid:count
+statType: dcid:measuredValue
+
+Node: dcid:DietaryIntake_Energy_Rural
+typeOf: dcid:StatisticalVariable
+name: "Energy intake in rural area"
+populationType: dcid:Energy
+measuredProperty: dcid:dietaryIntake
+statType: dcid:measuredValue
+placeOfResidenceClassification: dcid:Rural
+
+Node: dcid:DietaryIntake_Energy_Urban
+typeOf: dcid:StatisticalVariable
+name: "Energy intake in urban area"
+populationType: dcid:Energy
+measuredProperty: dcid:dietaryIntake
+statType: dcid:measuredValue
+placeOfResidenceClassification: dcid:Urban
+
+Node: dcid:DietaryIntake_Fat_Rural
+typeOf: dcid:StatisticalVariable
+name: "Fat intake in rural area"
+populationType: dcid:Fat
+measuredProperty: dcid:dietaryIntake
+statType: dcid:measuredValue
+placeOfResidenceClassification: dcid:Rural
+
+Node: dcid:DietaryIntake_Fat_Urban
+typeOf: dcid:StatisticalVariable
+name: "Fat intake in urban area"
+populationType: dcid:Fat
+measuredProperty: dcid:dietaryIntake
+statType: dcid:measuredValue
+placeOfResidenceClassification: dcid:Urban
+
+Node: dcid:DietaryIntake_Protein_Rural
+typeOf: dcid:StatisticalVariable
+name: "Protein intake in rural area"
+populationType: dcid:Protein
+measuredProperty: dcid:dietaryIntake
+statType: dcid:measuredValue
+placeOfResidenceClassification: dcid:Rural
+
+Node: dcid:DietaryIntake_Protein_Urban
+typeOf: dcid:StatisticalVariable
+name: "Protein intake in urban area"
+populationType: dcid:Protein
+measuredProperty: dcid:dietaryIntake
+statType: dcid:measuredValue
+placeOfResidenceClassification: dcid:Urban

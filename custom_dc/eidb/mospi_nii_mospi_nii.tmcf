@@ -1,0 +1,9 @@
+Node: E:mospi_nii->E0
+observationAbout: C:mospi_nii->observationAbout
+observationDate: C:mospi_nii->observationDate
+value: C:mospi_nii->value
+variableMeasured: C:mospi_nii->variableMeasured
+unit: C:mospi_nii->unit
+scalingFactor: C:mospi_nii->scalingFactor
+measurementMethod: C:mospi_nii->measurementMethod
+typeOf: dcs:StatVarObservation
