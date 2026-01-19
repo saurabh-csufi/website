@@ -1963,7 +1963,6 @@ End EVERY response with exactly 3 clickable follow-up suggestions. These will be
           <div class="welcome-message" id="welcome-message">
             <div class="suggestions">
               <button class="suggestion" data-text="Has factory employment grown faster than GDP in the last 5 years?" disabled>Has factory employment grown faster than GDP in the last 5 years?</button>
-              <button class="suggestion" data-text="Which state has the highest factory productivity?" disabled>Which state has the highest factory productivity?</button>
               <button class="suggestion" data-text="Track food inflation alongside agricultural export growth" disabled>Track food inflation alongside agricultural export growth</button>
               <button class="suggestion" data-text="Compare North vs South India: GSDP, factory count, and inflation" disabled>Compare North vs South India: GSDP, factory count, and inflation</button>
             </div>
@@ -3448,7 +3447,6 @@ Respond with ONLY the visualization type (one word): map, line, bar, ranking, pi
               <div class="welcome-message" id="welcome-message">
                 <div class="suggestions">
                   <button class="suggestion" data-text="Has factory employment grown faster than GDP in the last 5 years?">Has factory employment grown faster than GDP in the last 5 years?</button>
-                  <button class="suggestion" data-text="Which state has the highest factory productivity?">Which state has the highest factory productivity?</button>
                   <button class="suggestion" data-text="Track food inflation alongside agricultural export growth">Track food inflation alongside agricultural export growth</button>
                   <button class="suggestion" data-text="Compare North vs South India: GSDP, factory count, and inflation">Compare North vs South India: GSDP, factory count, and inflation</button>
                 </div>
@@ -4196,11 +4194,12 @@ Please present this information following your formatting guidelines.`;
               streamingMessage.setText(finalResponse);
             }
           } else {
-            // Neither worked
+            // Neither worked - show data request link
+            const dataRequestLink = '[submit a data request](https://issuetracker.google.com/issues/new?component=1660823&template=2053232&pli=1)';
             if (mcpResult.error && kbResult.error) {
-              finalResponse = 'I was unable to retrieve information for your query. Please try rephrasing your question.';
+              finalResponse = `I was unable to retrieve information for your query. Please try rephrasing your question or ${dataRequestLink}.`;
             } else {
-              finalResponse = 'No relevant information found for your query.';
+              finalResponse = `No relevant information found for your query. You can ${dataRequestLink} for this data.`;
             }
             streamingMessage.setText(finalResponse);
           }
