@@ -95,6 +95,19 @@
         "unit": "unit",
         "measurementMethod": "measurementMethod"
       }
+    },
+    "mospi_nii.csv": {
+      "provenance": "MOSPI NII Data",
+      "format": "variablePerRow",
+      "columnMappings": {
+        "entity": "observationAbout",
+        "date": "observationDate",
+        "value": "value",
+        "variable": "variableMeasured",
+        "unit": "unit",
+        "scalingFactor": "scalingFactor",
+        "measurementMethod": "measurementMethod"
+      }
     }
   },
   "sources": {
@@ -113,7 +126,8 @@
         "MOSPI GDP Data": "https://esankhyiki.mospi.gov.in/catalogue-main/catalogue?page=0&search=&q=Gross+Domestic+Product+%28GDP%29",
         "MOSPI GSDP Current Prices": "https://esankhyiki.mospi.gov.in/catalogue-main/catalogue?page=0&search=&q=GSDP",
         "MOSPI GSDP Constant Prices": "https://esankhyiki.mospi.gov.in/catalogue-main/catalogue?page=0&search=&q=GSDP",
-        "MOSPI ASI Data": "https://esankhyiki.mospi.gov.in/catalogue-main/catalogue?page=0&search=&product=ASI"
+        "MOSPI ASI Data": "https://esankhyiki.mospi.gov.in/catalogue-main/catalogue?page=0&search=&product=ASI",
+        "MOSPI NII Data": "https://esankhyiki.mospi.gov.in/catalogue-main/catalogue?page=0&product=Nutritional+Intake+in+India&search="
       }
     }
   }

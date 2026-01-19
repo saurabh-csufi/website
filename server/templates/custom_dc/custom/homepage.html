@@ -31,7 +31,7 @@
   <script src="/datacommons.js"></script>
   <script>
     window.CHAT_CONFIG = {
-      PROMPT_VERSION: '1.0.2',  // Increment when prompts change to auto-invalidate localStorage
+      PROMPT_VERSION: '1.0.3',  // Increment when prompts change to auto-invalidate localStorage
       models: {
         MCP_MODEL: 'gemini-3-flash-preview',
         KB_MODEL: 'gemini-3-flash-preview'
@@ -89,6 +89,14 @@ This instance includes **all public Data Commons data** plus custom India-specif
 - Geographic Coverage: State-wise data with Rural/Urban breakdown
 - Metrics: Number of factories, workers, emoluments, fixed capital, input/output values, productivity ratios
 - Year: 2024
+
+**Custom Dataset 5: MOSPI Nutritional Intake in India (NII)**:
+- Dietary Intake: Daily average calorie, protein, and fat intake per person/consumer unit
+- Geographic Coverage: All Indian states with Rural/Urban breakdown
+- Nutrient Sources: Percentage of protein from cereals, pulses, milk, egg/fish/meat, and other foods
+- Meal Patterns: Average meals per person/household in rural and urban areas
+- Measurement Methods: Both adjusted and unadjusted estimates available
+- Years: 2023-2024
 
 ### MOSPI Variable Reference (EXACT DCIDs - Use These Directly)
 
@@ -154,6 +162,53 @@ This instance includes **all public Data Commons data** plus custom India-specif
 - Amount_EconomicActivity_Factory_FixedCapital_AsAFractionOf_Count_Establishment_Factory (Average fixed capital per factory)
 - Amount_EconomicActivity_Factory_GrossValueAdded_AsAFractionOf_Count_Person_Factory_TotalEngaged (GVA per person engaged)
 - Count_Person_Factory_TotalEngaged_AsAFractionOf_Count_Establishment_Factory (Average persons per factory)
+
+**NII Nutritional Intake Variables** (Nutritional Intake in India):
+
+*Daily Calorie/Energy Intake (unit: KiloCalorie):*
+- Daily_Mean_DietaryIntake_Energy_Rural_AsAFractionOf_Count_Person (Avg daily calorie intake per person, rural)
+- Daily_Mean_DietaryIntake_Energy_Urban_AsAFractionOf_Count_Person (Avg daily calorie intake per person, urban)
+- Daily_Mean_DietaryIntake_Energy_Rural_AsAFractionOf_Count_ConsumerUnit (Avg daily calorie intake per consumer unit, rural)
+- Daily_Mean_DietaryIntake_Energy_Urban_AsAFractionOf_Count_ConsumerUnit (Avg daily calorie intake per consumer unit, urban)
+
+*Daily Protein Intake (unit: Gram):*
+- Daily_Mean_DietaryIntake_Protein_Rural_AsAFractionOf_Count_Person (Avg daily protein intake per person, rural)
+- Daily_Mean_DietaryIntake_Protein_Urban_AsAFractionOf_Count_Person (Avg daily protein intake per person, urban)
+- Daily_Mean_DietaryIntake_Protein_Rural_AsAFractionOf_Count_ConsumerUnit (Avg daily protein intake per consumer unit, rural)
+- Daily_Mean_DietaryIntake_Protein_Urban_AsAFractionOf_Count_ConsumerUnit (Avg daily protein intake per consumer unit, urban)
+
+*Daily Fat Intake (unit: Gram):*
+- Daily_Mean_DietaryIntake_Fat_Rural_AsAFractionOf_Count_Person (Avg daily fat intake per person, rural)
+- Daily_Mean_DietaryIntake_Fat_Urban_AsAFractionOf_Count_Person (Avg daily fat intake per person, urban)
+- Daily_Mean_DietaryIntake_Fat_Rural_AsAFractionOf_Count_ConsumerUnit (Avg daily fat intake per consumer unit, rural)
+- Daily_Mean_DietaryIntake_Fat_Urban_AsAFractionOf_Count_ConsumerUnit (Avg daily fat intake per consumer unit, urban)
+
+*Protein Source Percentages (unit: Percent):*
+- DietaryIntake_Protein_Cereal_Rural_AsAFractionOf_DietaryIntake_Protein_Rural (% protein from cereals, rural)
+- DietaryIntake_Protein_Cereal_Urban_AsAFractionOf_DietaryIntake_Protein_Urban (% protein from cereals, urban)
+- DietaryIntake_Protein_Pulse_Rural_AsAFractionOf_DietaryIntake_Protein_Rural (% protein from pulses, rural)
+- DietaryIntake_Protein_Pulse_Urban_AsAFractionOf_DietaryIntake_Protein_Urban (% protein from pulses, urban)
+- DietaryIntake_Protein_Milk_Rural_AsAFractionOf_DietaryIntake_Protein_Rural (% protein from milk, rural)
+- DietaryIntake_Protein_Milk_Urban_AsAFractionOf_DietaryIntake_Protein_Urban (% protein from milk, urban)
+- DietaryIntake_Protein_EggFishMeat_Rural_AsAFractionOf_DietaryIntake_Protein_Rural (% protein from egg/fish/meat, rural)
+- DietaryIntake_Protein_EggFishMeat_Urban_AsAFractionOf_DietaryIntake_Protein_Urban (% protein from egg/fish/meat, urban)
+- DietaryIntake_Protein_NIIOtherFood_Rural_AsAFractionOf_DietaryIntake_Protein_Rural (% protein from other foods, rural)
+- DietaryIntake_Protein_NIIOtherFood_Urban_AsAFractionOf_DietaryIntake_Protein_Urban (% protein from other foods, urban)
+
+*Energy Source Percentages (unit: Percent):*
+- DietaryIntake_Energy_Cereal_Rural_AsAFractionOf_DietaryIntake_Energy_Rural (% energy from cereals, rural)
+- DietaryIntake_Energy_Cereal_Urban_AsAFractionOf_DietaryIntake_Energy_Urban (% energy from cereals, urban)
+
+*Meal Counts (unit: MealPer30Day):*
+- Mean_Count_Meal_Rural_AsAFractionOf_Count_Person (Avg meals per person in 30 days, rural)
+- Mean_Count_Meal_Urban_AsAFractionOf_Count_Person (Avg meals per person in 30 days, urban)
+- Mean_Count_Meal_Rural_AsAFractionOf_Count_Household (Avg meals per household in 30 days, rural)
+- Mean_Count_Meal_Urban_AsAFractionOf_Count_Household (Avg meals per household in 30 days, urban)
+
+*Measurement Methods:*
+- MospiNIIUnadjusted (Raw/unadjusted estimates)
+- MospiNIIAdjusted (Adjusted estimates)
+- Geographic: country/IND for national, wikidataId/Q#### for states
 
 **EIDB Export Variables** (India Export-Import Database):
 
@@ -285,6 +340,16 @@ Transform user queries to Data Commons schema:
 - "Factory value added" → Amount_EconomicActivity_Factory_GrossValueAdded
 - "Factory wages" → Amount_EconomicActivity_Factory_Emolument
 - "Factory productivity" → Amount_EconomicActivity_Factory_GrossValueAdded_AsAFractionOf_Count_Person_Factory_TotalEngaged
+
+**NII Nutritional Intake Data (MOSPI):**
+- "Calorie intake" / "Energy intake" → Daily_Mean_DietaryIntake_Energy_Rural_AsAFractionOf_Count_Person or _Urban variant
+- "Protein intake" → Daily_Mean_DietaryIntake_Protein_Rural_AsAFractionOf_Count_Person or _Urban variant
+- "Fat intake" → Daily_Mean_DietaryIntake_Fat_Rural_AsAFractionOf_Count_Person or _Urban variant
+- "Nutrition rural vs urban" → Compare _Rural and _Urban variants of dietary intake variables
+- "Protein from cereals/pulses/milk" → DietaryIntake_Protein_Cereal/Pulse/Milk_Rural/Urban_AsAFractionOf_DietaryIntake_Protein_Rural/Urban
+- "Meals per person" → Mean_Count_Meal_Rural_AsAFractionOf_Count_Person or _Urban variant
+- "Consumer unit intake" → Use _AsAFractionOf_Count_ConsumerUnit variants for household-adjusted metrics
+- Geographic: country/IND for national, wikidataId/Q#### for states (same as GDP/ASI)
 
 **Public Data Commons:**
 - "Population" → Count_Person (ALWAYS use this for total population - never use religious/caste demographics)
