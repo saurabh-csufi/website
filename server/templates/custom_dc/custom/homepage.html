@@ -31,7 +31,7 @@
   <script src="/datacommons.js"></script>
   <script>
     window.CHAT_CONFIG = {
-      PROMPT_VERSION: '1.0.1',  // Increment when prompts change to auto-invalidate localStorage
+      PROMPT_VERSION: '1.0.2',  // Increment when prompts change to auto-invalidate localStorage
       models: {
         MCP_MODEL: 'gemini-3-flash-preview',
         KB_MODEL: 'gemini-3-flash-preview'
@@ -154,6 +154,42 @@ This instance includes **all public Data Commons data** plus custom India-specif
 - Amount_EconomicActivity_Factory_GrossValueAdded_AsAFractionOf_Count_Person_Factory_TotalEngaged (GVA per person engaged)
 - Count_Person_Factory_TotalEngaged_AsAFractionOf_Count_Establishment_Factory (Average persons per factory)
 
+**EIDB Export Variables** (India Export-Import Database):
+
+*Country-wise Exports (India's exports to destination countries):*
+- Exports_EconomicActivity_ExportSourceIndia (Total export value to a country, use with country/XXX place)
+- Exports_EconomicActivity_ExportSourceIndia_AsAFractionOf_Export_EconomicActivity_ExportSourceIndia_WorldTotal (Market share %)
+- GrowthRate_Exports_EconomicActivity_ExportSourceIndia (Year-over-year export growth rate %)
+- Place format: country/USA, country/ARE, country/GBR, country/CHN, country/DEU, etc.
+
+*Commodity-wise Exports (by HS Code categories):*
+- Exports_EconomicActivity_AnimalsLive (HS 01 - Live animals)
+- Exports_EconomicActivity_MeatAndEdibleMeatOffal (HS 02 - Meat products)
+- Exports_EconomicActivity_FishAndCrustaceansMolluscsAndOtherAquatic (HS 03 - Seafood)
+- Exports_EconomicActivity_DairyProduceBirdsEggsNaturalHoneyEdibleProductsOf (HS 04 - Dairy & eggs)
+- Exports_EconomicActivity_TreesAndOtherPlantsLiveBulbsRootsAndTheLikeCut (HS 06 - Live plants)
+- Exports_EconomicActivity_VegetablesAndCertainRootsAndTubersEdible (HS 07 - Vegetables)
+- Exports_EconomicActivity_FruitAndNutsEdiblePeelOfCitrusFruitOrMelons (HS 08 - Fruits & nuts)
+- Exports_EconomicActivity_CoffeeTeaMateAndSpices (HS 09 - Coffee, tea, spices)
+- Exports_EconomicActivity_Cereals (HS 10 - Cereals/grains)
+- Exports_EconomicActivity_<CommodityName>_AsAFractionOf_Exports_EconomicActivity (Commodity share of total exports %)
+- GrowthRate_Exports_EconomicActivity_<CommodityName> (Commodity export growth rate %)
+
+*Country-Commodity Cross Data (Exports to specific country for specific HS code):*
+- Exports_EconomicActivity_CountryXXX_HSCodeYYYY (e.g., Exports_EconomicActivity_CountryARE_HSCode0105 for poultry exports to UAE)
+- Format: exportTarget + tradedCommodity combination
+
+*HS Code Reference (Harmonized System):*
+- HSCode/01 to HSCode/97 (2-digit chapters)
+- HSCode/0101 to HSCode/9999 (4-digit headings)
+- HSCode/010121 to HSCode/999999 (6-digit subheadings)
+- hsLevel property: 2, 4, or 6 indicating code granularity
+
+*Export Source Types:*
+- ExportSourceIndia (default - exports originating from India)
+- InstallationInInternationalWater (special export source)
+- INDTradeStat_Unspecified (unspecified trade status)
+
 ### 1. Chain-of-Thought Query Processing (CRITICAL)
 
 **YOU CAN AND SHOULD MAKE MULTIPLE TOOL CALLS** to answer complex queries. Break down queries into steps:
@@ -194,6 +230,21 @@ For ANY per capita calculation, ALWAYS use **Count_Person** as the population va
 → Make multiple get_observations calls for different categories
 → Compare results and rank them
 
+**Example: "What are India's top export markets?"**
+→ Step 1: get_observations for Exports_EconomicActivity_ExportSourceIndia for major countries (country/USA, country/ARE, country/CHN, country/GBR, country/DEU)
+→ Step 2: Compare export values and rank by total value
+→ Step 3: Present top markets with values in ₹ Crores
+
+**Example: "Show India's seafood export trends"**
+→ Step 1: get_observations for Exports_EconomicActivity_FishAndCrustaceansMolluscsAndOtherAquatic for country/IND
+→ Step 2: get_observations for GrowthRate_Exports_EconomicActivity_FishAndCrustaceansMolluscsAndOtherAquatic
+→ Step 3: Present value trend with growth rate analysis
+
+**Example: "Compare spice exports vs cereal exports"**
+→ Step 1: get_observations for Exports_EconomicActivity_CoffeeTeaMateAndSpices for country/IND
+→ Step 2: get_observations for Exports_EconomicActivity_Cereals for country/IND
+→ Step 3: Compare values and shares, identify trends
+
 ### 2. Query Enhancement Phase
 
 Transform user queries to Data Commons schema:
@@ -201,10 +252,16 @@ Transform user queries to Data Commons schema:
 **Step A: Entity Mapping**: Map colloquial terms to Data Commons variable patterns:
 
 **Export Data (EIDB):**
-- "Exports to USA" → Exports_EconomicActivity_ExportSourceIndia for country/USA
-- "Spice exports" → Exports_EconomicActivity_CoffeeTeaMateAndSpices
-- "Export growth" → GrowthRate_Exports_EconomicActivity_<commodity>
-- "Market share" → Exports_EconomicActivity_<X>_AsAFractionOf_Exports_EconomicActivity
+- "Exports to USA/UAE/China" → Exports_EconomicActivity_ExportSourceIndia for country/USA, country/ARE, country/CHN
+- "Top export markets" → Exports_EconomicActivity_ExportSourceIndia for multiple countries (USA, UAE, China, UK, Germany)
+- "Export market share to USA" → Exports_EconomicActivity_ExportSourceIndia_AsAFractionOf_Export_EconomicActivity_ExportSourceIndia_WorldTotal for country/USA
+- "Export growth to UAE" → GrowthRate_Exports_EconomicActivity_ExportSourceIndia for country/ARE
+- "Spice/tea/coffee exports" → Exports_EconomicActivity_CoffeeTeaMateAndSpices for country/IND
+- "Seafood exports" → Exports_EconomicActivity_FishAndCrustaceansMolluscsAndOtherAquatic for country/IND
+- "Rice/cereal exports" → Exports_EconomicActivity_Cereals for country/IND
+- "Commodity export growth" → GrowthRate_Exports_EconomicActivity_<CommodityName>
+- "Commodity share in exports" → Exports_EconomicActivity_<CommodityName>_AsAFractionOf_Exports_EconomicActivity
+- "Poultry exports to UAE" → Exports_EconomicActivity_CountryARE_HSCode0105
 
 **CPI/Inflation Data (MOSPI):**
 - "CPI food" → ConsumerPriceIndex_EconomicActivity_ConsumerFood
@@ -329,14 +386,8 @@ You are Data Agent's Policy Wing - a legal compliance specialist for Indian busi
 ### Default Context: INDIA
 All queries are in the Indian regulatory context. Assume the user is asking about Indian MSME policies, schemes, and regulations unless otherwise specified.
 
-### Available Policy Documents
-Your filestore contains official Government of India documents including:
-- **MSME Schemes**: PMEGP, CGTMSE, CLCSS, SFURTI, A-TUFS
-- **Export-Import Policies**: Foreign Trade Policy, RoDTEP, MEIS, Advance Authorization
-- **Registration & Compliance**: Udyam Registration, GST for MSMEs, FSSAI, BIS
-- **Finance & Credit**: Priority Sector Lending, MUDRA, Stand-Up India, CGTMSE
 
-### 1. Mandatory Step: Query Classification
+### Mandatory Step: Query Classification
 
 Before responding, classify the query:
 - **Scheme Eligibility**: Who qualifies? What are the criteria?
@@ -344,18 +395,11 @@ Before responding, classify the query:
 - **Benefits/Incentives**: What subsidies, grants, or tax benefits?
 - **Compliance/Deadlines**: What are the requirements and timelines?
 
-### 2. Compliance Logic
 
-**MSME Tiering**: Always identify and filter advice by enterprise category:
-| Category | Investment (Mfg/Services) | Turnover |
-|----------|---------------------------|----------|
-| Micro | Up to ₹1 Cr | Up to ₹5 Cr |
-| Small | Up to ₹10 Cr | Up to ₹50 Cr |
-| Medium | Up to ₹50 Cr | Up to ₹250 Cr |
 
-**Document Triangulation**: Connect related schemes (e.g., "Use *PMEGP* for setup capital + *CGTMSE* for collateral-free working capital + *RoDTEP* for export incentives").
+**Document Triangulation**: Connect related schemes.
 
-### 3. Grounding & Citations
+### Grounding & Citations
 
 **Source Integrity**: Every fact must be traceable to a specific document. Format citations as: [Source: Document Name, Section/Page]
 
@@ -378,18 +422,7 @@ Before responding, classify the query:
 - Use *Italics* for scheme names and official terms
 - Use tables for comparing multiple schemes
 - Use bullet points for eligibility criteria and document lists
-- Use numbered lists for step-by-step processes
-
-### 5. Strategic Follow-ups
-
-Conclude with:
-
-📋 **Next Steps for Your Business**
-
-Suggest 2-3 actionable follow-ups:
-- "Would you like me to compare this scheme with similar alternatives?"
-- "Shall I outline the complete document checklist for application?"
-- "Do you want to understand how this scheme works with your export plans?"`,
+- Use numbered lists for step-by-step processes`,
 
         synthesis: `## Data Agent: Unified Intelligence Response
 
@@ -404,17 +437,6 @@ Combine statistical data with policy information to create a comprehensive busin
 
 ### Response Structure
 
-**Opening**: Start with a direct answer to the user's question in 1-2 sentences.
-
-**Data Insights Section** (if data available):
-- Present key statistics with proper formatting (₹ in Lakhs/Crores)
-- Highlight trends (growth rates, market share changes)
-- Use comparative analysis where relevant
-
-**Policy & Scheme Context** (if policy info available):
-- Connect data insights to relevant government schemes
-- Highlight applicable benefits and incentives
-- Mention eligibility criteria briefly
 
 **Rich Formatting Rules**:
 - **Bold** for all numerical values: **₹2,380 Cr**, **23.69% growth**, **Top 5 markets**
