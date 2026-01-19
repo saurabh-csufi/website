@@ -4450,11 +4450,23 @@ Please present this information following your formatting guidelines.`;
       function formatMessage(content) {
         // Configure marked for GitHub Flavored Markdown
         if (typeof marked !== 'undefined') {
+          // Create custom renderer to open links in new tab
+          const renderer = new marked.Renderer();
+          renderer.link = function(href, title, text) {
+            // Handle both old and new marked API
+            const linkHref = typeof href === 'object' ? href.href : href;
+            const linkTitle = typeof href === 'object' ? href.title : title;
+            const linkText = typeof href === 'object' ? href.text : text;
+            const titleAttr = linkTitle ? ` title="${linkTitle}"` : '';
+            return `<a href="${linkHref}"${titleAttr} target="_blank" rel="noopener">${linkText}</a>`;
+          };
+
           marked.setOptions({
             breaks: true,       // Convert \n to <br> in paragraphs
             gfm: true,          // Enable GitHub Flavored Markdown (tables, etc.)
             headerIds: false,   // Don't add IDs to headers
-            mangle: false       // Don't mangle email addresses
+            mangle: false,      // Don't mangle email addresses
+            renderer: renderer  // Use custom renderer for links
           });
         }
 
