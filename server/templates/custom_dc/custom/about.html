@@ -22,6 +22,127 @@
 
 {% block head %}
 {{ super() }}
+<script>
+/**
+ * API Response Filtering via XMLHttpRequest Interception
+ * 
+ * CRITICAL: This must run BEFORE datacommons.js loads to intercept XMLHttpRequest.
+ * 
+ * HOW IT WORKS:
+ * - Intercepts XMLHttpRequest at the lowest level before any library uses it
+ * - Filters response data before React/components receive it
+ * 
+ * TO REUSE FOR OTHER FILTERS:
+ * - Add new conditions in the xhr.onreadystatechange handler
+ * - Use filterPlaceFromData() helper function
+ * - Example: Filter 'country/USA' from Country/Earth requests
+ */
+(function() {
+  /**
+   * Helper function to filter a specific place DCID from response data
+   * @param {Object} data - API response data object
+   * @param {string} placeDcid - Place DCID to filter (e.g., 'country/IND')
+   */
+  const filterPlaceFromData = (data, placeDcid) => {
+    if (data && data.data) {
+      Object.keys(data.data).forEach(statVar => {
+        if (data.data[statVar] && data.data[statVar][placeDcid]) {
+          delete data.data[statVar][placeDcid];
+        }
+      });
+    }
+    return data;
+  };
+
+  // Intercept XMLHttpRequest BEFORE datacommons.js loads
+  const OriginalXHR = window.XMLHttpRequest;
+  
+  window.XMLHttpRequest = function() {
+    const xhr = new OriginalXHR();
+    let requestUrl = '';
+    let filteredResponse = null;
+    
+    // Store the URL when open is called
+    const originalOpen = xhr.open;
+    xhr.open = function(method, url, ...args) {
+      requestUrl = typeof url === 'string' ? url : '';
+      return originalOpen.apply(this, arguments);
+    };
+    
+    // Override send to intercept response
+    const originalSend = xhr.send;
+    xhr.send = function(...args) {
+      // Set up response interception
+      const originalOnReadyStateChange = xhr.onreadystatechange;
+      
+      xhr.onreadystatechange = function() {
+        // When response is complete, filter it
+        if (xhr.readyState === 4 && xhr.status === 200 && !filteredResponse) {
+          if (requestUrl && requestUrl.includes('/api/observations/point/within')) {
+            try {
+              const urlObj = new URL(requestUrl, window.location.origin);
+              const childType = urlObj.searchParams.get('childType');
+              const parentEntity = urlObj.searchParams.get('parentEntity');
+              
+              // Filter India from Country/Earth requests (export destinations)
+              if (childType === 'Country' && parentEntity === 'Earth') {
+                try {
+                  // Get original response
+                  const originalResponseText = xhr.responseText;
+                  const responseData = JSON.parse(originalResponseText);
+                  
+                  // Filter India (country/IND)
+                  filterPlaceFromData(responseData, 'country/IND');
+                  
+                  // Store filtered response
+                  filteredResponse = JSON.stringify(responseData);
+                  
+                  // Replace responseText property
+                  Object.defineProperty(xhr, 'responseText', {
+                    get: function() { return filteredResponse; },
+                    configurable: true,
+                    enumerable: true
+                  });
+                  
+                  Object.defineProperty(xhr, 'response', {
+                    get: function() { return filteredResponse; },
+                    configurable: true,
+                    enumerable: true
+                  });
+                } catch (e) {
+                  // If parsing fails, leave as-is
+                }
+              }
+              
+              // ADD MORE FILTER CONDITIONS HERE AS NEEDED
+              // Example: Filter India from other endpoints
+              // if (childType === 'State' && parentEntity === 'country/IND') {
+              //   // Filter specific state if needed
+              // }
+              
+            } catch (e) {
+              // If URL parsing fails, leave as-is
+            }
+          }
+        }
+        
+        // Call original handler
+        if (originalOnReadyStateChange) {
+          originalOnReadyStateChange.apply(this, arguments);
+        }
+      };
+      
+      return originalSend.apply(this, arguments);
+    };
+    
+    return xhr;
+  };
+  
+  // Preserve XMLHttpRequest static properties
+  Object.setPrototypeOf(window.XMLHttpRequest, OriginalXHR);
+  Object.setPrototypeOf(window.XMLHttpRequest.prototype, OriginalXHR.prototype);
+})();
+</script>
 <script src="https://datacommons.org/datacommons.js"></script>
 <style>
   :root {
@@ -394,6 +515,7 @@
       grid-template-columns: 1fr;
     }
   }
+
 </style>
 {% endblock %}
 
@@ -413,6 +535,7 @@
       <button class="tab-button" data-tab="gdp-gsdp">GDP & State GSDP</button>
       <button class="tab-button" data-tab="exports">Export Data</button>
       <button class="tab-button" data-tab="industrial">Industrial Stats</button>
+      <button class="tab-button" data-tab="economic-insights">Economic Insights</button>
     </div>
 
   <!-- Tab Content: CPI & Inflation -->
@@ -709,31 +832,10 @@
     </div>
 
     <!-- State GSDP Section -->
-    <!-- Top States Ranking Section -->
-    <div class="section-header">
-      <div class="icon">📊</div>
-      <h2>Top States by GSDP (Current Prices)</h2>
-    </div>
-
-    <div class="insights-grid" style="margin-bottom: 1.5rem;">
-      <div class="insight-card full-width-card">
-        <h3>Top 10 States by GSDP Ranking</h3>
-        <datacommons-ranking
-          apiRoot="/"
-          header="State-wise GSDP Ranking (Current Prices)"
-          parentPlace="country/IND"
-          childPlaceType="AdministrativeArea1"
-          variable="Amount_EconomicActivity_GrossDomesticProduction_Nominal"
-          rankingCount="10"
-          showHighest
-        ></datacommons-ranking>
-      </div>
-    </div>
-
-    <!-- GSDP Trends Over Time -->
+    <!-- Top States by GSDP -->
     <div class="section-header">
       <div class="icon">📈</div>
-      <h2>GSDP Trends Over Time</h2>
+      <h2>Top States by GSDP (Current Prices)</h2>
     </div>
 
     <div class="insights-grid">
@@ -746,6 +848,7 @@
           childPlaceType="AdministrativeArea1"
           variables="Amount_EconomicActivity_GrossDomesticProduction_Nominal"
           sort="descending"
+          maxPlaces="10"
         ></datacommons-bar>
       </div>
     </div>
@@ -792,95 +895,6 @@
 
   <!-- Tab Content: Export Data -->
   <div id="tab-exports" class="tab-content">
-    <!-- Top Export Destinations -->
-    <div class="section-header">
-      <div class="icon">📊</div>
-      <h2>Top Export Destinations</h2>
-    </div>
-
-    <div class="insights-grid" style="margin-bottom: 1.5rem;">
-      <div class="insight-card full-width-card">
-        <h3>Top 15 Export Destinations</h3>
-        <p style="color: #666; font-size: 0.9rem; margin-bottom: 1rem;">
-          Top countries receiving exports from India, ranked by export value in Indian Rupees. Note: "India" appearing in the list likely represents total exports or a data classification issue, as a country cannot export to itself.
-        </p>
-        <datacommons-ranking
-          apiRoot="/"
-          header="Top Export Destinations from India (INR)"
-          parentPlace="Earth"
-          childPlaceType="Country"
-          variable="Exports_EconomicActivity_ExportSourceIndia"
-          rankingCount="15"
-          showHighest
-        ></datacommons-ranking>
-      </div>
-    </div>
-
-    <!-- Export Trends -->
-    <div class="section-header">
-      <div class="icon">📈</div>
-      <h2>Export Trends</h2>
-    </div>
-
-    <div class="insights-grid">
-      <div class="insight-card full-width-card">
-        <h3>Top Export Destinations (Latest Year)</h3>
-        <p style="color: #666; font-size: 0.9rem; margin-bottom: 1rem;">
-          Major export destinations from India by value. Note: "India" appearing here likely represents total exports or a data classification issue, not actual exports to India.
-        </p>
-        <datacommons-bar
-          apiRoot="/"
-          header="Top Countries by Export Value (INR)"
-          parentPlace="Earth"
-          childPlaceType="Country"
-          variables="Exports_EconomicActivity_ExportSourceIndia"
-          sort="descending"
-          maxPlaces="15"
-        ></datacommons-bar>
-      </div>
-    </div>
-
-    <!-- Export Destinations Map -->
-    <div class="section-header">
-      <div class="icon">🗺️</div>
-      <h2>Export Destinations by Country</h2>
-    </div>
-
-    <div class="insights-grid">
-      <div class="insight-card full-width-card">
-        <h3>Export Value by Destination Country</h3>
-        <datacommons-map
-          apiRoot="/"
-          header="Exports from India by Destination Country (INR)"
-          parentPlace="Earth"
-          childPlaceType="Country"
-          variable="Exports_EconomicActivity_ExportSourceIndia"
-        ></datacommons-map>
-      </div>
-    </div>
-
-    <!-- Commodity Exports Section -->
-    <div class="section-header">
-      <div class="icon">📦</div>
-      <h2>Top Exported Commodities</h2>
-    </div>
-
-    <p style="color: #666; font-size: 0.9rem; margin-bottom: 1.5rem;">
-      Major commodities exported from India, ranked by export value in Indian Rupees.
-    </p>
-
-    <div class="insights-grid" style="margin-bottom: 1.5rem;">
-      <div class="insight-card full-width-card">
-        <h3>Commodity Export Trends Over Time</h3>
-        <datacommons-line
-          apiRoot="/"
-          header="Major Commodity Exports (INR)"
-          places="country/IND"
-          variables="Exports_EconomicActivity_Cereals Exports_EconomicActivity_CoffeeTeaMateAndSpices Exports_EconomicActivity_FishAndCrustaceansMolluscsAndOtherAquatic Exports_EconomicActivity_SugarsAndSugarConfectionery"
-        ></datacommons-line>
-      </div>
-    </div>
-
     <!-- Key Commodity Highlights -->
     <div class="section-header">
       <div class="icon">💎</div>
@@ -933,14 +947,71 @@
           unit="INR"
         ></datacommons-highlight>
       </div>
-      <div class="highlight-card green">
-        <datacommons-highlight
+    </div>
+
+    <!-- Top Export Destinations -->
+    <div class="section-header">
+      <div class="icon">📈</div>
+      <h2>Top Export Destinations</h2>
+    </div>
+
+    <div class="insights-grid">
+      <div class="insight-card full-width-card">
+        <h3>Top Export Destinations (Latest Year)</h3>
+        <p style="color: #666; font-size: 0.9rem; margin-bottom: 1rem;">
+          Top countries receiving exports from India, ranked by export value in Indian Rupees.
+        </p>
+        <datacommons-bar
+          id="export-destinations-chart"
           apiRoot="/"
-          header="Fruits & Nuts"
-          place="country/IND"
-          variable="Exports_EconomicActivity_FruitAndNutsEdiblePeelOfCitrusFruitOrMelons"
-          unit="INR"
-        ></datacommons-highlight>
+          header="Top Countries by Export Value (INR)"
+          parentPlace="Earth"
+          childPlaceType="Country"
+          variables="Exports_EconomicActivity_ExportSourceIndia"
+          sort="descending"
+          maxPlaces="16"
+        ></datacommons-bar>
+      </div>
+    </div>
+
+    <!-- Export Destinations Map -->
+    <div class="section-header">
+      <div class="icon">🗺️</div>
+      <h2>Export Destinations by Country</h2>
+    </div>
+
+    <div class="insights-grid">
+      <div class="insight-card full-width-card">
+        <h3>Export Value by Destination Country</h3>
+        <datacommons-map
+          apiRoot="/"
+          header="Exports from India by Destination Country (INR)"
+          parentPlace="Earth"
+          childPlaceType="Country"
+          variable="Exports_EconomicActivity_ExportSourceIndia"
+        ></datacommons-map>
+      </div>
+    </div>
+
+    <!-- Commodity Exports Section -->
+    <div class="section-header">
+      <div class="icon">📦</div>
+      <h2>Top Exported Commodities</h2>
+    </div>
+
+    <p style="color: #666; font-size: 0.9rem; margin-bottom: 1.5rem;">
+      Major commodities exported from India, ranked by export value in Indian Rupees.
+    </p>
+
+    <div class="insights-grid" style="margin-bottom: 1.5rem;">
+      <div class="insight-card full-width-card">
+        <h3>Commodity Export Trends Over Time</h3>
+        <datacommons-line
+          apiRoot="/"
+          header="Major Commodity Exports (INR)"
+          places="country/IND"
+          variables="Exports_EconomicActivity_Cereals Exports_EconomicActivity_CoffeeTeaMateAndSpices Exports_EconomicActivity_FishAndCrustaceansMolluscsAndOtherAquatic Exports_EconomicActivity_SugarsAndSugarConfectionery"
+        ></datacommons-line>
       </div>
     </div>
   </div>
@@ -1002,27 +1073,6 @@
       <h2>Top States by Factory Count</h2>
     </div>
 
-    <div class="insights-grid" style="margin-bottom: 1.5rem;">
-      <div class="insight-card full-width-card">
-        <h3>Top 10 States by Number of Factories</h3>
-        <datacommons-ranking
-          apiRoot="/"
-          header="States Ranked by Factory Count"
-          parentPlace="country/IND"
-          childPlaceType="AdministrativeArea1"
-          variable="Count_Establishment_Factory"
-          rankingCount="10"
-          showHighest
-        ></datacommons-ranking>
-      </div>
-    </div>
-
-    <!-- Industrial Trends -->
-    <div class="section-header">
-      <div class="icon">📉</div>
-      <h2>Industrial Trends</h2>
-    </div>
-
     <div class="insights-grid">
       <div class="insight-card full-width-card">
         <h3>Top States by Factory Count (Latest Year)</h3>
@@ -1056,6 +1106,203 @@
         ></datacommons-map>
       </div>
     </div>
+  </div>
+
+  <!-- Tab Content: Economic Insights -->
+  <div id="tab-economic-insights" class="tab-content">
+    <!-- Key Cross-Domain Indicators -->
+    <div class="section-header">
+      <div class="icon">🔗</div>
+      <h2>Key Cross-Domain Indicators</h2>
+    </div>
+
+    <div class="highlight-section">
+      <div class="highlight-card">
+        <datacommons-highlight
+          apiRoot="/"
+          header="GDP (Nominal)"
+          place="country/IND"
+          variable="Amount_EconomicActivity_GrossDomesticProduction_Nominal"
+          unit="INR"
+        ></datacommons-highlight>
+      </div>
+      <div class="highlight-card saffron">
+        <datacommons-highlight
+          apiRoot="/"
+          header="General CPI"
+          place="country/IND"
+          variable="ConsumerPriceIndex_EconomicActivity_MOSPIGeneral"
+        ></datacommons-highlight>
+      </div>
+      <div class="highlight-card green">
+        <datacommons-highlight
+          apiRoot="/"
+          header="Total Factories"
+          place="country/IND"
+          variable="Count_Establishment_Factory"
+        ></datacommons-highlight>
+      </div>
+      <div class="highlight-card">
+        <datacommons-highlight
+          apiRoot="/"
+          header="Factory Workers"
+          place="country/IND"
+          variable="Count_Worker_Factory"
+        ></datacommons-highlight>
+      </div>
+      <div class="highlight-card saffron">
+        <datacommons-highlight
+          apiRoot="/"
+          header="Factory Gross Value Added"
+          place="country/IND"
+          variable="Amount_EconomicActivity_Factory_GrossValueAdded"
+          unit="INR"
+        ></datacommons-highlight>
+      </div>
+    </div>
+
+    <!-- Economic Growth vs Price Stability -->
+    <div class="section-header">
+      <div class="icon">📈</div>
+      <h2>Economic Growth vs Price Stability</h2>
+    </div>
+
+    <div class="insights-grid">
+      <div class="insight-card full-width-card">
+        <h3>GDP Growth vs CPI Trends</h3>
+        <datacommons-line
+          apiRoot="/"
+          header="GDP Growth Rate vs Consumer Price Index Over Time"
+          places="country/IND"
+          variables="GrowthRate_Amount_EconomicActivity_GrossDomesticProduction ConsumerPriceIndex_EconomicActivity_MOSPIGeneral"
+        ></datacommons-line>
+      </div>
+    </div>
+
+    <!-- Export Performance vs Industrial Production -->
+    <div class="section-header">
+      <div class="icon">🏭</div>
+      <h2>Export Performance vs Industrial Production</h2>
+    </div>
+
+    <div class="insights-grid">
+      <div class="insight-card full-width-card">
+        <h3>Major Export Commodities vs Factory Output Trends</h3>
+        <datacommons-line
+          apiRoot="/"
+          header="Cereals Exports vs Factory Gross Value Added Over Time"
+          places="country/IND"
+          variables="Exports_EconomicActivity_Cereals Amount_EconomicActivity_Factory_GrossValueAdded"
+        ></datacommons-line>
+      </div>
+    </div>
+
+    <!-- State-wise Cross-Domain Comparison -->
+    <div class="section-header">
+      <div class="icon">🗺️</div>
+      <h2>State-wise Cross-Domain Comparison</h2>
+    </div>
+
+    <div class="insights-grid">
+      <div class="insight-card full-width-card">
+        <h3>GSDP vs Factory Count</h3>
+        <p style="color: #666; font-size: 0.9rem; margin-bottom: 1rem;">
+          Relationship between Gross State Domestic Product and number of factories across Indian states.
+        </p>
+        <datacommons-scatter
+          apiRoot="/"
+          header="GSDP vs Factory Count by State"
+          parentPlace="country/IND"
+          childPlaceType="AdministrativeArea1"
+          variables="Amount_EconomicActivity_GrossDomesticProduction_Nominal Count_Establishment_Factory"
+        ></datacommons-scatter>
+      </div>
+    </div>
+
+    <!-- GDP vs Export Performance -->
+    <div class="section-header">
+      <div class="icon">💹</div>
+      <h2>GDP vs Export Performance</h2>
+    </div>
+
+    <div class="insights-grid">
+      <div class="insight-card full-width-card">
+        <h3>National GDP vs Major Export Commodities</h3>
+        <p style="color: #666; font-size: 0.9rem; margin-bottom: 1rem;">
+          Comparing India's Gross Domestic Product with major export commodity trends over time.
+        </p>
+        <datacommons-line
+          apiRoot="/"
+          header="GDP vs Cereals Exports Over Time"
+          places="country/IND"
+          variables="Amount_EconomicActivity_GrossDomesticProduction_Nominal Exports_EconomicActivity_Cereals"
+        ></datacommons-line>
+      </div>
+    </div>
+
+    <!-- Export Commodity Diversification -->
+    <div class="section-header">
+      <div class="icon">🌍</div>
+      <h2>Export Commodity Diversification</h2>
+    </div>
+
+    <div class="insights-grid">
+      <div class="insight-card full-width-card">
+        <h3>Major Export Commodities Trends</h3>
+        <p style="color: #666; font-size: 0.9rem; margin-bottom: 1rem;">
+          Comparing trends across major export commodity categories to understand export diversification.
+        </p>
+        <datacommons-line
+          apiRoot="/"
+          header="Major Export Commodities Over Time"
+          places="country/IND"
+          variables="Exports_EconomicActivity_Cereals Exports_EconomicActivity_CoffeeTeaMateAndSpices Exports_EconomicActivity_FishAndCrustaceansMolluscsAndOtherAquatic"
+        ></datacommons-line>
+      </div>
+    </div>
+
+    <!-- CPI Category Analysis -->
+    <div class="section-header">
+      <div class="icon">🛒</div>
+      <h2>CPI Category Analysis</h2>
+    </div>
+
+    <div class="insights-grid">
+      <div class="insight-card full-width-card">
+        <h3>Food vs Non-Food Price Trends</h3>
+        <p style="color: #666; font-size: 0.9rem; margin-bottom: 1rem;">
+          Comparing food and non-food consumer price indices to understand inflation patterns across consumption categories.
+        </p>
+        <datacommons-line
+          apiRoot="/"
+          header="Food CPI vs Non-Food CPI Over Time"
+          places="country/IND"
+          variables="ConsumerPriceIndex_EconomicActivity_ConsumerFood ConsumerPriceIndex_EconomicActivity_ClothingAndFootwear ConsumerPriceIndex_EconomicActivity_FuelAndLight"
+        ></datacommons-line>
+      </div>
+    </div>
+
+    <!-- Export Growth Rates Comparison -->
+    <div class="section-header">
+      <div class="icon">📊</div>
+      <h2>Export Growth Rates Comparison</h2>
+    </div>
+
+    <div class="insights-grid">
+      <div class="insight-card full-width-card">
+        <h3>Growth Rates Across Major Export Commodities</h3>
+        <p style="color: #666; font-size: 0.9rem; margin-bottom: 1rem;">
+          Comparing year-over-year growth rates across different export commodity categories to identify fastest-growing export sectors.
+        </p>
+        <datacommons-line
+          apiRoot="/"
+          header="Export Growth Rates by Commodity"
+          places="country/IND"
+          variables="GrowthRate_Exports_EconomicActivity_Cereals GrowthRate_Exports_EconomicActivity_CoffeeTeaMateAndSpices GrowthRate_Exports_EconomicActivity_FishAndCrustaceansMolluscsAndOtherAquatic"
+        ></datacommons-line>
+      </div>
+    </div>
+
   </div>
 
   <!-- Footer -->
@@ -1270,6 +1517,7 @@ function drawInflationBarChart() {
 
   container.innerHTML = html;
 }
+
 
 // Tab Navigation Functionality
 function initTabs() {
