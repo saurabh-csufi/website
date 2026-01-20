@@ -3411,6 +3411,10 @@ Respond with ONLY the visualization type (one word): map, line, bar, ranking, pi
                 }
               }
               console.log(`Fallback to Chart.js successful for ${containerId}`);
+            } else {
+              // Both DC component and Chart.js have no data - remove the container entirely
+              console.log(`No data available from DC or Chart.js for ${containerId} - removing chart container`);
+              container.remove();
             }
             break;
           }
@@ -3449,6 +3453,10 @@ Respond with ONLY the visualization type (one word): map, line, bar, ranking, pi
                   new Chart(canvas, chartResult.config);
                 }
               }
+            } else {
+              // Both DC component and Chart.js have no data - remove the container entirely
+              console.log(`No data available after timeout for ${containerId} - removing chart container`);
+              container.remove();
             }
           }
         }
