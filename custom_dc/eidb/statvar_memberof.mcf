@@ -14340,3 +14340,95 @@ memberOf: dcid:dc/g/MOSPI_Inflation
 
 Node: dcid:Inflation_EconomicActivity_ConsumerPriceIndex_Vegetables_Urban
 memberOf: dcid:dc/g/MOSPI_Inflation
+
+
+# MOSPI NII - Calorie/Energy Intake
+Node: dcid:Daily_Mean_DietaryIntake_Energy_Rural_AsAFractionOf_Count_Person
+memberOf: dcid:dc/g/NII_CalorieIntake
+
+Node: dcid:Daily_Mean_DietaryIntake_Energy_Urban_AsAFractionOf_Count_Person
+memberOf: dcid:dc/g/NII_CalorieIntake
+
+Node: dcid:Daily_Mean_DietaryIntake_Energy_Rural_AsAFractionOf_Count_ConsumerUnit
+memberOf: dcid:dc/g/NII_CalorieIntake
+
+Node: dcid:Daily_Mean_DietaryIntake_Energy_Urban_AsAFractionOf_Count_ConsumerUnit
+memberOf: dcid:dc/g/NII_CalorieIntake
+
+# MOSPI NII - Protein Intake
+Node: dcid:Daily_Mean_DietaryIntake_Protein_Rural_AsAFractionOf_Count_Person
+memberOf: dcid:dc/g/NII_ProteinIntake
+
+Node: dcid:Daily_Mean_DietaryIntake_Protein_Urban_AsAFractionOf_Count_Person
+memberOf: dcid:dc/g/NII_ProteinIntake
+
+Node: dcid:Daily_Mean_DietaryIntake_Protein_Rural_AsAFractionOf_Count_ConsumerUnit
+memberOf: dcid:dc/g/NII_ProteinIntake
+
+Node: dcid:Daily_Mean_DietaryIntake_Protein_Urban_AsAFractionOf_Count_ConsumerUnit
+memberOf: dcid:dc/g/NII_ProteinIntake
+
+# MOSPI NII - Fat Intake
+Node: dcid:Daily_Mean_DietaryIntake_Fat_Rural_AsAFractionOf_Count_Person
+memberOf: dcid:dc/g/NII_FatIntake
+
+Node: dcid:Daily_Mean_DietaryIntake_Fat_Urban_AsAFractionOf_Count_Person
+memberOf: dcid:dc/g/NII_FatIntake
+
+Node: dcid:Daily_Mean_DietaryIntake_Fat_Rural_AsAFractionOf_Count_ConsumerUnit
+memberOf: dcid:dc/g/NII_FatIntake
+
+Node: dcid:Daily_Mean_DietaryIntake_Fat_Urban_AsAFractionOf_Count_ConsumerUnit
+memberOf: dcid:dc/g/NII_FatIntake
+
+# MOSPI NII - Protein Sources
+Node: dcid:DietaryIntake_Protein_Cereal_Rural_AsAFractionOf_DietaryIntake_Protein_Rural
+memberOf: dcid:dc/g/NII_ProteinSources
+
+Node: dcid:DietaryIntake_Protein_Cereal_Urban_AsAFractionOf_DietaryIntake_Protein_Urban
+memberOf: dcid:dc/g/NII_ProteinSources
+
+Node: dcid:DietaryIntake_Protein_Pulse_Rural_AsAFractionOf_DietaryIntake_Protein_Rural
+memberOf: dcid:dc/g/NII_ProteinSources
+
+Node: dcid:DietaryIntake_Protein_Pulse_Urban_AsAFractionOf_DietaryIntake_Protein_Urban
+memberOf: dcid:dc/g/NII_ProteinSources
+
+Node: dcid:DietaryIntake_Protein_Milk_Rural_AsAFractionOf_DietaryIntake_Protein_Rural
+memberOf: dcid:dc/g/NII_ProteinSources
+
+Node: dcid:DietaryIntake_Protein_Milk_Urban_AsAFractionOf_DietaryIntake_Protein_Urban
+memberOf: dcid:dc/g/NII_ProteinSources
+
+Node: dcid:DietaryIntake_Protein_EggFishMeat_Rural_AsAFractionOf_DietaryIntake_Protein_Rural
+memberOf: dcid:dc/g/NII_ProteinSources
+
+Node: dcid:DietaryIntake_Protein_EggFishMeat_Urban_AsAFractionOf_DietaryIntake_Protein_Urban
+memberOf: dcid:dc/g/NII_ProteinSources
+
+Node: dcid:DietaryIntake_Protein_NIIOtherFood_Rural_AsAFractionOf_DietaryIntake_Protein_Rural
+memberOf: dcid:dc/g/NII_ProteinSources
+
+Node: dcid:DietaryIntake_Protein_NIIOtherFood_Urban_AsAFractionOf_DietaryIntake_Protein_Urban
+memberOf: dcid:dc/g/NII_ProteinSources
+
+# MOSPI NII - Energy Sources
+Node: dcid:DietaryIntake_Energy_Cereal_Rural_AsAFractionOf_DietaryIntake_Energy_Rural
+memberOf: dcid:dc/g/NII_EnergySources
+
+Node: dcid:DietaryIntake_Energy_Cereal_Urban_AsAFractionOf_DietaryIntake_Energy_Urban
+memberOf: dcid:dc/g/NII_EnergySources
+
+# MOSPI NII - Meal Counts
+Node: dcid:Mean_Count_Meal_Rural_AsAFractionOf_Count_Person
+memberOf: dcid:dc/g/NII_MealCounts
+
+Node: dcid:Mean_Count_Meal_Urban_AsAFractionOf_Count_Person
+memberOf: dcid:dc/g/NII_MealCounts
+
+Node: dcid:Mean_Count_Meal_Rural_AsAFractionOf_Count_Household
+memberOf: dcid:dc/g/NII_MealCounts
+
+Node: dcid:Mean_Count_Meal_Urban_AsAFractionOf_Count_Household
+memberOf: dcid:dc/g/NII_MealCounts
+

@@ -58,3 +58,49 @@ Node: dcid:dc/g/MOSPI_Inflation
 typeOf: dcs:StatVarGroup
 name: "Inflation Rates"
 specializationOf: dcid:dc/g/MOSPI
+
+# ============================================================
+# MOSPI Nutritional Intake in India (NII) Data
+# ============================================================
+
+# Root group for NII data - connects to dc/g/Root (top level)
+Node: dcid:dc/g/NII
+typeOf: dcs:StatVarGroup
+name: "MOSPI Nutritional Intake"
+specializationOf: dcid:dc/g/Root
+
+# Sub-group for Daily Calorie Intake
+Node: dcid:dc/g/NII_CalorieIntake
+typeOf: dcs:StatVarGroup
+name: "Daily Calorie Intake"
+specializationOf: dcid:dc/g/NII
+
+# Sub-group for Daily Fat Intake
+Node: dcid:dc/g/NII_FatIntake
+typeOf: dcs:StatVarGroup
+name: "Daily Fat Intake"
+specializationOf: dcid:dc/g/NII
+
+# Sub-group for Daily Protein Intake
+Node: dcid:dc/g/NII_ProteinIntake
+typeOf: dcs:StatVarGroup
+name: "Daily Protein Intake"
+specializationOf: dcid:dc/g/NII
+
+# Sub-group for Protein Sources (% from cereal, egg/fish/meat, milk, pulses, etc.)
+Node: dcid:dc/g/NII_ProteinSources
+typeOf: dcs:StatVarGroup
+name: "Protein Sources"
+specializationOf: dcid:dc/g/NII
+
+# Sub-group for Energy Sources (% from cereal, etc.)
+Node: dcid:dc/g/NII_EnergySources
+typeOf: dcs:StatVarGroup
+name: "Energy Sources"
+specializationOf: dcid:dc/g/NII
+
+# Sub-group for Meal Counts
+Node: dcid:dc/g/NII_MealCounts
+typeOf: dcs:StatVarGroup
+name: "Meal Counts"
+specializationOf: dcid:dc/g/NII
