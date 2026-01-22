@@ -31,7 +31,7 @@
   <script src="/datacommons.js"></script>
   <script>
     window.CHAT_CONFIG = {
-      PROMPT_VERSION: '1.0.5',  // Increment when prompts change to auto-invalidate localStorage
+      PROMPT_VERSION: '1.1.0',  // Increment when prompts change to auto-invalidate localStorage
       models: {
         MCP_MODEL: 'gemini-3-flash-preview',
         KB_MODEL: 'gemini-3-flash-preview'
@@ -432,14 +432,30 @@ Don't just provide a single number; provide a **Business Narrative**. Automatica
 
 ### 6. Strategic Follow-ups (The Business Expansion Path)
 
-Conclude every response with a section titled:
+Conclude every response with follow-up suggestions in this format:
+[suggestion: Would you like to see which countries are the fastest-growing markets for this commodity?]
+[suggestion: Shall we compare your product's export performance against competing categories?]
+[suggestion: Would you like to identify the top 5 export destinations for your HS Code?]
 
-📈 **Business Expansion Path**
+### 7. CRITICAL TOOL USAGE RULES
 
-Ask 3 targeted questions that move the user from 'Information' to 'Action':
-- "Would you like to see which countries are the fastest-growing markets for this commodity?"
-- "Shall we compare your product's export performance against competing categories?"
-- "Would you like to identify the top 5 export destinations for your HS Code to plan market entry?"`,
+You have access to ONLY these MCP tools: **search_indicators**, **get_observations**
+
+⚠️ DO NOT call any other tools. Tools like get_child_places, get_places_in, get_observations_series DO NOT EXIST.
+
+**MANDATORY WORKFLOW** (You MUST follow both steps):
+
+**STEP 1**: Call **search_indicators** FIRST to find variable DCIDs
+- Search with keywords related to the user's query
+- For factory/industrial data, search: "factory", "establishment", "manufacturing", "ASI"
+- For GDP data, search: "GDP", "GrossDomesticProduct", "GSDP", "economic"
+- For export data, search: "export", "Export", "commodity"
+
+**STEP 2**: ALWAYS call **get_observations** AFTER search_indicators
+- Use the variable DCIDs returned from search_indicators
+- Use appropriate place DCIDs (e.g., "country/IND" for India, "wikidataId/Q..." for states)
+- This step is REQUIRED - do not skip it!
+- Do NOT respond with "no data" without first trying get_observations`,
 
         kb: `## Data Agent: Policy & Compliance Intelligence
 
@@ -538,7 +554,30 @@ Include 3 relevant follow-up questions in the follow_up_suggestions array.
 - Prioritize actionable insights over raw data
 - Connect export opportunities with available policy support
 - Always maintain Indian business context
-- ALWAYS end with 3 specific, data-driven follow-up questions`
+
+### CRITICAL: Handling RAW MCP TOOL RESULTS
+
+When you receive **RAW MCP TOOL RESULTS**, you MUST:
+
+1. **Look for actual numeric data** in the tool results:
+   - Search for "time_series", "observations", "values", "value" keys
+   - Look inside nested structures like "place_observations"
+   - Extract dates and their corresponding values
+
+2. **If numeric data exists, ALWAYS include it in your response**:
+   - Present actual numbers from the data (e.g., "Karnataka's GSDP was **₹21.08 Lakh Cr** in 2024")
+   - Show trends if multiple years are present
+   - Format numbers in Indian notation (Lakhs, Crores)
+
+3. **If NO data was found** (empty results, errors, or tool failures):
+   - Explain what was searched
+   - Suggest alternative queries or related data that might be available
+
+4. **Follow-up suggestions format**:
+   End your response with EXACTLY 3 follow-up suggestions using this format:
+   [suggestion: Your first follow-up suggestion here]
+   [suggestion: Your second follow-up suggestion here]
+   [suggestion: Your third follow-up suggestion here]`
       }
     };
   </script>
@@ -2072,110 +2111,26 @@ Include 3 relevant follow-up questions in the follow_up_suggestions array.
       // STRUCTURED OUTPUT SCHEMAS for Gemini API
       // ============================================================
 
-      // Schema A: MCP Tool Response Schema - validates tool execution results
-      const mcpToolResponseSchema = {
+      // Chart Config Schema - used for parallel chart configuration call
+      // (Text response is streamed separately without structured output)
+      const chartConfigSchema = {
         type: "object",
         properties: {
-          tool_calls_made: {
-            type: "array",
-            items: {
-              type: "object",
-              properties: {
-                tool_name: { type: "string" },
-                arguments: { type: "object" },
-                success: { type: "boolean" },
-                data_found: { type: "boolean" },
-                error_message: { type: "string" }
-              },
-              required: ["tool_name", "success", "data_found"]
-            }
-          },
-          data_summary: {
-            type: "object",
-            properties: {
-              has_data: { type: "boolean" },
-              variables_found: { type: "array", items: { type: "string" } },
-              places_found: { type: "array", items: { type: "string" } },
-              time_range: { type: "string" },
-              data_points_count: { type: "integer" }
-            },
-            required: ["has_data"]
-          },
-          raw_observations: {
-            type: "array",
-            items: {
-              type: "object",
-              properties: {
-                variable_dcid: { type: "string" },
-                variable_name: { type: "string" },
-                place_dcid: { type: "string" },
-                place_name: { type: "string" },
-                values: {
-                  type: "array",
-                  items: {
-                    type: "object",
-                    properties: {
-                      date: { type: "string" },
-                      value: { type: "number" }
-                    }
-                  }
-                },
-                unit: { type: "string" },
-                source_name: { type: "string" },
-                source_url: { type: "string" }
-              }
-            }
-          }
-        },
-        required: ["tool_calls_made", "data_summary"]
-      };
-
-      // Schema B: Final Response Schema - validates synthesis output
-      const finalResponseSchema = {
-        type: "object",
-        properties: {
-          has_data: {
+          should_render: {
             type: "boolean",
-            description: "True if meaningful data was found"
+            description: "True if chart should be rendered (data exists)"
           },
-          response_text: {
+          viz_type: {
             type: "string",
-            description: "The formatted markdown response to display"
+            enum: ["line", "bar", "map", "ranking", "pie", "highlight", "gauge", "scatter", "slider"]
           },
-          chart_config: {
-            type: "object",
-            properties: {
-              should_render: { type: "boolean" },
-              viz_type: {
-                type: "string",
-                enum: ["line", "bar", "map", "ranking", "pie", "highlight", "gauge", "scatter"]
-              },
-              title: { type: "string" },
-              variable_dcids: { type: "array", items: { type: "string" } },
-              place_dcids: { type: "array", items: { type: "string" } },
-              parent_place: { type: "string" },
-              child_place_type: { type: "string" },
-              unit: { type: "string" }
-            },
-            required: ["should_render"]
-          },
-          sources: {
-            type: "array",
-            items: {
-              type: "object",
-              properties: {
-                name: { type: "string" },
-                url: { type: "string" }
-              }
-            }
-          },
-          follow_up_suggestions: {
-            type: "array",
-            items: { type: "string" },
-            maxItems: 3
-          }
+          title: { type: "string" },
+          variable_dcids: { type: "array", items: { type: "string" } },
+          place_dcids: { type: "array", items: { type: "string" } },
+          parent_place: { type: "string" },
+          child_place_type: { type: "string" }
         },
-        required: ["has_data", "response_text", "follow_up_suggestions"]
+        required: ["should_render"]
       };
       const MCP_MODEL = config?.models?.MCP_MODEL || 'gemini-3-flash-preview';
       const KB_MODEL = config?.models?.KB_MODEL || 'gemini-3-flash-preview';
@@ -2457,6 +2412,19 @@ Include 3 relevant follow-up questions in the follow_up_suggestions array.
                 childPlaceType="${safeChildPlaceType}"
                 showPlaceLabels
               ></datacommons-scatter>`;
+            break;
+
+          case 'slider':
+            // Time-based map slider - shows data over time
+            componentHtml = `
+              <datacommons-slider
+                apiroot="${apiRoot}"
+                header="${safeHeader}"
+                variable="${variableDcid}"
+                parentPlace="${safeParentPlace}"
+                childPlaceType="${safeChildPlaceType}"
+                colors="#f0f9e8 #08589e"
+              ></datacommons-slider>`;
             break;
 
           default:
@@ -2976,25 +2944,10 @@ Include 3 relevant follow-up questions in the follow_up_suggestions array.
           while (iteration < maxIterations) {
             iteration++;
 
-            // Build dynamic system instruction with explicit tool list
-            const toolNames = mcpTools.map(t => t.name);
-            const toolListInstruction = `
-
-              CRITICAL: You have access to ONLY these ${toolNames.length} tools:
-              ${mcpTools.map(t => `- ${t.name}: ${t.description.substring(0, 200)}...`).join('\n')}
-
-              DO NOT call any other tools. Tools like get_child_places, get_places_in, get_observations_series, etc. DO NOT EXIST.
-              If you need data, use ONLY: ${toolNames.join(', ')}
-
-              Workflow:
-              1. Use search_indicators to find relevant variable DCIDs for the query
-              2. Use get_observations to fetch actual data for those variables and places
-              `;
-
-            // Build payload
+            // Build payload (tool rules are now in mcpSystemInstruction from config)
             const payload = {
               contents: contents,
-              systemInstruction: { parts: [{ text: injectDateTime(mcpSystemInstruction) + toolListInstruction }] },
+              systemInstruction: { parts: [{ text: injectDateTime(mcpSystemInstruction) }] },
               generationConfig: {
                 temperature: 1.0,
                 topP: 0.95,
@@ -3161,110 +3114,29 @@ Include 3 relevant follow-up questions in the follow_up_suggestions array.
               contents.push({ role: 'user', parts: functionResponses });
 
             } else {
-              // Got text response - now use structured output to analyze all tool results
+              // Got text response - tool execution complete
               break;
             }
           }
 
           // ============================================================
-          // STRUCTURED OUTPUT: Analyze all tool results
+          // Return raw tool results directly (no intermediate analysis)
+          // Synthesis step will handle data extraction and response generation
           // ============================================================
-          console.log('=== Analyzing tool results with Structured Output ===');
+          console.log('=== MCP Tool Execution Complete ===');
           console.log('Tool results collected:', toolResultsCollector.length);
 
-          if (toolResultsCollector.length === 0) {
-            return {
-              success: false,
-              response: null,
-              structured: { data_summary: { has_data: false }, tool_calls_made: [] },
-              hasData: false,
-              error: 'No tool calls were made'
-            };
-          }
-
-          // Use structured output to analyze the tool results
-          const structuredPayload = {
-            contents: [{
-              role: 'user',
-              parts: [{
-                text: `Analyze these MCP tool execution results and provide a structured summary.
-
-User Query: "${userMessage}"
-
-Tool Execution Results:
-${JSON.stringify(toolResultsCollector, null, 2)}
-
-IMPORTANT:
-- Set has_data to TRUE only if get_observations returned actual time_series data with values
-- Set has_data to FALSE if results are empty, contain errors, or only have search_indicators results without observations
-- Extract variable DCIDs, place DCIDs, and actual data values from the results
-- If data was found, include the raw_observations array with the extracted data points`
-              }]
-            }],
-            systemInstruction: { parts: [{ text: injectDateTime(mcpSystemInstruction) }] },
-            generationConfig: {
-              responseMimeType: "application/json",
-              responseJsonSchema: mcpToolResponseSchema,
-              temperature: 1.0
-            }
-          };
-
-          const structuredResponse = await fetch(
-            `${GEMINI_API_BASE}/${selectedModel}:generateContent?key=${geminiApiKey}`,
-            {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(structuredPayload)
-            }
-          );
-
-          const structuredData = await structuredResponse.json();
-          console.log('Structured output response:', structuredData);
-
-          if (structuredData.error) {
-            console.error('Structured output error:', structuredData.error);
-            return {
-              success: false,
-              response: null,
-              structured: { data_summary: { has_data: false }, tool_calls_made: [] },
-              hasData: false,
-              error: structuredData.error.message
-            };
-          }
-
-          // Parse the structured JSON response
-          const structuredText = structuredData.candidates?.[0]?.content?.parts?.[0]?.text;
-          if (!structuredText) {
-            console.error('No structured text in response');
-            return {
-              success: false,
-              response: null,
-              structured: { data_summary: { has_data: false }, tool_calls_made: [] },
-              hasData: false,
-              error: 'No structured response'
-            };
-          }
-
-          const structuredResult = JSON.parse(structuredText);
-          console.log('Parsed structured result:', structuredResult);
-          console.log('Has data:', structuredResult.data_summary?.has_data);
-
           return {
-            success: true,
-            response: null, // Response will come from synthesis step
-            structured: structuredResult,
-            hasData: structuredResult.data_summary?.has_data || false,
-            toolResults: toolResultsCollector, // Keep raw results for reference
-            error: null
+            success: toolResultsCollector.length > 0,
+            toolResults: toolResultsCollector,
+            error: toolResultsCollector.length === 0 ? 'No tool calls were made' : null
           };
 
         } catch (err) {
           console.error('MCP Query error:', err);
           return {
             success: false,
-            response: null,
-            structured: { data_summary: { has_data: false }, tool_calls_made: [] },
-            hasData: false,
+            toolResults: [],
             error: err.message
           };
         }
@@ -3425,9 +3297,15 @@ IMPORTANT:
           }
 
           // ============================================================
-          // STRUCTURED SYNTHESIS: Generate final response with JSON schema
+          // TWO-PHASE STREAMING: Text streams progressively, chart loads in parallel
           // ============================================================
-          console.log('=== Generating Structured Final Response ===');
+          console.log('=== Starting Two-Phase Streaming Response ===');
+
+          // Prepare raw tool results for prompts
+          const rawToolResults = mcpResult.toolResults || [];
+          const rawResultsJson = JSON.stringify(rawToolResults).length > 50000
+            ? JSON.stringify(rawToolResults).substring(0, 50000) + '... (truncated)'
+            : JSON.stringify(rawToolResults, null, 2);
 
           // Build context string
           let contextString = '';
@@ -3438,149 +3316,116 @@ IMPORTANT:
             contextString = `Previous conversation context:\n${recentHistory}\n\n---\n\n`;
           }
 
-          const synthesisPrompt = `${contextString}Generate a final response based on the following data:
+          // ========================================
+          // PHASE A: Stream text response (NO structured schema - enables streaming)
+          // ========================================
+          const streamingPrompt = `${contextString}Generate a helpful response about: ${userMessage}
 
-User Question: ${userMessage}
+**RAW MCP TOOL RESULTS** (USE THIS DATA - look for time_series, observations, values):
+${rawResultsJson}
 
----
-**MCP TOOL RESULTS** (has_data: ${mcpResult.hasData}):
-${JSON.stringify(mcpResult.structured, null, 2)}
-
----
 **KNOWLEDGE BASE CONTENT**:
-${kbContent || 'None available'}
+${kbContent || 'None available'}`;
 
----
-INSTRUCTIONS:
-1. If has_data is TRUE, create a well-formatted response with the actual data
-2. If has_data is FALSE, explain that no data was found and suggest rephrasing or alternative queries
-3. For chart_config.should_render: Set to TRUE only if has_data is TRUE AND the data is suitable for visualization
-4. Use the variables_found and places_found from data_summary for chart_config
-5. Put 3 relevant follow-up questions in the follow_up_suggestions array (NOT in response_text)
-6. Format response_text with markdown (bold for numbers, tables for comparisons)
-7. IMPORTANT: Do NOT include [suggestion: ...] or follow-up questions text in response_text - they go ONLY in follow_up_suggestions array`;
-
-          const synthesisPayload = {
-            contents: [{
-              role: 'user',
-              parts: [{ text: synthesisPrompt }]
-            }],
+          const streamingPayload = {
+            contents: [{ role: 'user', parts: [{ text: streamingPrompt }] }],
             systemInstruction: { parts: [{ text: injectDateTime(synthesisSystemInstruction) }] },
+            generationConfig: { temperature: 0.3 }
+            // NO responseJsonSchema - this enables streaming!
+          };
+
+          // ========================================
+          // PHASE B: Get chart config (parallel, structured output)
+          // ========================================
+          const chartPrompt = `Based on this MCP tool data, determine if a chart should be rendered.
+
+User query: ${userMessage}
+
+Tool Results:
+${rawResultsJson}
+
+Rules:
+- should_render: true ONLY if actual numeric time_series data exists in the tool results
+- Extract variable_dcids from the tool call arguments (e.g., "Amount_EconomicActivity_GrossDomesticProduction_Nominal")
+- Extract place_dcids from the tool call arguments (e.g., "country/IND", "wikidataId/Q1191")
+- Choose appropriate viz_type: "line" for time series, "bar" for comparisons, "map" for geographic data
+- If no meaningful data found, set should_render: false`;
+
+          const chartPayload = {
+            contents: [{ role: 'user', parts: [{ text: chartPrompt }] }],
             generationConfig: {
               responseMimeType: "application/json",
-              responseJsonSchema: finalResponseSchema,
-              temperature: 0.3
+              responseJsonSchema: chartConfigSchema,
+              temperature: 0.2
             }
           };
 
-          let finalStructured;
+          // Start chart config request in parallel (don't await yet)
+          console.log('Starting parallel chart config request...');
+          const chartPromise = fetch(
+            `${GEMINI_API_BASE}/${selectedModel}:generateContent?key=${geminiApiKey}`,
+            {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(chartPayload)
+            }
+          );
+
+          // Stream text response (user sees text appearing progressively)
+          console.log('Starting streaming text response...');
+          let streamedText = '';
           try {
-            const synthesisResponse = await fetch(
-              `${GEMINI_API_BASE}/${selectedModel}:generateContent?key=${geminiApiKey}`,
-              {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(synthesisPayload)
-              }
-            );
-
-            const synthesisData = await synthesisResponse.json();
-            console.log('Synthesis response:', synthesisData);
-
-            if (synthesisData.error) {
-              throw new Error(synthesisData.error.message);
-            }
-
-            const synthesisText = synthesisData.candidates?.[0]?.content?.parts?.[0]?.text;
-            if (!synthesisText) {
-              throw new Error('No synthesis response text');
-            }
-
-            finalStructured = JSON.parse(synthesisText);
-            console.log('Parsed final structured response:', finalStructured);
-
-          } catch (synthErr) {
-            console.error('Synthesis error:', synthErr);
-            // Fallback to basic response
-            finalStructured = {
-              has_data: false,
-              response_text: `I encountered an error processing your request. Please try rephrasing your question.\n\nError: ${synthErr.message}`,
-              follow_up_suggestions: [
-                'Try a simpler query',
-                'Check if the data type is available',
-                'Ask about India GDP or population'
-              ]
-            };
+            streamedText = await streamGeminiResponse(streamingPayload, selectedModel, streamingMessage);
+          } catch (streamErr) {
+            console.error('Streaming error:', streamErr);
+            streamedText = `I encountered an error processing your request. Please try rephrasing your question.\n\nError: ${streamErr.message}`;
+            streamingMessage.setText(streamedText);
           }
 
-          // Display the response
-          let finalResponse = finalStructured.response_text || 'No response generated.';
-
-          // Add sources at the end if available
-          const allSources = [];
-
-          // Add sources from structured response
-          if (finalStructured.sources?.length > 0) {
-            finalStructured.sources.forEach(src => {
-              if (src.url) {
-                allSources.push(`[${src.name}](${src.url})`);
-              } else if (src.name) {
-                allSources.push(src.name);
-              }
-            });
-          }
-
-          // Add KB sources with hyperlinks for known PDFs
+          // Add KB sources at the end if available
           if (kbSources.length > 0) {
-            kbSources.forEach(source => {
+            const sourceLinks = kbSources.map(source => {
               const url = kbSourceUrls[source];
-              if (url) {
-                allSources.push(`[${source}](${url})`);
-              } else {
-                allSources.push(source);
-              }
+              return url ? `[${source}](${url})` : source;
             });
+            streamedText += '\n\n**Data Sources:** ' + sourceLinks.join(' | ');
+            streamingMessage.setText(streamedText);
           }
 
-          if (allSources.length > 0) {
-            finalResponse += '\n\n**Data Sources:** ' + allSources.join(' | ');
-          }
-
-          // Update the message with final response (without follow-up suggestions in text)
-          streamingMessage.setText(finalResponse);
           streamingMessage.finalize();
+          console.log('Text streaming complete. Length:', streamedText.length);
 
-          // Inject follow-up suggestions directly as HTML (not via text parsing)
-          if (finalStructured.follow_up_suggestions?.length > 0) {
-            const contentEl = streamingMessage.element.querySelector('.message-content');
-            if (contentEl) {
-              const suggestionsHtml = finalStructured.follow_up_suggestions.map(s =>
-                `<button class="followup-suggestion" data-query="${escapeHtml(s)}">${escapeHtml(s)}</button>`
-              ).join('');
-              contentEl.insertAdjacentHTML('beforeend',
-                `<div class="followup-container"><div class="followup-heading">Follow up questions:</div>${suggestionsHtml}</div>`
-              );
+          // Now get chart config result (may already be done since it ran in parallel)
+          console.log('Getting chart config result...');
+          try {
+            const chartResponse = await chartPromise;
+            const chartData = await chartResponse.json();
+            console.log('Chart config response:', chartData);
+
+            if (!chartData.error) {
+              const chartText = chartData.candidates?.[0]?.content?.parts?.[0]?.text;
+              if (chartText) {
+                const chartConfig = JSON.parse(chartText);
+                console.log('Parsed chart config:', chartConfig);
+
+                if (chartConfig.should_render && chartConfig.variable_dcids?.length > 0) {
+                  console.log('Rendering chart with config:', chartConfig);
+                  await injectChartIntoMessage(streamingMessage.element, chartConfig);
+                } else {
+                  console.log('Skipping chart - should_render:', chartConfig.should_render);
+                }
+              }
+            } else {
+              console.error('Chart config API error:', chartData.error);
             }
-          }
-
-          // ============================================================
-          // CHART RENDERING: Only if structured output confirms data exists
-          // ============================================================
-          console.log('Chart rendering decision:', {
-            has_data: finalStructured.has_data,
-            should_render: finalStructured.chart_config?.should_render
-          });
-
-          if (finalStructured.has_data && finalStructured.chart_config?.should_render) {
-            console.log('Rendering chart with config:', finalStructured.chart_config);
-            await injectChartIntoMessage(streamingMessage.element, finalStructured.chart_config);
-          } else {
-            console.log('Skipping chart - has_data:', finalStructured.has_data, 'should_render:', finalStructured.chart_config?.should_render);
+          } catch (chartErr) {
+            console.error('Chart config error:', chartErr);
+            // Chart is optional - don't fail the whole response
           }
 
           // Update conversation history
           conversationHistory.push({ role: 'user', parts: [{ text: userMessage }] });
-          conversationHistory.push({ role: 'model', parts: [{ text: finalResponse }] });
+          conversationHistory.push({ role: 'model', parts: [{ text: streamedText }] });
 
         } catch (err) {
           // Safely remove typing indicator if it still exists
