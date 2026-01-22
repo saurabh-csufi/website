@@ -14432,3 +14432,68 @@ memberOf: dcid:dc/g/NII_MealCounts
 Node: dcid:Mean_Count_Meal_Urban_AsAFractionOf_Count_Household
 memberOf: dcid:dc/g/NII_MealCounts
 
+
+# ============================================================
+# MOSPI Annual Survey of Industries (ASI) memberOf statements
+# ============================================================
+
+# MOSPI ASI - Factory Counts
+Node: dcid:Count_Establishment_Factory
+memberOf: dcid:dc/g/ASI_FactoryCounts
+
+Node: dcid:Count_Establishment_Factory_Rural
+memberOf: dcid:dc/g/ASI_FactoryCounts
+
+# MOSPI ASI - Employment
+Node: dcid:Count_Person_Factory_TotalEngaged
+memberOf: dcid:dc/g/ASI_Employment
+
+Node: dcid:Count_Person_Factory_TotalEngaged_Rural
+memberOf: dcid:dc/g/ASI_Employment
+
+Node: dcid:Count_Worker_Factory
+memberOf: dcid:dc/g/ASI_Employment
+
+# MOSPI ASI - Financial Metrics
+Node: dcid:NetValueAdded_EconomicActivity_Factory
+memberOf: dcid:dc/g/ASI_FinancialMetrics
+
+Node: dcid:Amount_EconomicActivity_Factory_Emolument
+memberOf: dcid:dc/g/ASI_FinancialMetrics
+
+Node: dcid:Amount_EconomicActivity_Factory_FixedCapital
+memberOf: dcid:dc/g/ASI_FinancialMetrics
+
+Node: dcid:Amount_EconomicActivity_Factory_GrossValueAdded
+memberOf: dcid:dc/g/ASI_FinancialMetrics
+
+Node: dcid:Amount_EconomicActivity_Factory_Input
+memberOf: dcid:dc/g/ASI_FinancialMetrics
+
+Node: dcid:Amount_EconomicActivity_Factory_Output
+memberOf: dcid:dc/g/ASI_FinancialMetrics
+
+Node: dcid:Amount_EconomicActivity_Factory_Emolument_Rural
+memberOf: dcid:dc/g/ASI_FinancialMetrics
+
+Node: dcid:Amount_EconomicActivity_Factory_FixedCapital_Rural
+memberOf: dcid:dc/g/ASI_FinancialMetrics
+
+Node: dcid:Amount_EconomicActivity_Factory_Input_Rural
+memberOf: dcid:dc/g/ASI_FinancialMetrics
+
+Node: dcid:Amount_EconomicActivity_Factory_Output_Rural
+memberOf: dcid:dc/g/ASI_FinancialMetrics
+
+# MOSPI ASI - Per-Capita Metrics
+Node: dcid:Amount_EconomicActivity_Factory_FixedCapital_AsAFractionOf_Count_Establishment_Factory
+memberOf: dcid:dc/g/ASI_PerCapita
+
+Node: dcid:Amount_EconomicActivity_Factory_GrossValueAdded_AsAFractionOf_Count_Person_Factory_TotalEngaged
+memberOf: dcid:dc/g/ASI_PerCapita
+
+Node: dcid:Count_Person_Factory_TotalEngaged_AsAFractionOf_Count_Establishment_Factory
+memberOf: dcid:dc/g/ASI_PerCapita
+
+Node: dcid:Wages_Worker_AsAFractionOf_Count_Worker
+memberOf: dcid:dc/g/ASI_PerCapita

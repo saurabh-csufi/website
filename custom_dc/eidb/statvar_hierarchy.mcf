@@ -104,3 +104,37 @@ Node: dcid:dc/g/NII_MealCounts
 typeOf: dcs:StatVarGroup
 name: "Meal Counts"
 specializationOf: dcid:dc/g/NII
+
+# ============================================================
+# MOSPI Annual Survey of Industries (ASI) Data
+# ============================================================
+
+# Root group for ASI data - connects to dc/g/Root (top level)
+Node: dcid:dc/g/ASI
+typeOf: dcs:StatVarGroup
+name: "MOSPI Annual Survey of Industries"
+specializationOf: dcid:dc/g/Root
+
+# Sub-group for Factory Counts
+Node: dcid:dc/g/ASI_FactoryCounts
+typeOf: dcs:StatVarGroup
+name: "Factory Counts"
+specializationOf: dcid:dc/g/ASI
+
+# Sub-group for Employment figures
+Node: dcid:dc/g/ASI_Employment
+typeOf: dcs:StatVarGroup
+name: "Factory Employment"
+specializationOf: dcid:dc/g/ASI
+
+# Sub-group for Financial/Economic Metrics
+Node: dcid:dc/g/ASI_FinancialMetrics
+typeOf: dcs:StatVarGroup
+name: "Factory Financial Metrics"
+specializationOf: dcid:dc/g/ASI
+
+# Sub-group for Per-Capita and Ratio Metrics
+Node: dcid:dc/g/ASI_PerCapita
+typeOf: dcs:StatVarGroup
+name: "Per-Capita Factory Metrics"
+specializationOf: dcid:dc/g/ASI
