@@ -31,7 +31,7 @@
   <script src="/datacommons.js"></script>
   <script>
     window.CHAT_CONFIG = {
-      PROMPT_VERSION: '1.0.3',  // Increment when prompts change to auto-invalidate localStorage
+      PROMPT_VERSION: '1.0.5',  // Increment when prompts change to auto-invalidate localStorage
       models: {
         MCP_MODEL: 'gemini-3-flash-preview',
         KB_MODEL: 'gemini-3-flash-preview'
@@ -516,57 +516,23 @@ Combine statistical data with policy information to create a comprehensive busin
 - Reference Indian fiscal years where relevant (FY 2020-21)
 - Mention relevant ministries (MoCI, MoMSME)
 
-### Closing Section - Clickable Follow-Up Suggestions (MANDATORY)
+### Follow-Up Suggestions (for follow_up_suggestions array)
 
-End EVERY response with exactly 3 clickable follow-up suggestions. These will be rendered as clickable text links.
+Include 3 relevant follow-up questions in the follow_up_suggestions array.
 
-**CRITICAL FORMATTING RULES:**
-1. Start with the heading: **Follow up questions:**
-2. Use the EXACT format: \`[suggestion: Your query text here]\`
-3. Write as **direct commands/queries** (imperative), NOT as questions
-4. Do NOT use "Shall I...", "Would you like...", "Do you want..." - these are NOT clickable
-5. Keep suggestions concise (under 60 characters ideally)
-6. Put each suggestion on its own line, NO bullet points or dashes before them
+**Rules for follow_up_suggestions:**
+- Write as **direct commands/queries** (imperative), NOT conversational questions
+- Do NOT use "Shall I...", "Would you like...", "Do you want..."
+- Keep suggestions concise (under 60 characters)
+- Make them specific and actionable
 
-**✅ CORRECT Format (Direct Commands):**
-\`[suggestion: Compare rural vs urban food inflation]\`
-\`[suggestion: Show vegetable price trends since 2020]\`
-\`[suggestion: Which category has the highest inflation?]\`
+**Example follow_up_suggestions array:**
+["Compare rural vs urban vegetable inflation", "Show food price index trend since 2020", "Which food category has highest inflation?"]
 
-**❌ WRONG Format (Conversational Questions):**
-- "Would you like to see rural vs urban comparison?" ← WRONG
-- "Shall I show the inflation trend?" ← WRONG
-- "Do you want to compare categories?" ← WRONG
-
-**Follow-Up Suggestion Ideas by Topic:**
-
-**If query was about CPI/Prices:**
-- \`[suggestion: Compare rural vs urban CPI for {category}]\`
-- \`[suggestion: Show {category} inflation rate trend]\`
-- \`[suggestion: Compare {category} with {related_category} prices]\`
-
-**If query was about Inflation:**
-- \`[suggestion: Show underlying CPI index for {category}]\`
-- \`[suggestion: Compare {category} inflation rural vs urban]\`
-- \`[suggestion: Which sub-category drives {category} inflation?]\`
-
-**If query was about specific category:**
-- \`[suggestion: Show {category} trend from 2020 to 2024]\`
-- \`[suggestion: Compare {category} rural vs urban]\`
-- \`[suggestion: Compare {category} with {related_category}]\`
-
-**Available MOSPI Categories for Suggestions:**
-- Food: Food, Cereals, Vegetables, Fruits, Meat & Fish, Eggs, Milk, Oils & Fats, Pulses, Sugar, Spices
-- Non-Food: Clothing, Fuel & Light, Health, Education, Transport, Recreation, Household Goods, Personal Care
-- Areas: Rural, Urban, Combined
-
-**Example Output:**
-\`\`\`
-**Follow up questions:**
-[suggestion: Compare rural vs urban vegetable inflation]
-[suggestion: Show food price index trend since 2020]
-[suggestion: Which food category has highest inflation?]
-\`\`\`
+**Topic-specific ideas:**
+- CPI/Prices: "Compare rural vs urban CPI for {category}", "Show {category} inflation trend"
+- Exports: "Show top export markets for {commodity}", "Compare {commodity} exports year over year"
+- Factory data: "Compare factory employment across states", "Show factory output trends"
 
 ### Important Guidelines
 - Prioritize actionable insights over raw data
@@ -1898,90 +1864,9 @@ End EVERY response with exactly 3 clickable follow-up suggestions. These will be
       text-decoration: underline;
     }
 
-    /* Chart.js container styles */
-    .chart-container {
-      background: #ffffff;
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      padding: 16px;
+    /* DC Chart wrapper */
+    .dc-chart-wrapper {
       margin: 16px 0;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-    }
-
-    .chart-container canvas {
-      max-height: 350px !important;
-    }
-
-    .chart-title {
-      font-size: 0.95rem;
-      font-weight: 600;
-      color: var(--gov-blue);
-      margin: 0 0 12px 0;
-    }
-
-    .chart-footer {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 12px;
-      padding-top: 8px;
-      border-top: 1px solid var(--border-color);
-      font-size: 0.8rem;
-      color: var(--text-muted);
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-
-    .chart-unit, .chart-source {
-      font-size: 0.8rem;
-      color: var(--text-muted);
-    }
-
-    .chart-error {
-      background: #fdf2f2;
-      border: 1px solid #fecaca;
-      border-radius: 8px;
-      padding: 16px;
-      margin-top: 16px;
-      color: var(--danger);
-      font-size: 0.9rem;
-    }
-
-    /* Highlight card style */
-    .highlight-container {
-      text-align: center;
-      padding: 24px;
-    }
-
-    .highlight-value {
-      font-size: 2.5rem;
-      font-weight: 700;
-      color: var(--gov-blue);
-      margin: 16px 0 8px;
-    }
-
-    .highlight-unit {
-      font-size: 1rem;
-      color: var(--text-muted);
-      margin-bottom: 16px;
-    }
-
-    /* Multiple Chart.js charts spacing */
-    .message-content .chart-container + .chart-container {
-      margin-top: 20px;
-    }
-
-    /* Hybrid chart wrapper */
-    .hybrid-chart-wrapper {
-      margin: 16px 0;
-    }
-
-    .hybrid-chart-wrapper.chartjs-fallback .dc-chart-container {
-      display: none;
-    }
-
-    .hybrid-chart-wrapper .chart-container {
-      margin: 0;
     }
   </style>
 {% endblock %}
@@ -2182,6 +2067,116 @@ End EVERY response with exactly 3 clickable follow-up suggestions. These will be
       }
 
       const GEMINI_API_BASE = config?.api?.GEMINI_API_BASE || 'https://generativelanguage.googleapis.com/v1beta/models';
+
+      // ============================================================
+      // STRUCTURED OUTPUT SCHEMAS for Gemini API
+      // ============================================================
+
+      // Schema A: MCP Tool Response Schema - validates tool execution results
+      const mcpToolResponseSchema = {
+        type: "object",
+        properties: {
+          tool_calls_made: {
+            type: "array",
+            items: {
+              type: "object",
+              properties: {
+                tool_name: { type: "string" },
+                arguments: { type: "object" },
+                success: { type: "boolean" },
+                data_found: { type: "boolean" },
+                error_message: { type: "string" }
+              },
+              required: ["tool_name", "success", "data_found"]
+            }
+          },
+          data_summary: {
+            type: "object",
+            properties: {
+              has_data: { type: "boolean" },
+              variables_found: { type: "array", items: { type: "string" } },
+              places_found: { type: "array", items: { type: "string" } },
+              time_range: { type: "string" },
+              data_points_count: { type: "integer" }
+            },
+            required: ["has_data"]
+          },
+          raw_observations: {
+            type: "array",
+            items: {
+              type: "object",
+              properties: {
+                variable_dcid: { type: "string" },
+                variable_name: { type: "string" },
+                place_dcid: { type: "string" },
+                place_name: { type: "string" },
+                values: {
+                  type: "array",
+                  items: {
+                    type: "object",
+                    properties: {
+                      date: { type: "string" },
+                      value: { type: "number" }
+                    }
+                  }
+                },
+                unit: { type: "string" },
+                source_name: { type: "string" },
+                source_url: { type: "string" }
+              }
+            }
+          }
+        },
+        required: ["tool_calls_made", "data_summary"]
+      };
+
+      // Schema B: Final Response Schema - validates synthesis output
+      const finalResponseSchema = {
+        type: "object",
+        properties: {
+          has_data: {
+            type: "boolean",
+            description: "True if meaningful data was found"
+          },
+          response_text: {
+            type: "string",
+            description: "The formatted markdown response to display"
+          },
+          chart_config: {
+            type: "object",
+            properties: {
+              should_render: { type: "boolean" },
+              viz_type: {
+                type: "string",
+                enum: ["line", "bar", "map", "ranking", "pie", "highlight", "gauge", "scatter"]
+              },
+              title: { type: "string" },
+              variable_dcids: { type: "array", items: { type: "string" } },
+              place_dcids: { type: "array", items: { type: "string" } },
+              parent_place: { type: "string" },
+              child_place_type: { type: "string" },
+              unit: { type: "string" }
+            },
+            required: ["should_render"]
+          },
+          sources: {
+            type: "array",
+            items: {
+              type: "object",
+              properties: {
+                name: { type: "string" },
+                url: { type: "string" }
+              }
+            }
+          },
+          follow_up_suggestions: {
+            type: "array",
+            items: { type: "string" },
+            maxItems: 3
+          }
+        },
+        required: ["has_data", "response_text", "follow_up_suggestions"]
+      };
       const MCP_MODEL = config?.models?.MCP_MODEL || 'gemini-3-flash-preview';
       const KB_MODEL = config?.models?.KB_MODEL || 'gemini-3-flash-preview';
 
@@ -2266,8 +2261,6 @@ End EVERY response with exactly 3 clickable follow-up suggestions. These will be
       let mcpConnected = false;
       let conversationHistory = [];
       let isProcessing = false;
-      let lastChartAnalysis = null;
-      let lastDataSource = null;  // Track the data source from MCP responses
 
       // PDF Knowledge Base Source URLs - maps PDF filenames to their URLs
       const kbSourceUrls = {
@@ -2320,202 +2313,11 @@ End EVERY response with exactly 3 clickable follow-up suggestions. These will be
         "MSME_Schemes_English_0.pdf": "https://msme.gov.in/sites/default/files/MSME_Schemes_English_0.pdf"
       };
 
-      // Chart.js Script Loader
-      let chartJsLoaded = false;
-      let chartJsLoadPromise = null;
-
-      function loadChartJs() {
-        if (chartJsLoaded) return Promise.resolve();
-        if (chartJsLoadPromise) return chartJsLoadPromise;
-
-        chartJsLoadPromise = new Promise((resolve, reject) => {
-          const script = document.createElement('script');
-          script.src = 'https://cdn.jsdelivr.net/npm/chart.js';
-          script.onload = () => {
-            chartJsLoaded = true;
-            console.log('Chart.js loaded');
-            resolve();
-          };
-          script.onerror = () => reject(new Error('Failed to load Chart.js'));
-          document.head.appendChild(script);
-        });
-
-        return chartJsLoadPromise;
-      }
-
-      // Current user query for visualization detection
+      // Current user query for context
       let currentUserQuery = '';
 
-      // Detect the best visualization type based on query and data
-      function detectVisualizationType(query, dataInfo) {
-        const q = (query || '').toLowerCase();
-
-        // MAP: Multiple states/districts for single variable with no time series
-        if (dataInfo.multiplePlaces && dataInfo.isStateLevel && !dataInfo.hasTimeSeries) {
-          return 'map';
-        }
-
-        // MAP: Keywords indicating geographic comparison
-        if (q.match(/across states|state-wise|by state|statewise|map|geographic|regional|gsdp|state gdp/i) && dataInfo.isStateLevel) {
-          return 'map';
-        }
-
-        // RANKING: Top/bottom/highest/lowest queries
-        if (q.match(/top \d+|bottom \d+|highest|lowest|rank|best|worst|leading|most|least/i)) {
-          return 'ranking';
-        }
-
-        // LINE: Time series with trends
-        if (dataInfo.hasTimeSeries && dataInfo.labels && dataInfo.labels.length > 2) {
-          return 'line';
-        }
-
-        // PIE: Distribution/breakdown queries
-        if (q.match(/distribution|breakdown|share|composition|split|proportion/i)) {
-          return 'pie';
-        }
-
-        // GAUGE: Percentage/rate for single place
-        if (q.match(/rate|percentage|%|ratio/i) && !dataInfo.multiplePlaces) {
-          return 'gauge';
-        }
-
-        // HIGHLIGHT: Single metric queries (single place, single time point)
-        if (!dataInfo.multiplePlaces && !dataInfo.hasTimeSeries) {
-          return 'highlight';
-        }
-
-        // SCATTER: Correlation queries with 2 variables
-        if (q.match(/correlation|vs|versus|relationship|compare.*with|scatter/i) && dataInfo.multipleVariables) {
-          return 'scatter';
-        }
-
-        // BAR: Default for comparisons (multiple places or single date)
-        if (dataInfo.multiplePlaces || !dataInfo.hasTimeSeries) {
-          return 'bar';
-        }
-
-        return 'line'; // Default fallback
-      }
-
-      // Detect parent place from place DCIDs
-      function detectParentPlace(placeDcids) {
-        if (!placeDcids || placeDcids.length === 0) return 'country/IND';
-
-        // If all places are Indian states (wikidataId format)
-        if (placeDcids.every(p => p && p.startsWith('wikidataId/'))) {
-          return 'country/IND';
-        }
-        // If all places are US states (geoId/XX format - 2 digits)
-        if (placeDcids.every(p => p && p.match(/^geoId\/\d{2}$/))) {
-          return 'country/USA';
-        }
-        // If country/IND is in the list
-        if (placeDcids.some(p => p === 'country/IND')) {
-          return 'country/IND';
-        }
-        return 'country/IND'; // Default to India
-      }
-
-      // Detect child place type from place DCIDs
-      function detectChildPlaceType(placeDcids) {
-        if (!placeDcids || placeDcids.length === 0) return 'State';
-
-        // Indian states use wikidataId
-        if (placeDcids.some(p => p && p.startsWith('wikidataId/'))) {
-          return 'State';
-        }
-        // US states (2 digit geoId)
-        if (placeDcids.some(p => p && p.match(/^geoId\/\d{2}$/))) {
-          return 'State';
-        }
-        // US counties (5 digit geoId)
-        if (placeDcids.some(p => p && p.match(/^geoId\/\d{5}$/))) {
-          return 'County';
-        }
-        return 'State'; // Default
-      }
-
-      // Use Gemini to intelligently determine the best visualization type
-      async function detectVisualizationTypeWithGemini(query, dataInfo) {
-        // If no API key, fall back to rule-based detection
-        if (!geminiApiKey) {
-          return detectVisualizationType(query, dataInfo);
-        }
-
-        try {
-          const prompt = `You are a data visualization expert. Given a user query and data characteristics, determine the single best visualization type.
-
-USER QUERY: "${query}"
-
-DATA CHARACTERISTICS:
-- Variable: ${dataInfo.variableName || 'Unknown'}
-- Number of places: ${dataInfo.placeDcids?.length || 0}
-- Place names: ${dataInfo.placeNames?.slice(0, 5).join(', ') || 'None'}${dataInfo.placeNames?.length > 5 ? '...' : ''}
-- Is state-level data: ${dataInfo.isStateLevel ? 'Yes' : 'No'}
-- Has time series: ${dataInfo.hasTimeSeries ? 'Yes' : 'No'}
-- Number of time points: ${dataInfo.labels?.length || 0}
-- Unit: ${dataInfo.unit || 'None'}
-
-AVAILABLE VISUALIZATION TYPES:
-1. "map" - Choropleth map for geographic comparison across states/regions. Best when comparing a single variable across multiple geographic areas.
-2. "line" - Line chart for trends over time. Best for time series data showing change over time.
-3. "bar" - Bar chart for comparing values across categories. Best for comparing multiple places or variables at a point in time.
-4. "ranking" - Ranked list showing top/bottom values. Best when user asks for "top", "highest", "lowest", "ranking".
-5. "pie" - Pie/donut chart for showing proportions. Best for distribution or breakdown queries.
-6. "gauge" - Gauge chart for single percentage/rate values. Best for showing a single metric as percentage.
-7. "highlight" - Single value highlight. Best for displaying one key metric.
-8. "scatter" - Scatter plot for correlation between two variables.
-
-DECISION RULES:
-- If multiple Indian states are being compared for a single metric → prefer "map"
-- If the query mentions "across states", "state-wise", "by state", "regional" → prefer "map"
-- If there's time series data with clear temporal aspect → prefer "line"
-- If query asks for "top", "bottom", "highest", "lowest", "rank" → prefer "ranking"
-- If query asks for "distribution", "breakdown", "share" → prefer "pie"
-- If single value for single place → prefer "highlight"
-
-Respond with ONLY the visualization type (one word): map, line, bar, ranking, pie, gauge, highlight, or scatter`;
-
-          const payload = {
-            contents: [{ role: 'user', parts: [{ text: prompt }] }],
-            generationConfig: {
-              temperature: 0.1,
-              maxOutputTokens: 20
-            }
-          };
-
-          const response = await fetch(
-            `${GEMINI_API_BASE}/${selectedModel}:generateContent?key=${geminiApiKey}`,
-            {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(payload)
-            }
-          );
-
-          const data = await response.json();
-
-          if (data.candidates && data.candidates[0]?.content?.parts?.[0]?.text) {
-            const vizType = data.candidates[0].content.parts[0].text.trim().toLowerCase();
-            const validTypes = ['map', 'line', 'bar', 'ranking', 'pie', 'gauge', 'highlight', 'scatter'];
-
-            if (validTypes.includes(vizType)) {
-              console.log(`Gemini detected visualization type: ${vizType}`);
-              return vizType;
-            }
-          }
-
-          // Fall back to rule-based if Gemini response is invalid
-          console.log('Gemini response invalid, falling back to rule-based detection');
-          return detectVisualizationType(query, dataInfo);
-
-        } catch (err) {
-          console.error('Gemini visualization detection error:', err);
-          // Fall back to rule-based detection on error
-          return detectVisualizationType(query, dataInfo);
-        }
-      }
+      // Note: Visualization type detection is now handled by structured output in finalResponseSchema
+      // The detectVisualizationType() and detectVisualizationTypeWithGemini() functions have been removed.
 
       // Render Data Commons Web Component based on chart data
       function renderDCComponent(chartData) {
@@ -2679,786 +2481,74 @@ Respond with ONLY the visualization type (one word): map, line, bar, ranking, pi
           </div>`;
       }
 
-      // Chart.js fallback renderer - uses actual data from MCP results
-      // Returns { html, chartId, config } or { html } for highlight
-      function renderChartWithChartJS(chartData) {
-        if (!chartData || !chartData.datasets || chartData.datasets.length === 0) {
-          console.log('renderChartWithChartJS: No data to render');
-          return null;
+      // Note: Chart analysis, validation, and Chart.js rendering have been removed.
+      // Structured output from Gemini now handles data validation and chart type detection.
+
+      // ============================================================
+      // SIMPLIFIED: Inject chart into message using DC Web Components only
+      // Structured output has already validated that data exists
+      // ============================================================
+      async function injectChartIntoMessage(messageEl, chartConfig) {
+        // chartConfig comes from finalResponseSchema.chart_config
+        if (!chartConfig || !chartConfig.should_render) {
+          console.log('Chart rendering skipped - should_render is false or chartConfig missing');
+          return;
         }
 
-        const { vizType, variableName, labels, datasets, unit, sources } = chartData;
-        const chartId = `chart-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-
-        // Color palette for multiple datasets
-        const colors = [
-          { bg: 'rgba(59, 130, 246, 0.6)', border: 'rgb(59, 130, 246)' },
-          { bg: 'rgba(16, 185, 129, 0.6)', border: 'rgb(16, 185, 129)' },
-          { bg: 'rgba(245, 158, 11, 0.6)', border: 'rgb(245, 158, 11)' },
-          { bg: 'rgba(239, 68, 68, 0.6)', border: 'rgb(239, 68, 68)' },
-          { bg: 'rgba(139, 92, 246, 0.6)', border: 'rgb(139, 92, 246)' },
-          { bg: 'rgba(236, 72, 153, 0.6)', border: 'rgb(236, 72, 153)' },
-          { bg: 'rgba(34, 197, 94, 0.6)', border: 'rgb(34, 197, 94)' },
-          { bg: 'rgba(249, 115, 22, 0.6)', border: 'rgb(249, 115, 22)' }
-        ];
-
-        // Map vizType to Chart.js type
-        let chartType = 'line';
-        let chartOptions = {};
-        let chartDatasets = [];
-
-        switch (vizType) {
-          case 'bar':
-          case 'ranking':
-            chartType = 'bar';
-            chartDatasets = datasets.map((ds, i) => ({
-              label: ds.label,
-              data: ds.data,
-              backgroundColor: colors[i % colors.length].bg,
-              borderColor: colors[i % colors.length].border,
-              borderWidth: 1
-            }));
-            chartOptions = {
-              indexAxis: vizType === 'ranking' ? 'y' : 'x',
-              responsive: true,
-              maintainAspectRatio: false,
-              plugins: {
-                legend: { display: datasets.length > 1 },
-                title: { display: true, text: variableName }
-              },
-              scales: {
-                x: { title: { display: true, text: vizType === 'ranking' ? (unit || 'Value') : '' } },
-                y: { title: { display: true, text: vizType !== 'ranking' ? (unit || 'Value') : '' } }
-              }
-            };
-            break;
-
-          case 'pie':
-            // Delegate to pie chart helper
-            return renderPieChart(chartId, variableName, datasets, colors, unit, sources);
-
-          case 'highlight':
-            // Render as a simple value display (no Chart.js needed)
-            const highlightValue = datasets[0]?.data?.[datasets[0].data.length - 1] || datasets[0]?.data?.[0] || 'N/A';
-            return {
-              html: `
-                <div class="chart-container highlight-container" id="${chartId}">
-                  <h4 class="chart-title">${escapeHtml(variableName)}</h4>
-                  <div class="highlight-value">${formatNumber(highlightValue)}</div>
-                  <div class="highlight-unit">${unit ? escapeHtml(unit) : ''}</div>
-                  <div class="chart-footer">
-                    <span class="chart-source">Source: ${sources?.join(', ') || 'Data Commons'}</span>
-                  </div>
-                </div>`,
-              chartId: null,
-              config: null
-            };
-
-          case 'line':
-          default:
-            chartType = 'line';
-            chartDatasets = datasets.map((ds, i) => ({
-              label: ds.label,
-              data: ds.data,
-              borderColor: colors[i % colors.length].border,
-              backgroundColor: colors[i % colors.length].bg,
-              fill: false,
-              tension: 0.1
-            }));
-            chartOptions = {
-              responsive: true,
-              maintainAspectRatio: false,
-              plugins: {
-                legend: { display: datasets.length > 1 },
-                title: { display: true, text: variableName }
-              },
-              scales: {
-                x: { title: { display: true, text: 'Year' } },
-                y: { title: { display: true, text: unit || 'Value' } }
-              }
-            };
+        if (!chartConfig.variable_dcids?.length) {
+          console.log('Chart rendering skipped - no variable_dcids');
+          return;
         }
-
-        // Build config object
-        const chartConfig = {
-          type: chartType,
-          data: { labels: labels, datasets: chartDatasets },
-          options: chartOptions
-        };
-
-        const html = `
-          <div class="chart-container" id="${chartId}-container">
-            <canvas id="${chartId}" style="width: 100%; height: 300px;"></canvas>
-            <div class="chart-footer">
-              ${unit ? `<span class="chart-unit">Unit: ${escapeHtml(unit)}</span>` : ''}
-              <span class="chart-source">Source: ${sources?.join(', ') || 'Data Commons'}</span>
-            </div>
-          </div>`;
-
-        return { html, chartId, config: chartConfig };
-      }
-
-      // Helper for pie chart - returns {html, chartId, config}
-      function renderPieChart(chartId, title, datasets, colors, unit, sources) {
-        const pieLabels = datasets.map(ds => ds.label);
-        const pieData = datasets.map(ds => {
-          const data = ds.data;
-          return data[data.length - 1] || data[0] || 0;
-        });
-
-        const chartConfig = {
-          type: 'doughnut',
-          data: {
-            labels: pieLabels,
-            datasets: [{
-              data: pieData,
-              backgroundColor: colors.slice(0, datasets.length).map(c => c.bg),
-              borderColor: colors.slice(0, datasets.length).map(c => c.border),
-              borderWidth: 1
-            }]
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-              legend: { display: true, position: 'right' },
-              title: { display: true, text: title }
-            }
-          }
-        };
-
-        const html = `
-          <div class="chart-container" id="${chartId}-container">
-            <canvas id="${chartId}" style="width: 100%; height: 300px;"></canvas>
-            <div class="chart-footer">
-              ${unit ? `<span class="chart-unit">Unit: ${escapeHtml(unit)}</span>` : ''}
-              <span class="chart-source">Source: ${sources?.join(', ') || 'Data Commons'}</span>
-            </div>
-          </div>`;
-
-        return { html, chartId, config: chartConfig };
-      }
-
-      // Chart Data Analyzer - extracts actual data from tool results for DC Web Components
-      function analyzeChartData(toolName, result) {
-        if (toolName !== 'get_observations') return null;
 
         try {
-          console.log('Analyzing chart data for tool:', toolName);
-          console.log('Raw result:', result);
-
-          const data = typeof result === 'string' ? JSON.parse(result) : result;
-          console.log('Parsed data:', data);
-
-          // Must have variable and place_observations
-          if (!data.variable || !data.place_observations) {
-            console.log('Missing variable or place_observations');
-            return null;
-          }
-
-          // EXTRACT DCIDs for DC Web Components
-          const variableDcid = data.variable?.dcid;
-          const variableName = data.variable.name || data.variable.dcid;
-          const places = data.place_observations;
-
-          if (!places || places.length === 0) {
-            console.log('No places found');
-            return null;
-          }
-
-          // Extract place DCIDs
-          const placeDcids = places.map(p => p.place?.dcid).filter(Boolean);
-          const placeNames = places.map(p => p.place?.name || p.place?.dcid || 'Unknown');
-
-          // Extract time series data
-          const datasets = [];
-          let labels = [];
-
-          for (const placeData of places) {
-            const placeName = placeData.place?.name || placeData.place?.dcid || 'Unknown';
-            const timeSeries = placeData.time_series || [];
-
-            console.log(`Place: ${placeName}, Time series points: ${timeSeries.length}`);
-
-            if (timeSeries.length > 0) {
-              // Extract labels (dates) from first place
-              if (labels.length === 0) {
-                labels = timeSeries.map(point => point[0]);
-              }
-
-              // Extract values
-              const values = timeSeries.map(point => point[1]);
-
-              // Smart label: use variableName if single place, placeName if multiple places
-              let datasetLabel;
-              if (places.length === 1) {
-                datasetLabel = variableName;
-              } else {
-                datasetLabel = placeName;
-              }
-
-              datasets.push({
-                label: datasetLabel,
-                data: values,
-                borderColor: getChartColor(datasets.length),
-                backgroundColor: getChartColor(datasets.length, 0.7),
-                tension: 0.1,
-                fill: false
-              });
-            }
-          }
-
-          if (labels.length === 0 || datasets.length === 0) {
-            console.log('No valid data points found');
-            return null;
-          }
-
-          // Determine data characteristics
-          const hasTimeSeries = labels.length > 1;
-          const multiplePlaces = placeDcids.length > 1;
-          const isStateLevel = placeDcids.some(p => p && (p.startsWith('wikidataId/') || p.match(/^geoId\/\d{2}$/)));
-          const isCountryLevel = placeDcids.some(p => p && p.startsWith('country/'));
-
-          // Detect best visualization type using user query
-          const vizType = detectVisualizationType(currentUserQuery, {
-            variableDcid,
-            placeDcids,
-            hasTimeSeries,
-            multiplePlaces,
-            isStateLevel,
-            isCountryLevel,
-            labels
-          });
-
-          // Detect geographic hierarchy
-          const parentPlace = detectParentPlace(placeDcids);
-          const childPlaceType = detectChildPlaceType(placeDcids);
-
-          // Extract source metadata
-          const sourceMetadata = data.source_metadata || {};
-          const unit = sourceMetadata.unit || '';
-          const sourceName = sourceMetadata.import_name || sourceMetadata.source_name || 'Data Commons';
-          const sourceUrl = sourceMetadata.provenance_url || sourceMetadata.source_url || '';
-
-          // Store sources as a map (name → url)
-          const sources = {};
-          if (sourceName) {
-            sources[sourceName] = sourceUrl || '';
-          }
-
-          console.log('Chart analysis complete:', {
-            vizType,
-            variableDcid,
-            variableName,
-            placeDcids,
-            labels,
-            datasetsCount: datasets.length,
-            unit,
-            parentPlace,
-            childPlaceType,
-            sources
-          });
-
-          return {
-            vizType,
-            variableDcid,
-            variableName,
-            placeDcids,
-            placeNames,
-            labels,
-            datasets,
-            unit,
-            sources,
-            parentPlace,
-            childPlaceType,
-            hasTimeSeries,
-            multiplePlaces,
-            isStateLevel
-          };
-        } catch (e) {
-          console.error('Error analyzing chart data:', e);
-          return null;
-        }
-      }
-
-      // Merge chart data from multiple get_observations calls
-      // Groups by UNIT - same unit data goes into one chart, different units get separate charts
-      function mergeChartData(existing, newData) {
-        // Handle initial case - return as array
-        if (!existing) return newData ? [newData] : [];
-        if (!newData) return Array.isArray(existing) ? existing : [existing];
-
-        // Ensure existing is an array
-        const allCharts = Array.isArray(existing) ? [...existing] : [existing];
-
-        console.log('Merging chart data:', {
-          existingCharts: allCharts.length,
-          newDataUnit: newData.unit,
-          newDataVariable: newData.variableName
-        });
-
-        // Find chart with same unit to merge into
-        const sameUnitIndex = allCharts.findIndex(c => c.unit === newData.unit);
-
-        if (sameUnitIndex !== -1) {
-          // SAME UNIT - merge into existing chart
-          const existingChart = allCharts[sameUnitIndex];
-
-          // Combine variable names
-          let combinedVariableName = existingChart.variableName;
-          if (newData.variableName && newData.variableName !== existingChart.variableName) {
-            combinedVariableName = `${existingChart.variableName} vs ${newData.variableName}`;
-          }
-
-          // Merge labels (union of all dates, sorted)
-          const allLabelsSet = new Set([...(existingChart.labels || []), ...(newData.labels || [])]);
-          const mergedLabels = Array.from(allLabelsSet).sort();
-
-          // Reindex existing datasets to new merged labels
-          const reindexedExisting = (existingChart.datasets || []).map(ds => ({
-            ...ds,
-            data: mergedLabels.map(label => {
-              const idx = (existingChart.labels || []).indexOf(label);
-              return idx !== -1 ? ds.data[idx] : null;
-            })
-          }));
-
-          // Reindex new datasets to merged labels with new colors
-          const colorOffset = (existingChart.datasets || []).length;
-          const reindexedNew = (newData.datasets || []).map((ds, i) => ({
-            ...ds,
-            data: mergedLabels.map(label => {
-              const idx = (newData.labels || []).indexOf(label);
-              return idx !== -1 ? ds.data[idx] : null;
-            }),
-            borderColor: getChartColor(colorOffset + i),
-            backgroundColor: getChartColor(colorOffset + i, 0.7)
-          }));
-
-          // Merge place DCIDs
-          const mergedPlaceDcids = [...new Set([
-            ...(existingChart.placeDcids || []),
-            ...(newData.placeDcids || [])
-          ])];
-
-          // Merge ALL variable DCIDs (for comparison charts, pie charts, etc.)
-          const mergedVariableDcids = [...new Set([
-            ...(existingChart.variableDcids || [existingChart.variableDcid]),
-            ...(newData.variableDcids || [newData.variableDcid])
-          ].filter(Boolean))];
-
-          // Update the chart in place
-          allCharts[sameUnitIndex] = {
-            ...existingChart,
-            variableName: combinedVariableName,
-            variableDcids: mergedVariableDcids,
-            placeDcids: mergedPlaceDcids,
-            labels: mergedLabels,
-            datasets: [...reindexedExisting, ...reindexedNew],
-            sources: { ...(existingChart.sources || {}), ...(newData.sources || {}) },
-            // Re-detect viz type with merged data
-            vizType: detectVisualizationType(currentUserQuery, {
-              variableDcid: existingChart.variableDcid,
-              placeDcids: mergedPlaceDcids,
-              hasTimeSeries: mergedLabels.length > 1,
-              multiplePlaces: mergedPlaceDcids.length > 1,
-              isStateLevel: mergedPlaceDcids.some(p => p && (p.startsWith('wikidataId/') || p.match(/^geoId\/\d{2}$/))),
-              isCountryLevel: mergedPlaceDcids.some(p => p && p.startsWith('country/')),
-              labels: mergedLabels,
-              multipleVariables: mergedVariableDcids.length > 1
-            })
-          };
-
-          console.log('Merged into existing chart (same unit):', {
-            unit: existingChart.unit,
-            variableName: combinedVariableName,
-            datasetsCount: allCharts[sameUnitIndex].datasets.length
-          });
-
-        } else {
-          // DIFFERENT UNIT - add as separate chart
-          console.log('Adding as separate chart (different unit):', newData.unit);
-          allCharts.push(newData);
-        }
-
-        return allCharts;
-      }
-
-      // Chart color palette
-      function getChartColor(index, alpha = 1) {
-        const colors = [
-          `rgba(0, 51, 102, ${alpha})`,   // Gov blue
-          `rgba(255, 153, 51, ${alpha})`, // Saffron
-          `rgba(19, 136, 8, ${alpha})`,   // Green
-          `rgba(66, 133, 244, ${alpha})`, // Google blue
-          `rgba(234, 67, 53, ${alpha})`,  // Google red
-          `rgba(251, 188, 5, ${alpha})`,  // Google yellow
-        ];
-        return colors[index % colors.length];
-      }
-
-      // Format large numbers for display
-      function formatNumber(num) {
-        if (num >= 1e12) return (num / 1e12).toFixed(2) + 'T';
-        if (num >= 1e9) return (num / 1e9).toFixed(2) + 'B';
-        if (num >= 1e7) return (num / 1e7).toFixed(2) + 'Cr';
-        if (num >= 1e5) return (num / 1e5).toFixed(2) + 'L';
-        if (num >= 1e3) return (num / 1e3).toFixed(1) + 'K';
-        return num.toLocaleString();
-      }
-
-      // Render chart using Chart.js
-      async function renderChart(chartData) {
-        if (!chartData) return '';
-
-        const chartId = `chart-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-        const { chartType, variableName, labels, datasets, unit, sources } = chartData;
-
-        // Build source attribution HTML with separate links for each source
-        let sourceHtml = '';
-        if (sources && Object.keys(sources).length > 0) {
-          const sourceLinks = Object.entries(sources).map(([name, url]) => {
-            if (url) {
-              return `<a href="${escapeHtml(url)}" target="_blank" rel="noopener">${escapeHtml(name)}</a>`;
-            } else {
-              return escapeHtml(name);
-            }
-          });
-          sourceHtml = `<div class="dc-chart-source">Source: ${sourceLinks.join(' | ')}</div>`;
-        }
-
-        // Create chart container HTML (title removed - legend is sufficient)
-        const containerHtml = `
-          <div class="dc-chart-container" id="${chartId}-container">
-            <canvas id="${chartId}" style="max-height: 300px;"></canvas>
-            <div class="dc-chart-footer">
-              ${unit ? `<span class="dc-chart-unit">Unit: ${escapeHtml(unit)}</span>` : ''}
-              ${sourceHtml}
-            </div>
-          </div>
-        `;
-
-        return { html: containerHtml, chartId, chartType, labels, datasets, variableName };
-      }
-
-      // Check if data exists for a variable in Data Commons API
-      async function checkVariableHasData(variableDcid, placeDcid) {
-        if (!variableDcid) return false;
-
-        try {
-          const apiRoot = window.location.origin;
-          const place = placeDcid || 'country/IND';
-
-          // Use the observations/series API to check if data exists
-          const url = `${apiRoot}/api/observations/series?variables=${encodeURIComponent(variableDcid)}&entities=${encodeURIComponent(place)}`;
-
-          const response = await fetch(url, {
-            method: 'GET',
-            headers: { 'Content-Type': 'application/json' }
-          });
-
-          if (!response.ok) {
-            console.log(`API check failed for ${variableDcid}: ${response.status}`);
-            return false;
-          }
-
-          const result = await response.json();
-
-          // Response format: { data: { variableDcid: { placeDcid: { series: [...] } } } }
-          const hasData = result?.data?.[variableDcid]?.[place]?.series?.length > 0;
-
-          console.log(`Variable ${variableDcid} hasData: ${hasData}`, hasData ? `(${result.data[variableDcid][place].series.length} observations)` : '');
-          return hasData;
-        } catch (err) {
-          console.error(`Error checking variable ${variableDcid}:`, err);
-          return false;
-        }
-      }
-
-      // Filter chart data to only include variables with actual data
-      async function filterValidVariables(chartData) {
-        if (!chartData) return null;
-
-        // Get all variable DCIDs
-        const allVariableDcids = chartData.variableDcids && chartData.variableDcids.length > 0
-          ? chartData.variableDcids
-          : [chartData.variableDcid].filter(Boolean);
-
-        if (allVariableDcids.length === 0) return null;
-
-        // Get a place to check against
-        const checkPlace = chartData.placeDcids?.[0] || chartData.parentPlace || 'country/IND';
-
-        console.log(`Validating ${allVariableDcids.length} variables against DC API...`);
-
-        // Check each variable in parallel
-        const validityChecks = await Promise.all(
-          allVariableDcids.map(async (dcid) => ({
-            dcid,
-            hasData: await checkVariableHasData(dcid, checkPlace)
-          }))
-        );
-
-        // Filter to only valid variables
-        const validVariables = validityChecks.filter(v => v.hasData).map(v => v.dcid);
-        const invalidVariables = validityChecks.filter(v => !v.hasData).map(v => v.dcid);
-
-        console.log(`Valid variables: ${validVariables.length}, Invalid: ${invalidVariables.length}`);
-        if (invalidVariables.length > 0) {
-          console.log('Removed variables without data:', invalidVariables);
-        }
-
-        if (validVariables.length === 0) {
-          console.log('No valid variables found - skipping chart');
-          return null;
-        }
-
-        // Update chartData with only valid variables
-        const filteredData = { ...chartData };
-        filteredData.variableDcids = validVariables;
-        filteredData.variableDcid = validVariables[0]; // Primary variable
-
-        // Update variable name if we removed some
-        if (invalidVariables.length > 0 && validVariables.length < allVariableDcids.length) {
-          // Find the corresponding dataset labels for valid variables
-          const validDatasets = (chartData.datasets || []).filter((ds, idx) => {
-            const dcid = allVariableDcids[idx];
-            return validVariables.includes(dcid);
-          });
-          filteredData.datasets = validDatasets;
-
-          // Update variable name
-          if (validDatasets.length > 0) {
-            filteredData.variableName = validDatasets.map(ds => ds.label).join(' vs ');
-          }
-        }
-
-        return filteredData;
-      }
-
-      // Inject chart(s) into message - with pre-validation
-      // 1. Validate variables have data in DC API
-      // 2. Render DC Web Components for valid variables
-      // 3. Fall back to Chart.js if DC components fail
-      async function injectChartIntoMessage(messageEl, chartDataArray) {
-        if (!chartDataArray) return;
-
-        // Ensure it's an array
-        const charts = Array.isArray(chartDataArray) ? chartDataArray : [chartDataArray];
-
-        if (charts.length === 0) return;
-
-        try {
-          console.log('Injecting charts:', charts.length, 'chart(s)');
+          console.log('Injecting chart with validated config:', chartConfig);
 
           const contentEl = messageEl.querySelector('.message-content');
           if (!contentEl) return;
 
-          // Render each chart (grouped by unit)
-          for (let chartData of charts) {
-            if (!chartData || (!chartData.variableDcid && !chartData.datasets?.length)) {
-              console.log('Skipping chart - no data');
-              continue;
-            }
+          // Map chartConfig to renderDCComponent format
+          const dcChartData = {
+            vizType: chartConfig.viz_type || 'line',
+            variableDcid: chartConfig.variable_dcids[0],
+            variableDcids: chartConfig.variable_dcids,
+            variableName: chartConfig.title || 'Data Visualization',
+            placeDcids: chartConfig.place_dcids || [],
+            parentPlace: chartConfig.parent_place || 'country/IND',
+            childPlaceType: chartConfig.child_place_type || 'State',
+            unit: chartConfig.unit || ''
+          };
 
-            // NOTE: Skipping pre-validation - DC components handle missing data gracefully
-            // and pre-validation was filtering out valid variables due to place DCID mismatches
-            // If you need to re-enable, uncomment the filterValidVariables call below:
-            // chartData = await filterValidVariables(chartData);
-            // if (!chartData) {
-            //   console.log('Skipping chart - no valid variables after API check');
-            //   continue;
-            // }
+          console.log('Rendering DC component with:', dcChartData);
 
-            // Use Gemini to determine the best visualization type
-            const originalVizType = chartData.vizType;
-            chartData.vizType = await detectVisualizationTypeWithGemini(currentUserQuery, chartData);
+          // Create a unique container ID
+          const containerId = `dc-chart-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
-            console.log('Rendering chart:', {
-              vizType: chartData.vizType,
-              variableName: chartData.variableName,
-              variableDcids: chartData.variableDcids,
-              unit: chartData.unit,
-              datasetsCount: chartData.datasets?.length
-            });
+          // Render DC Web Component
+          const dcHtml = renderDCComponent(dcChartData);
 
-            // Create a unique container ID for this chart
-            const containerId = `hybrid-chart-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+          if (!dcHtml) {
+            console.log('No DC HTML generated');
+            return;
+          }
 
-            // Render DC Web Component
-            const dcHtml = renderDCComponent(chartData);
+          // Create wrapper div
+          const wrapperHtml = `<div id="${containerId}" class="dc-chart-wrapper">${dcHtml}</div>`;
 
-            // Create wrapper div to monitor DC component
-            const wrapperHtml = `<div id="${containerId}" class="hybrid-chart-wrapper">${dcHtml}</div>`;
-
-            // Insert the DC component
-            const followupContainer = contentEl.querySelector('.followup-container');
-            if (followupContainer) {
-              followupContainer.insertAdjacentHTML('beforebegin', wrapperHtml);
-            } else {
-              contentEl.insertAdjacentHTML('beforeend', wrapperHtml);
-            }
-
-            // Monitor the DC component for failures and fall back to Chart.js if needed
-            monitorDCComponentAndFallback(containerId, chartData);
+          // Insert the DC component before follow-up container if it exists
+          const followupContainer = contentEl.querySelector('.followup-container');
+          if (followupContainer) {
+            followupContainer.insertAdjacentHTML('beforebegin', wrapperHtml);
+          } else {
+            contentEl.insertAdjacentHTML('beforeend', wrapperHtml);
           }
 
           chatMessages.scrollTop = chatMessages.scrollHeight;
-          console.log('Charts injected successfully');
+          console.log('Chart injected successfully');
 
         } catch (err) {
-          console.error('Failed to inject charts:', err);
-          const contentEl = messageEl.querySelector('.message-content');
-          if (contentEl) {
-            contentEl.insertAdjacentHTML('beforeend',
-              `<div class="chart-error">Unable to load visualization: ${err.message}</div>`
-            );
-          }
-        }
-      }
-
-      // Monitor DC component and fall back to Chart.js if it fails
-      async function monitorDCComponentAndFallback(containerId, chartData) {
-        const container = document.getElementById(containerId);
-        if (!container) return;
-
-        // Wait a bit for DC component to initialize
-        await new Promise(resolve => setTimeout(resolve, 800));
-
-        // Check for failure indicators
-        const checkForFailure = () => {
-          // Check for "No data available" text
-          const noDataText = container.textContent.includes('No data available');
-
-          // Check for error elements
-          const hasErrorEl = container.querySelector('.error, [class*="error"]');
-
-          // Check SVG viewBox for negative values (the specific error we're seeing)
-          const svgs = container.querySelectorAll('svg');
-          let svgViewBoxError = false;
-          svgs.forEach(svg => {
-            const viewBox = svg.getAttribute('viewBox');
-            if (viewBox && viewBox.includes('-')) {
-              svgViewBoxError = true;
-            }
-          });
-
-          // Check if SVG exists but is essentially empty (no paths, rects, etc.)
-          const hasSvg = svgs.length > 0;
-          const hasChartContent = container.querySelector('svg path, svg rect, svg circle, svg line');
-          const emptySvg = hasSvg && !hasChartContent;
-
-          // Check for loading state stuck
-          const stillLoading = container.querySelector('.loading, [class*="loading"]');
-
-          return {
-            failed: noDataText || hasErrorEl || svgViewBoxError || emptySvg,
-            noDataText,
-            hasErrorEl: !!hasErrorEl,
-            svgViewBoxError,
-            emptySvg,
-            stillLoading: !!stillLoading,
-            hasSvg,
-            hasChartContent: !!hasChartContent
-          };
-        };
-
-        // Check multiple times over 3 seconds
-        const checkIntervals = [0, 500, 1000, 1500, 2000];
-        let fallbackTriggered = false;
-
-        for (let i = 0; i < checkIntervals.length; i++) {
-          if (i > 0) {
-            await new Promise(resolve => setTimeout(resolve, 500));
-          }
-
-          if (fallbackTriggered) break;
-
-          const status = checkForFailure();
-          console.log(`DC component check [${containerId}] at ${checkIntervals[i]}ms:`, status);
-
-          // If DC component failed, fall back to Chart.js
-          if (status.failed) {
-            console.log(`DC component failed for ${containerId}, falling back to Chart.js`);
-            fallbackTriggered = true;
-
-            // Load Chart.js if needed
-            if (typeof Chart === 'undefined') {
-              await new Promise((resolve, reject) => {
-                const script = document.createElement('script');
-                script.src = 'https://cdn.jsdelivr.net/npm/chart.js';
-                script.onload = resolve;
-                script.onerror = reject;
-                document.head.appendChild(script);
-              });
-            }
-
-            // Get Chart.js render result (returns object with html, chartId, config)
-            const chartResult = renderChartWithChartJS(chartData);
-            if (chartResult && chartResult.html) {
-              // Replace container content with Chart.js HTML
-              container.innerHTML = chartResult.html;
-              container.classList.add('chartjs-fallback');
-
-              // Initialize Chart.js if config provided
-              if (chartResult.chartId && chartResult.config) {
-                // Small delay to ensure DOM is updated
-                await new Promise(resolve => setTimeout(resolve, 50));
-                const canvas = document.getElementById(chartResult.chartId);
-                if (canvas) {
-                  new Chart(canvas, chartResult.config);
-                  console.log(`Chart.js initialized for ${chartResult.chartId}`);
-                }
-              }
-              console.log(`Fallback to Chart.js successful for ${containerId}`);
-            } else {
-              // Both DC component and Chart.js have no data - remove the container entirely
-              console.log(`No data available from DC or Chart.js for ${containerId} - removing chart container`);
-              container.remove();
-            }
-            break;
-          }
-
-          // If we have valid chart content, stop checking - DC component succeeded
-          if (status.hasChartContent) {
-            console.log(`DC component loaded successfully for ${containerId}`);
-            break;
-          }
-        }
-
-        // Final check after all intervals - if still no content, fall back
-        if (!fallbackTriggered) {
-          const finalStatus = checkForFailure();
-          if (!finalStatus.hasChartContent) {
-            console.log(`DC component still empty after timeout for ${containerId}, falling back to Chart.js`);
-
-            if (typeof Chart === 'undefined') {
-              await new Promise((resolve, reject) => {
-                const script = document.createElement('script');
-                script.src = 'https://cdn.jsdelivr.net/npm/chart.js';
-                script.onload = resolve;
-                script.onerror = reject;
-                document.head.appendChild(script);
-              });
-            }
-
-            const chartResult = renderChartWithChartJS(chartData);
-            if (chartResult && chartResult.html) {
-              container.innerHTML = chartResult.html;
-              container.classList.add('chartjs-fallback');
-              if (chartResult.chartId && chartResult.config) {
-                await new Promise(resolve => setTimeout(resolve, 50));
-                const canvas = document.getElementById(chartResult.chartId);
-                if (canvas) {
-                  new Chart(canvas, chartResult.config);
-                }
-              }
-            } else {
-              // Both DC component and Chart.js have no data - remove the container entirely
-              console.log(`No data available after timeout for ${containerId} - removing chart container`);
-              container.remove();
-            }
-          }
+          console.error('Failed to inject chart:', err);
+          // Don't show error to user - structured output already validated data exists
+          // If DC component fails, it will show its own error state
         }
       }
 
@@ -3847,54 +2937,23 @@ Respond with ONLY the visualization type (one word): map, line, bar, ranking, pi
         }
         resultEl.textContent = displayResult;
 
-        // Analyze for chart data and extract source if this is a get_observations call
-        if (!isError && toolName === 'get_observations') {
-          try {
-            const chartData = analyzeChartData(toolName, result);
-            if (chartData) {
-              // Accumulate chart data from multiple get_observations calls
-              // mergeChartData handles array conversion and unit-based grouping
-              lastChartAnalysis = mergeChartData(lastChartAnalysis, chartData);
-              console.log('Chart data accumulated:', lastChartAnalysis);
-
-              // Also store source info for text responses
-              if (chartData.sources && Object.keys(chartData.sources).length > 0) {
-                lastDataSource = chartData.sources;
-                console.log('Data source stored:', lastDataSource);
-              }
-            }
-          } catch (e) {
-            console.error('Chart analysis error:', e);
-          }
-        }
-
-        // Also try to extract source from search_indicators results
-        if (!isError && toolName === 'search_indicators') {
-          try {
-            const data = typeof result === 'string' ? JSON.parse(result) : result;
-            // search_indicators doesn't return source directly, but we note it's from Data Commons
-            if (data.variables || data.topics) {
-              lastDataSource = {
-                'Data Commons': 'https://datacommons.org'
-              };
-            }
-          } catch (e) {
-            // Ignore parse errors
-          }
-        }
+        // Note: Chart data analysis is now handled by structured output in queryWithMcpTools()
       }
 
       // ============================================================
-      // PHASE 1: MCP Tools Query (using selected model)
+      // PHASE 1: MCP Tools Query (using selected model) with Structured Output
       // ============================================================
       async function queryWithMcpTools(userMessage) {
         if (!mcpConnected || mcpTools.length === 0) {
           console.log('MCP not connected or no tools available');
-          return { success: false, response: null, error: 'MCP not connected' };
+          return { success: false, response: null, structured: null, hasData: false, error: 'MCP not connected' };
         }
 
-        console.log('=== Starting MCP Query ===');
+        console.log('=== Starting MCP Query with Structured Output ===');
         console.log(`MCP Tools available: ${mcpTools.map(t => t.name).join(', ')}`);
+
+        // Collect all tool results for structured analysis
+        const toolResultsCollector = [];
 
         try {
           // Build contents with conversation history
@@ -3917,12 +2976,27 @@ Respond with ONLY the visualization type (one word): map, line, bar, ranking, pi
           while (iteration < maxIterations) {
             iteration++;
 
+            // Build dynamic system instruction with explicit tool list
+            const toolNames = mcpTools.map(t => t.name);
+            const toolListInstruction = `
+
+              CRITICAL: You have access to ONLY these ${toolNames.length} tools:
+              ${mcpTools.map(t => `- ${t.name}: ${t.description.substring(0, 200)}...`).join('\n')}
+
+              DO NOT call any other tools. Tools like get_child_places, get_places_in, get_observations_series, etc. DO NOT EXIST.
+              If you need data, use ONLY: ${toolNames.join(', ')}
+
+              Workflow:
+              1. Use search_indicators to find relevant variable DCIDs for the query
+              2. Use get_observations to fetch actual data for those variables and places
+              `;
+
             // Build payload
             const payload = {
               contents: contents,
-              systemInstruction: { parts: [{ text: injectDateTime(mcpSystemInstruction) }] },
+              systemInstruction: { parts: [{ text: injectDateTime(mcpSystemInstruction) + toolListInstruction }] },
               generationConfig: {
-                temperature: 0.7,
+                temperature: 1.0,
                 topP: 0.95,
                 topK: 40
               }
@@ -3955,7 +3029,11 @@ Respond with ONLY the visualization type (one word): map, line, bar, ranking, pi
               const mode = (needsObservations && iteration <= 3) ? 'ANY' : 'AUTO';
               console.log(`MCP Iteration ${iteration}: Using mode ${mode} (needsObservations=${needsObservations}, toolsCalled=${Array.from(toolsCalled).join(',')})`);
               payload.toolConfig = {
-                functionCallingConfig: { mode: mode }
+                functionCallingConfig: {
+                  mode: mode,
+                  // Enable parallel function calling to reduce latency
+                  allowedFunctionNames: mcpTools.map(t => t.name)  // Restrict to only valid tools
+                }
               };
             }
 
@@ -3990,11 +3068,38 @@ Respond with ONLY the visualization type (one word): map, line, bar, ranking, pi
               // Add model response to conversation
               contents.push({ role: 'model', parts: responseParts });
 
-              // Execute tool calls
-              const functionResponses = [];
-              for (const part of functionCalls) {
+              // Get valid tool names from mcpTools
+              const validToolNames = new Set(mcpTools.map(t => t.name));
+              console.log('Valid MCP tools:', Array.from(validToolNames));
+
+              // Execute tool calls IN PARALLEL using Promise.all
+              const toolCallPromises = functionCalls.map(async (part) => {
                 const fc = part.functionCall;
                 console.log(`Executing MCP tool: ${fc.name}`, fc.args);
+
+                // VALIDATION: Check if tool exists before calling
+                if (!validToolNames.has(fc.name)) {
+                  console.warn(`Rejected unknown tool: ${fc.name}. Valid tools are: ${Array.from(validToolNames).join(', ')}`);
+                  const toolEl = showToolCall(fc.name, fc.args);
+                  const errorMsg = `Unknown tool: ${fc.name}. Only these tools are available: ${Array.from(validToolNames).join(', ')}`;
+                  updateToolCallResult(toolEl, errorMsg, true, fc.name);
+
+                  // Return error response for this tool
+                  return {
+                    toolResult: {
+                      tool_name: fc.name,
+                      arguments: fc.args,
+                      success: false,
+                      error: errorMsg
+                    },
+                    functionResponse: {
+                      functionResponse: {
+                        name: fc.name,
+                        response: { error: errorMsg }
+                      }
+                    }
+                  };
+                }
 
                 // Track that this tool was called
                 toolsCalled.add(fc.name);
@@ -4005,43 +3110,163 @@ Respond with ONLY the visualization type (one word): map, line, bar, ranking, pi
                 try {
                   const result = await executeMcpToolCall(fc.name, fc.args);
                   updateToolCallResult(toolEl, result, false, fc.name);
-                  functionResponses.push({
+
+                  // Return success response for this tool
+                  return {
+                    toolResult: {
+                      tool_name: fc.name,
+                      arguments: fc.args,
+                      success: true,
+                      result: result
+                    },
                     functionResponse: {
-                      name: fc.name,
-                      response: { result: result }
+                      functionResponse: {
+                        name: fc.name,
+                        response: { result: result }
+                      }
                     }
-                  });
+                  };
                 } catch (err) {
                   updateToolCallResult(toolEl, err.message, true, fc.name);
-                  functionResponses.push({
+
+                  // Return error response for this tool
+                  return {
+                    toolResult: {
+                      tool_name: fc.name,
+                      arguments: fc.args,
+                      success: false,
+                      error: err.message
+                    },
                     functionResponse: {
-                      name: fc.name,
-                      response: { error: err.message }
+                      functionResponse: {
+                        name: fc.name,
+                        response: { error: err.message }
+                      }
                     }
-                  });
+                  };
                 }
+              });
+
+              // Execute all tool calls in PARALLEL
+              const toolCallResults = await Promise.all(toolCallPromises);
+
+              // Collect results
+              const functionResponses = [];
+              for (const result of toolCallResults) {
+                toolResultsCollector.push(result.toolResult);
+                functionResponses.push(result.functionResponse);
               }
 
               // Add function responses
               contents.push({ role: 'user', parts: functionResponses });
 
             } else {
-              // Got text response
-              const textParts = responseParts.filter(p => p.text);
-              if (textParts.length > 0) {
-                const response = textParts.map(p => p.text).join('\n');
-                console.log('MCP Query successful');
-                return { success: true, response: response, error: null };
-              }
+              // Got text response - now use structured output to analyze all tool results
               break;
             }
           }
 
-          return { success: false, response: null, error: 'MCP query did not produce response' };
+          // ============================================================
+          // STRUCTURED OUTPUT: Analyze all tool results
+          // ============================================================
+          console.log('=== Analyzing tool results with Structured Output ===');
+          console.log('Tool results collected:', toolResultsCollector.length);
+
+          if (toolResultsCollector.length === 0) {
+            return {
+              success: false,
+              response: null,
+              structured: { data_summary: { has_data: false }, tool_calls_made: [] },
+              hasData: false,
+              error: 'No tool calls were made'
+            };
+          }
+
+          // Use structured output to analyze the tool results
+          const structuredPayload = {
+            contents: [{
+              role: 'user',
+              parts: [{
+                text: `Analyze these MCP tool execution results and provide a structured summary.
+
+User Query: "${userMessage}"
+
+Tool Execution Results:
+${JSON.stringify(toolResultsCollector, null, 2)}
+
+IMPORTANT:
+- Set has_data to TRUE only if get_observations returned actual time_series data with values
+- Set has_data to FALSE if results are empty, contain errors, or only have search_indicators results without observations
+- Extract variable DCIDs, place DCIDs, and actual data values from the results
+- If data was found, include the raw_observations array with the extracted data points`
+              }]
+            }],
+            systemInstruction: { parts: [{ text: injectDateTime(mcpSystemInstruction) }] },
+            generationConfig: {
+              responseMimeType: "application/json",
+              responseJsonSchema: mcpToolResponseSchema,
+              temperature: 1.0
+            }
+          };
+
+          const structuredResponse = await fetch(
+            `${GEMINI_API_BASE}/${selectedModel}:generateContent?key=${geminiApiKey}`,
+            {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(structuredPayload)
+            }
+          );
+
+          const structuredData = await structuredResponse.json();
+          console.log('Structured output response:', structuredData);
+
+          if (structuredData.error) {
+            console.error('Structured output error:', structuredData.error);
+            return {
+              success: false,
+              response: null,
+              structured: { data_summary: { has_data: false }, tool_calls_made: [] },
+              hasData: false,
+              error: structuredData.error.message
+            };
+          }
+
+          // Parse the structured JSON response
+          const structuredText = structuredData.candidates?.[0]?.content?.parts?.[0]?.text;
+          if (!structuredText) {
+            console.error('No structured text in response');
+            return {
+              success: false,
+              response: null,
+              structured: { data_summary: { has_data: false }, tool_calls_made: [] },
+              hasData: false,
+              error: 'No structured response'
+            };
+          }
+
+          const structuredResult = JSON.parse(structuredText);
+          console.log('Parsed structured result:', structuredResult);
+          console.log('Has data:', structuredResult.data_summary?.has_data);
+
+          return {
+            success: true,
+            response: null, // Response will come from synthesis step
+            structured: structuredResult,
+            hasData: structuredResult.data_summary?.has_data || false,
+            toolResults: toolResultsCollector, // Keep raw results for reference
+            error: null
+          };
 
         } catch (err) {
           console.error('MCP Query error:', err);
-          return { success: false, response: null, error: err.message };
+          return {
+            success: false,
+            response: null,
+            structured: { data_summary: { has_data: false }, tool_calls_made: [] },
+            hasData: false,
+            error: err.message
+          };
         }
       }
 
@@ -4148,10 +3373,6 @@ Respond with ONLY the visualization type (one word): map, line, bar, ranking, pi
         // Clear previous tool calls from left sidebar
         clearToolCalls();
 
-        // Reset data tracking for new query
-        lastDataSource = null;
-        lastChartAnalysis = null;
-
         // Set current user query for visualization detection
         currentUserQuery = message;
 
@@ -4171,7 +3392,7 @@ Respond with ONLY the visualization type (one word): map, line, bar, ranking, pi
         const userMessage = message;
 
         try {
-          console.log('=== Processing Query ===');
+          console.log('=== Processing Query with Structured Output ===');
           console.log(`User message: ${userMessage}`);
           console.log(`MCP connected: ${mcpConnected}, Tools: ${mcpTools.length}`);
           console.log(`KB enabled: ${kbEnabled}, Store: ${kbStoreId}`);
@@ -4182,179 +3403,136 @@ Respond with ONLY the visualization type (one word): map, line, bar, ranking, pi
             queryWithKnowledgeBase(userMessage)
           ]);
 
-          console.log('MCP Result:', mcpResult);
+          console.log('MCP Result (structured):', mcpResult);
           console.log('KB Result:', kbResult);
 
-          // Remove typing indicator and create streaming message
+          // Remove typing indicator and create message element
           typingEl.remove();
           const streamingMessage = createStreamingMessage();
-
-          // Combine results naturally
-          let finalResponse = '';
-          let mcpContent = '';
-          let kbContent = '';
-          let sources = [];
-
-          // Get MCP response content
-          if (mcpResult.success && mcpResult.response) {
-            mcpContent = mcpResult.response;
-          }
+          streamingMessage.setText('Analyzing data...');
 
           // Get KB response content (if relevant)
+          let kbContent = '';
+          let kbSources = [];
           if (kbResult.success && kbResult.response) {
             const noInfoPatterns = /no relevant information|not found in|cannot find|no information available/i;
             if (!noInfoPatterns.test(kbResult.response)) {
               kbContent = kbResult.response;
               if (kbResult.sources && kbResult.sources.length > 0) {
-                sources = kbResult.sources;
+                kbSources = kbResult.sources;
               }
             }
           }
 
-          // If we have both, use Gemini to synthesize a natural response with streaming
-          if (mcpContent && kbContent) {
-            try {
-              // Build synthesis contents with conversation history for context
-              const synthesisContents = [];
+          // ============================================================
+          // STRUCTURED SYNTHESIS: Generate final response with JSON schema
+          // ============================================================
+          console.log('=== Generating Structured Final Response ===');
 
-              // Build context string
-              let contextString = '';
-              if (conversationHistory.length > 0) {
-                const recentHistory = conversationHistory.slice(-10).map(msg =>
-                  `${msg.role === 'user' ? 'User' : 'Assistant'}: ${msg.parts[0].text.substring(0, 200)}...`
-                ).join('\n');
-                contextString = `Previous conversation context:\n${recentHistory}\n\n---\n\n`;
-              }
-
-              synthesisContents.push({
-                role: 'user',
-                parts: [{
-                  text: `${contextString}User's Question: ${userMessage}
-
----
-**EXPORT-IMPORT DATA (from India Ministry of Commerce)**:
-${mcpContent}
-
----
-**POLICY & SCHEME INFORMATION (from Government Documents)**:
-${kbContent}
-
----
-Please synthesize this information into a unified response following your formatting guidelines.`
-                }]
-              });
-
-              const synthesisPayload = {
-                contents: synthesisContents,
-                systemInstruction: { parts: [{ text: injectDateTime(synthesisSystemInstruction) }] },
-                generationConfig: {
-                  temperature: 0.3,
-                  topP: 0.95
-                }
-              };
-
-              // Use streaming for synthesis
-              finalResponse = await streamGeminiResponse(synthesisPayload, selectedModel, streamingMessage);
-
-            } catch (err) {
-              console.error('Synthesis streaming error:', err);
-              // Fallback: just combine them without streaming
-              finalResponse = mcpContent + '\n\n' + kbContent;
-              streamingMessage.setText(finalResponse);
-            }
-          } else if (mcpContent) {
-            // Stream a refined response for MCP-only content with conversation context
-            try {
-              let contextString = '';
-              if (conversationHistory.length > 0) {
-                const recentHistory = conversationHistory.slice(-6).map(msg =>
-                  `${msg.role === 'user' ? 'User' : 'Assistant'}: ${msg.parts[0].text.substring(0, 150)}...`
-                ).join('\n');
-                contextString = `Previous conversation context:\n${recentHistory}\n\n---\n\n`;
-              }
-              const refinePrompt = `${contextString}User's Question: ${userMessage}
-
----
-**STATISTICAL DATA (from India Ministry of Statistics)**:
-${mcpContent}
-
----
-Please present this information following your formatting guidelines.`;
-              const refinePayload = {
-                contents: [{
-                  role: 'user',
-                  parts: [{ text: refinePrompt }]
-                }],
-                systemInstruction: { parts: [{ text: injectDateTime(synthesisSystemInstruction) }] },
-                generationConfig: { temperature: 0.3, topP: 0.95 }
-              };
-              finalResponse = await streamGeminiResponse(refinePayload, selectedModel, streamingMessage);
-            } catch (err) {
-              // Fallback to non-streamed
-              finalResponse = mcpContent;
-              streamingMessage.setText(finalResponse);
-            }
-          } else if (kbContent) {
-            // Refine KB content with synthesis instruction to add follow-up suggestions
-            try {
-              let contextString = '';
-              if (conversationHistory.length > 0) {
-                const recentHistory = conversationHistory.slice(-6).map(msg =>
-                  `${msg.role === 'user' ? 'User' : 'Assistant'}: ${msg.parts[0].text.substring(0, 150)}...`
-                ).join('\n');
-                contextString = `Previous conversation context:\n${recentHistory}\n\n---\n\n`;
-              }
-              const refinePrompt = `${contextString}User's Question: ${userMessage}
-
----
-**POLICY & SCHEME INFORMATION (from Government Documents)**:
-${kbContent}
-
----
-Please present this information following your formatting guidelines.`;
-              const refinePayload = {
-                contents: [{
-                  role: 'user',
-                  parts: [{ text: refinePrompt }]
-                }],
-                systemInstruction: { parts: [{ text: injectDateTime(synthesisSystemInstruction) }] },
-                generationConfig: { temperature: 0.3, topP: 0.95 }
-              };
-              finalResponse = await streamGeminiResponse(refinePayload, selectedModel, streamingMessage);
-            } catch (err) {
-              // Fallback to non-refined KB content
-              finalResponse = kbContent;
-              streamingMessage.setText(finalResponse);
-            }
-          } else {
-            // Neither worked - show data request link
-            const dataRequestLink = '[submit a data request](https://issuetracker.google.com/issues/new?component=1660823&template=2053232&pli=1)';
-            if (mcpResult.error && kbResult.error) {
-              finalResponse = `I was unable to retrieve information for your query. Please try rephrasing your question or ${dataRequestLink}.`;
-            } else {
-              finalResponse = `No relevant information found for your query. You can ${dataRequestLink} for this data.`;
-            }
-            streamingMessage.setText(finalResponse);
+          // Build context string
+          let contextString = '';
+          if (conversationHistory.length > 0) {
+            const recentHistory = conversationHistory.slice(-10).map(msg =>
+              `${msg.role === 'user' ? 'User' : 'Assistant'}: ${msg.parts[0].text.substring(0, 200)}...`
+            ).join('\n');
+            contextString = `Previous conversation context:\n${recentHistory}\n\n---\n\n`;
           }
+
+          const synthesisPrompt = `${contextString}Generate a final response based on the following data:
+
+User Question: ${userMessage}
+
+---
+**MCP TOOL RESULTS** (has_data: ${mcpResult.hasData}):
+${JSON.stringify(mcpResult.structured, null, 2)}
+
+---
+**KNOWLEDGE BASE CONTENT**:
+${kbContent || 'None available'}
+
+---
+INSTRUCTIONS:
+1. If has_data is TRUE, create a well-formatted response with the actual data
+2. If has_data is FALSE, explain that no data was found and suggest rephrasing or alternative queries
+3. For chart_config.should_render: Set to TRUE only if has_data is TRUE AND the data is suitable for visualization
+4. Use the variables_found and places_found from data_summary for chart_config
+5. Put 3 relevant follow-up questions in the follow_up_suggestions array (NOT in response_text)
+6. Format response_text with markdown (bold for numbers, tables for comparisons)
+7. IMPORTANT: Do NOT include [suggestion: ...] or follow-up questions text in response_text - they go ONLY in follow_up_suggestions array`;
+
+          const synthesisPayload = {
+            contents: [{
+              role: 'user',
+              parts: [{ text: synthesisPrompt }]
+            }],
+            systemInstruction: { parts: [{ text: injectDateTime(synthesisSystemInstruction) }] },
+            generationConfig: {
+              responseMimeType: "application/json",
+              responseJsonSchema: finalResponseSchema,
+              temperature: 0.3
+            }
+          };
+
+          let finalStructured;
+          try {
+            const synthesisResponse = await fetch(
+              `${GEMINI_API_BASE}/${selectedModel}:generateContent?key=${geminiApiKey}`,
+              {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(synthesisPayload)
+              }
+            );
+
+            const synthesisData = await synthesisResponse.json();
+            console.log('Synthesis response:', synthesisData);
+
+            if (synthesisData.error) {
+              throw new Error(synthesisData.error.message);
+            }
+
+            const synthesisText = synthesisData.candidates?.[0]?.content?.parts?.[0]?.text;
+            if (!synthesisText) {
+              throw new Error('No synthesis response text');
+            }
+
+            finalStructured = JSON.parse(synthesisText);
+            console.log('Parsed final structured response:', finalStructured);
+
+          } catch (synthErr) {
+            console.error('Synthesis error:', synthErr);
+            // Fallback to basic response
+            finalStructured = {
+              has_data: false,
+              response_text: `I encountered an error processing your request. Please try rephrasing your question.\n\nError: ${synthErr.message}`,
+              follow_up_suggestions: [
+                'Try a simpler query',
+                'Check if the data type is available',
+                'Ask about India GDP or population'
+              ]
+            };
+          }
+
+          // Display the response
+          let finalResponse = finalStructured.response_text || 'No response generated.';
 
           // Add sources at the end if available
           const allSources = [];
 
-          // Add MCP/Data Commons sources (lastDataSource is a map: name → url)
-          if (lastDataSource && typeof lastDataSource === 'object') {
-            for (const [name, url] of Object.entries(lastDataSource)) {
-              if (url) {
-                allSources.push(`[${name}](${url})`);
-              } else if (name) {
-                allSources.push(name);
+          // Add sources from structured response
+          if (finalStructured.sources?.length > 0) {
+            finalStructured.sources.forEach(src => {
+              if (src.url) {
+                allSources.push(`[${src.name}](${src.url})`);
+              } else if (src.name) {
+                allSources.push(src.name);
               }
-            }
+            });
           }
 
           // Add KB sources with hyperlinks for known PDFs
-          if (sources.length > 0) {
-            sources.forEach(source => {
-              // Check if this source has a known URL in our mapping
+          if (kbSources.length > 0) {
+            kbSources.forEach(source => {
               const url = kbSourceUrls[source];
               if (url) {
                 allSources.push(`[${source}](${url})`);
@@ -4366,21 +3544,39 @@ Please present this information following your formatting guidelines.`;
 
           if (allSources.length > 0) {
             finalResponse += '\n\n**Data Sources:** ' + allSources.join(' | ');
-            streamingMessage.setText(finalResponse);
           }
 
-          // Finalize the streaming message (remove cursor)
+          // Update the message with final response (without follow-up suggestions in text)
+          streamingMessage.setText(finalResponse);
           streamingMessage.finalize();
 
-          // Inject chart visualization if we have chart data
-          if (lastChartAnalysis) {
-            console.log('Injecting chart with analysis:', lastChartAnalysis);
-            await injectChartIntoMessage(streamingMessage.element, lastChartAnalysis);
-            lastChartAnalysis = null;  // Reset for next query
+          // Inject follow-up suggestions directly as HTML (not via text parsing)
+          if (finalStructured.follow_up_suggestions?.length > 0) {
+            const contentEl = streamingMessage.element.querySelector('.message-content');
+            if (contentEl) {
+              const suggestionsHtml = finalStructured.follow_up_suggestions.map(s =>
+                `<button class="followup-suggestion" data-query="${escapeHtml(s)}">${escapeHtml(s)}</button>`
+              ).join('');
+              contentEl.insertAdjacentHTML('beforeend',
+                `<div class="followup-container"><div class="followup-heading">Follow up questions:</div>${suggestionsHtml}</div>`
+              );
+            }
           }
 
-          // Reset data source
-          lastDataSource = null;
+          // ============================================================
+          // CHART RENDERING: Only if structured output confirms data exists
+          // ============================================================
+          console.log('Chart rendering decision:', {
+            has_data: finalStructured.has_data,
+            should_render: finalStructured.chart_config?.should_render
+          });
+
+          if (finalStructured.has_data && finalStructured.chart_config?.should_render) {
+            console.log('Rendering chart with config:', finalStructured.chart_config);
+            await injectChartIntoMessage(streamingMessage.element, finalStructured.chart_config);
+          } else {
+            console.log('Skipping chart - has_data:', finalStructured.has_data, 'should_render:', finalStructured.chart_config?.should_render);
+          }
 
           // Update conversation history
           conversationHistory.push({ role: 'user', parts: [{ text: userMessage }] });
