@@ -2040,6 +2040,23 @@ When you receive **RAW MCP TOOL RESULTS**, you MUST:
           </div>
         </div>
 
+        <div class="config-section">
+          <label>Thinking Budget (Gemini 3)</label>
+          <div style="display: flex; gap: 8px; margin-top: 4px;">
+            <div style="flex: 1;">
+              <label for="mcp-thinking-input" style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 2px; display: block;">MCP Prompt</label>
+              <input type="text" id="mcp-thinking-input" placeholder="low" value="low" style="width: 100%; padding: 6px 8px; font-size: 0.85rem;">
+            </div>
+            <div style="flex: 1;">
+              <label for="synthesis-thinking-input" style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 2px; display: block;">Synthesis Prompt</label>
+              <input type="text" id="synthesis-thinking-input" placeholder="low" value="low" style="width: 100%; padding: 6px 8px; font-size: 0.85rem;">
+            </div>
+          </div>
+          <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 4px;">
+            Values: minimal, low, medium, high (or budget: 0-24576)
+          </div>
+        </div>
+
         <div class="prompt-section collapsed" id="mcp-prompt-section">
           <div class="prompt-header" onclick="togglePromptSection('mcp-prompt-section')">
             <span class="prompt-arrow">▶</span>
@@ -2216,6 +2233,9 @@ When you receive **RAW MCP TOOL RESULTS**, you MUST:
       let mcpConnected = false;
       let conversationHistory = [];
       let isProcessing = false;
+      // Thinking level config for Gemini 3 models (values: minimal, low, medium, high or budget number)
+      let mcpThinkingLevel = localStorage.getItem('mcp_thinking_level') || 'low';
+      let synthesisThinkingLevel = localStorage.getItem('synthesis_thinking_level') || 'low';
 
       // PDF Knowledge Base Source URLs - maps PDF filenames to their URLs
       const kbSourceUrls = {
@@ -2572,6 +2592,10 @@ When you receive **RAW MCP TOOL RESULTS**, you MUST:
       const kbPromptInput = document.getElementById('kb-prompt-input');
       const synthesisPromptInput = document.getElementById('synthesis-prompt-input');
 
+      // Thinking level input elements
+      const mcpThinkingInput = document.getElementById('mcp-thinking-input');
+      const synthesisThinkingInput = document.getElementById('synthesis-thinking-input');
+
       // Toggle prompt section collapse (exposed globally for onclick)
       window.togglePromptSection = function(sectionId) {
         const section = document.getElementById(sectionId);
@@ -2594,6 +2618,10 @@ When you receive **RAW MCP TOOL RESULTS**, you MUST:
         if (mcpPromptInput) mcpPromptInput.value = mcpSystemInstruction;
         if (kbPromptInput) kbPromptInput.value = kbSystemInstruction;
         if (synthesisPromptInput) synthesisPromptInput.value = synthesisSystemInstruction;
+
+        // Populate thinking level inputs with current values
+        if (mcpThinkingInput) mcpThinkingInput.value = mcpThinkingLevel;
+        if (synthesisThinkingInput) synthesisThinkingInput.value = synthesisThinkingLevel;
 
         // Event listeners
         saveConfigBtn.addEventListener('click', saveConfig);
@@ -2739,9 +2767,19 @@ When you receive **RAW MCP TOOL RESULTS**, you MUST:
         localStorage.setItem('synthesis_system_prompt', newSynthesisPrompt);
         localStorage.setItem('prompt_version', config?.PROMPT_VERSION || '1.0.0');
 
+        // Save and update thinking levels
+        const newMcpThinking = mcpThinkingInput?.value?.trim() || 'low';
+        const newSynthesisThinking = synthesisThinkingInput?.value?.trim() || 'low';
+        mcpThinkingLevel = newMcpThinking;
+        synthesisThinkingLevel = newSynthesisThinking;
+        localStorage.setItem('mcp_thinking_level', newMcpThinking);
+        localStorage.setItem('synthesis_thinking_level', newSynthesisThinking);
+
         // Console log the updated config
         console.group('📝 Config Updated (at ' + getCurrentDateTimeIST() + ')');
         console.log('Selected Model:', selectedModel);
+        console.log('MCP Thinking Level:', mcpThinkingLevel);
+        console.log('Synthesis Thinking Level:', synthesisThinkingLevel);
         console.log('MCP System Prompt (with DateTime):', injectDateTime(mcpSystemInstruction));
         console.log('KB System Prompt (with DateTime):', injectDateTime(kbSystemInstruction));
         console.log('Synthesis Prompt (with DateTime):', injectDateTime(synthesisSystemInstruction));
@@ -2972,7 +3010,8 @@ When you receive **RAW MCP TOOL RESULTS**, you MUST:
               generationConfig: {
                 temperature: 1.0,
                 topP: 0.95,
-                topK: 40
+                topK: 40,
+                thinkingConfig: buildThinkingConfig(mcpThinkingLevel)
               }
             };
 
@@ -3012,7 +3051,8 @@ When you receive **RAW MCP TOOL RESULTS**, you MUST:
             }
 
             // Call Gemini with selected model
-            console.log('MCP Request payload:', JSON.stringify(payload, null, 2));
+            console.group(`🔧 MCP API Call (iteration ${iteration})`);
+            console.log('Request Payload:', JSON.stringify(payload, null, 2));
 
             const response = await fetch(
               `${GEMINI_API_BASE}/${selectedModel}:generateContent?key=${geminiApiKey}`,
@@ -3024,7 +3064,8 @@ When you receive **RAW MCP TOOL RESULTS**, you MUST:
             );
 
             const data = await response.json();
-            console.log('MCP Response:', JSON.stringify(data, null, 2));
+            console.log('Response:', JSON.stringify(data, null, 2));
+            console.groupEnd();
 
             if (data.error) {
               throw new Error(data.error.message || 'MCP API request failed');
@@ -3201,7 +3242,8 @@ When you receive **RAW MCP TOOL RESULTS**, you MUST:
             }
           };
 
-          console.log('KB Request payload:', JSON.stringify(payload, null, 2));
+          console.group('📚 KB API Call');
+          console.log('Request Payload:', JSON.stringify(payload, null, 2));
 
           const response = await fetch(
             `${GEMINI_API_BASE}/${selectedModel}:generateContent?key=${geminiApiKey}`,
@@ -3213,7 +3255,8 @@ When you receive **RAW MCP TOOL RESULTS**, you MUST:
           );
 
           const data = await response.json();
-          console.log('KB Response:', JSON.stringify(data, null, 2));
+          console.log('Response:', JSON.stringify(data, null, 2));
+          console.groupEnd();
 
           if (data.error) {
             throw new Error(data.error.message || 'KB API request failed');
@@ -3363,7 +3406,10 @@ ${kbContent || 'None available'}`;
           const streamingPayload = {
             contents: [{ role: 'user', parts: [{ text: streamingPrompt }] }],
             systemInstruction: { parts: [{ text: injectDateTime(synthesisSystemInstruction) }] },
-            generationConfig: { temperature: 0.3 }
+            generationConfig: {
+              temperature: 0.3,
+              thinkingConfig: buildThinkingConfig(synthesisThinkingLevel)
+            }
             // NO responseJsonSchema - this enables streaming!
           };
 
@@ -3412,7 +3458,9 @@ ${rawResultsJson}
           };
 
           // Start chart config request in parallel (don't await yet)
-          console.log('Starting parallel chart config request...');
+          console.group('📊 Chart Config API Request');
+          console.log('Chart Config Request Payload:', JSON.stringify(chartPayload, null, 2));
+          console.groupEnd();
           const chartPromise = fetch(
             `${GEMINI_API_BASE}/${selectedModel}:generateContent?key=${geminiApiKey}`,
             {
@@ -3423,7 +3471,9 @@ ${rawResultsJson}
           );
 
           // Stream text response (user sees text appearing progressively)
-          console.log('Starting streaming text response...');
+          console.group('📝 Synthesis Streaming API Request');
+          console.log('Synthesis Request Payload:', JSON.stringify(streamingPayload, null, 2));
+          console.groupEnd();
           let streamedText = '';
           try {
             streamedText = await streamGeminiResponse(streamingPayload, selectedModel, streamingMessage);
@@ -3572,6 +3622,7 @@ ${rawResultsJson}
       // Stream content from Gemini API
       async function streamGeminiResponse(payload, model, streamingMessage) {
         const url = `${GEMINI_API_BASE}/${model}:streamGenerateContent?key=${geminiApiKey}&alt=sse`;
+        console.log('🌊 Streaming API URL:', url.replace(geminiApiKey, '***API_KEY***'));
 
         try {
           const response = await fetch(url, {
@@ -3621,6 +3672,7 @@ ${rawResultsJson}
             }
           }
 
+          console.log('🌊 Streaming complete. Total chars:', fullText.length);
           return fullText;
         } catch (err) {
           console.error('Streaming error:', err);
@@ -3741,6 +3793,24 @@ ${rawResultsJson}
         chatMessages.appendChild(errorEl);
         chatMessages.scrollTop = chatMessages.scrollHeight;
         setTimeout(() => errorEl.remove(), 10000);
+      }
+
+      // Build thinkingConfig based on user input (supports levels: minimal, low, medium, high or numeric budget)
+      function buildThinkingConfig(thinkingValue) {
+        if (!thinkingValue) return undefined;
+        const val = thinkingValue.trim().toLowerCase();
+        // Check if it's a valid thinking level
+        const validLevels = ['minimal', 'low', 'medium', 'high'];
+        if (validLevels.includes(val)) {
+          return { thinkingLevel: val };
+        }
+        // Check if it's a numeric budget
+        const budgetNum = parseInt(val, 10);
+        if (!isNaN(budgetNum)) {
+          return { thinkingBudget: budgetNum };
+        }
+        // Default to 'low' if invalid
+        return { thinkingLevel: 'low' };
       }
 
       function escapeHtml(text) {
