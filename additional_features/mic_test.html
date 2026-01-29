@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Voice Input Demo</title>
+</head>
+
+<body>
+  <h1>Chat Portal Voice Input</h1>
+  <textarea id="chatInput" rows="5" cols="50" placeholder="Click the button and speak..."></textarea><br>
+  <button id="startButton">Start Voice Input</button>
+  <button id="stopButton" disabled>Stop Voice Input</button>
+  <select id="languageSelect">
+    <option value="en-US">English (US)</option>
+    <option value="es-ES">Español (España)</option>
+    <option value="fr-FR">Français (France)</option>
+    <option value="de-DE">Deutsch (Deutschland)</option>
+    <option value="ja-JP">日本語 (日本)</option>
+    <option value="hi-IN">हिन्दी (India)</option>
+    <!-- Add more languages as needed -->
+  </select>
+
+  <script>
+    const chatInput = document.getElementById('chatInput');
+    const startButton = document.getElementById('startButton');
+    const stopButton = document.getElementById('stopButton');
+    const languageSelect = document.getElementById('languageSelect');
+
+      // Auto-detect system language
+      const systemLang = navigator.language;
+      if (systemLang) {
+        const options = Array.from(languageSelect.options);
+        // Try exact match first, then prefix match
+        const match = options.find(opt => opt.value === systemLang) ||
+          options.find(opt => opt.value.startsWith(systemLang.split('-')[0]));
+        if (match) {
+          languageSelect.value = match.value;
+          console.log("Auto-detected language: " + match.value);
+        }
+      }
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    let recognition = null;
+
+    if (SpeechRecognition) {
+      recognition = new SpeechRecognition();
+
+      // Continuous recognition
+      recognition.continuous = true;
+      // Show interim results
+      recognition.interimResults = true;
+
+      recognition.onstart = () => {
+        startButton.disabled = true;
+        stopButton.disabled = false;
+        console.log("Voice recognition started.");
+      };
+
+      recognition.onend = () => {
+        startButton.disabled = false;
+        stopButton.disabled = true;
+        console.log("Voice recognition ended.");
+      };
+
+      recognition.onerror = (event) => {
+        console.error("Speech recognition error:", event.error);
+        if (event.error === 'no-speech') {
+          console.log("No speech detected.");
+        } else if (event.error === 'audio-capture') {
+          console.error("Microphone problem.");
+        } else if (event.error === 'not-allowed') {
+          console.error("Permission to use microphone was denied.");
+        }
+        startButton.disabled = false;
+        stopButton.disabled = true;
+      };
+
+      recognition.onresult = (event) => {
+        let interim_transcript = '';
+        let final_transcript = '';
+
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+          if (event.results[i].isFinal) {
+            final_transcript += event.results[i][0].transcript;
+          } else {
+            interim_transcript += event.results[i][0].transcript;
+          }
+        }
+        chatInput.value = final_transcript + interim_transcript;
+        console.log("Interim: ", interim_transcript);
+        console.log("Final: ", final_transcript);
+      };
+
+    } else {
+      console.error("Web Speech API is not supported in this browser.");
+      startButton.disabled = true;
+      languageSelect.disabled = true;
+    }
+
+    startButton.addEventListener('click', () => {
+      if (recognition) {
+        // Set the language from the dropdown
+        recognition.lang = languageSelect.value;
+        console.log("Language set to: " + recognition.lang);
+        try {
+          recognition.start();
+        } catch (e) {
+          console.error("Error starting recognition: ", e);
+        }
+      }
+    });
+
+    stopButton.addEventListener('click', () => {
+      if (recognition) {
+        recognition.stop();
+      }
+    });
+
+    languageSelect.addEventListener('change', () => {
+      if (recognition && !startButton.disabled) { // If not currently running
+        recognition.lang = languageSelect.value;
+        console.log("Recognition language changed to: " + recognition.lang);
+      }
+    });
+  </script>
+</body>
+
+</html>

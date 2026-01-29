@@ -1339,7 +1339,7 @@ When you receive **RAW MCP TOOL RESULTS**, you MUST:
 
     /* New Chat Button */
     .new-chat-btn {
-      display: none;
+      display: flex;
       align-items: center;
       gap: 6px;
       padding: 6px 12px;
@@ -1351,7 +1351,7 @@ When you receive **RAW MCP TOOL RESULTS**, you MUST:
       font-weight: 500;
       cursor: pointer;
       transition: background 0.2s, transform 0.2s;
-      margin-left: auto;
+      white-space: nowrap;
     }
 
     .new-chat-btn:hover {
@@ -1364,8 +1364,16 @@ When you receive **RAW MCP TOOL RESULTS**, you MUST:
       height: 14px;
     }
 
-    .branding-header:not(.inactive) .new-chat-btn {
-      display: flex;
+    /* Mobile: hide "New Chat" text, keep icon */
+    @media (max-width: 480px) {
+      .new-chat-btn {
+        padding: 6px;
+        font-size: 0;
+      }
+      .new-chat-btn svg {
+        width: 18px;
+        height: 18px;
+      }
     }
 
     /* Welcome Message - Suggestions Only */
@@ -1519,6 +1527,124 @@ When you receive **RAW MCP TOOL RESULTS**, you MUST:
     #send-btn svg {
       width: 22px;
       height: 22px;
+    }
+
+    /* Mic Button */
+    #mic-btn {
+      background: transparent;
+      color: var(--text-muted);
+      border: 2px solid var(--border-color);
+      border-radius: 50%;
+      width: 52px;
+      height: 52px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      flex-shrink: 0;
+    }
+
+    #mic-btn:hover:not(:disabled) {
+      border-color: var(--gov-blue);
+      color: var(--gov-blue);
+    }
+
+    #mic-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    #mic-btn.recording {
+      background: var(--danger);
+      border-color: var(--danger);
+      color: white;
+      animation: pulse-mic 1.5s infinite;
+    }
+
+    #mic-btn svg {
+      width: 22px;
+      height: 22px;
+    }
+
+    @keyframes pulse-mic {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.05); opacity: 0.8; }
+    }
+
+    /* Header Controls Container */
+    .header-controls {
+      display: none;
+      align-items: center;
+      gap: 8px;
+      margin-left: auto;
+    }
+
+    .branding-header:not(.inactive) .header-controls {
+      display: flex;
+    }
+
+    /* Voice Language Selector */
+    #voice-lang-select {
+      padding: 6px 8px;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      background: white;
+      color: var(--text-dark);
+      font-size: 0.75rem;
+      cursor: pointer;
+      outline: none;
+      transition: border-color 0.2s;
+      max-width: 100px;
+    }
+
+    #voice-lang-select:hover:not(:disabled) {
+      border-color: var(--gov-blue);
+    }
+
+    #voice-lang-select:focus {
+      border-color: var(--gov-blue);
+      box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.1);
+    }
+
+    #voice-lang-select:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* Mobile adjustments for language selector */
+    @media (max-width: 480px) {
+      #voice-lang-select {
+        max-width: 80px;
+        font-size: 0.7rem;
+        padding: 4px 6px;
+      }
+    }
+
+    /* Mic not supported tooltip */
+    .mic-tooltip {
+      position: absolute;
+      background: var(--text-dark);
+      color: white;
+      padding: 6px 10px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      margin-bottom: 8px;
+      white-space: nowrap;
+      z-index: 10;
+    }
+
+    .mic-tooltip::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      border: 6px solid transparent;
+      border-top-color: var(--text-dark);
     }
 
     /* Typing Indicator */
@@ -1675,25 +1801,29 @@ When you receive **RAW MCP TOOL RESULTS**, you MUST:
       /* Smaller branding header on mobile */
       .branding-header {
         padding: 8px 12px;
-        gap: 10px;
+        gap: 8px;
       }
 
       .branding-header .branding-icon {
-        width: 36px;
-        height: 36px;
-        font-size: 16px;
+        width: 32px;
+        height: 32px;
+        font-size: 14px;
       }
 
       .branding-header h2 {
-        font-size: 0.95rem;
+        font-size: 0.85rem;
       }
 
       .branding-header .branding-tagline {
-        font-size: 0.7rem;
+        display: none;
       }
 
       .branding-status {
         display: none !important;
+      }
+
+      .header-controls {
+        gap: 6px;
       }
 
       /* Edge toggle tabs on mobile - smaller */
@@ -1957,13 +2087,31 @@ When you receive **RAW MCP TOOL RESULTS**, you MUST:
           <p class="branding-tagline">Your Intelligent Companion | आपका बुद्धिमान सहायक</p>
         </div>
         <span class="branding-status">• Configure settings</span>
-        <button class="new-chat-btn" id="new-chat-btn" title="Start a new conversation">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="12" y1="5" x2="12" y2="19"></line>
-            <line x1="5" y1="12" x2="19" y2="12"></line>
-          </svg>
-          New Chat
-        </button>
+        <div class="header-controls">
+          <select id="voice-lang-select" title="Voice input language" disabled>
+            <option value="en-US">English</option>
+            <option value="en-IN">English (IN)</option>
+            <option value="hi-IN">हिन्दी</option>
+            <option value="bn-IN">বাংলা</option>
+            <option value="te-IN">తెలుగు</option>
+            <option value="ta-IN">தமிழ்</option>
+            <option value="mr-IN">मराठी</option>
+            <option value="gu-IN">ગુજરાતી</option>
+            <option value="kn-IN">ಕನ್ನಡ</option>
+            <option value="ml-IN">മലയാളം</option>
+            <option value="pa-IN">ਪੰਜਾਬੀ</option>
+            <option value="or-IN">ଓଡ଼ିଆ</option>
+            <option value="as-IN">অসমীয়া</option>
+            <option value="ur-IN">اردو</option>
+          </select>
+          <button class="new-chat-btn" id="new-chat-btn" title="Start a new conversation">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            New Chat
+          </button>
+        </div>
       </div>
 
       <div class="chat-area">
@@ -1987,6 +2135,14 @@ When you receive **RAW MCP TOOL RESULTS**, you MUST:
                 disabled
               ></textarea>
             </div>
+            <button id="mic-btn" title="Voice input" disabled>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                <line x1="12" y1="19" x2="12" y2="23"/>
+                <line x1="8" y1="23" x2="16" y2="23"/>
+              </svg>
+            </button>
             <button id="send-btn" title="Send message" disabled>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
@@ -2358,6 +2514,142 @@ When you receive **RAW MCP TOOL RESULTS**, you MUST:
       // Current user query for context
       let currentUserQuery = '';
 
+      // ============================================================
+      // VOICE INPUT (Web Speech API)
+      // ============================================================
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      let speechRecognition = null;
+      let isRecording = false;
+
+      function initVoiceInput() {
+        const micBtn = document.getElementById('mic-btn');
+        const langSelect = document.getElementById('voice-lang-select');
+        if (!micBtn) return;
+
+        if (!SpeechRecognition) {
+          console.warn('Web Speech API not supported in this browser');
+          micBtn.title = 'Voice input not supported in this browser';
+          micBtn.disabled = true;
+          if (langSelect) langSelect.disabled = true;
+          return false;
+        }
+
+        speechRecognition = new SpeechRecognition();
+        speechRecognition.continuous = true;
+        speechRecognition.interimResults = true;
+
+        // Auto-detect system language and select matching option
+        const systemLang = navigator.language || 'en-US';
+        if (langSelect) {
+          const options = Array.from(langSelect.options);
+          // Try exact match first, then prefix match
+          const match = options.find(opt => opt.value === systemLang) ||
+            options.find(opt => opt.value.startsWith(systemLang.split('-')[0]));
+          if (match) {
+            langSelect.value = match.value;
+          }
+          // Set initial language from dropdown
+          speechRecognition.lang = langSelect.value;
+          console.log('Voice input initialized with language:', langSelect.value);
+
+          // Update language when dropdown changes
+          langSelect.addEventListener('change', () => {
+            speechRecognition.lang = langSelect.value;
+            console.log('Voice recognition language changed to:', langSelect.value);
+            // If currently recording, restart with new language
+            if (isRecording) {
+              speechRecognition.stop();
+              setTimeout(() => {
+                try {
+                  speechRecognition.start();
+                } catch (e) {
+                  console.error('Error restarting recognition:', e);
+                }
+              }, 100);
+            }
+          });
+        } else {
+          speechRecognition.lang = systemLang;
+          console.log('Voice input initialized with language:', systemLang);
+        }
+
+        speechRecognition.onstart = () => {
+          isRecording = true;
+          micBtn.classList.add('recording');
+          micBtn.title = 'Stop voice input';
+          console.log('Voice recognition started');
+        };
+
+        speechRecognition.onend = () => {
+          isRecording = false;
+          micBtn.classList.remove('recording');
+          micBtn.title = 'Voice input';
+          console.log('Voice recognition ended');
+        };
+
+        speechRecognition.onerror = (event) => {
+          console.error('Speech recognition error:', event.error);
+          isRecording = false;
+          micBtn.classList.remove('recording');
+          micBtn.title = 'Voice input';
+
+          if (event.error === 'not-allowed') {
+            showError('Microphone access denied. Please allow microphone access in your browser settings.');
+          } else if (event.error === 'no-speech') {
+            // No speech detected - don't show error, just stop
+          } else if (event.error === 'audio-capture') {
+            showError('No microphone found. Please connect a microphone.');
+          }
+        };
+
+        speechRecognition.onresult = (event) => {
+          let interimTranscript = '';
+          let finalTranscript = '';
+
+          for (let i = event.resultIndex; i < event.results.length; ++i) {
+            if (event.results[i].isFinal) {
+              finalTranscript += event.results[i][0].transcript;
+            } else {
+              interimTranscript += event.results[i][0].transcript;
+            }
+          }
+
+          // Update the chat input with the transcription
+          const chatInput = document.getElementById('chat-input');
+          if (chatInput) {
+            chatInput.value = finalTranscript + interimTranscript;
+            // Trigger auto-resize
+            chatInput.style.height = 'auto';
+            chatInput.style.height = Math.min(chatInput.scrollHeight, 150) + 'px';
+          }
+        };
+
+        // Mic button click handler
+        micBtn.addEventListener('click', toggleVoiceInput);
+
+        return true;
+      }
+
+      function toggleVoiceInput() {
+        if (!speechRecognition) return;
+
+        if (isRecording) {
+          speechRecognition.stop();
+        } else {
+          try {
+            speechRecognition.start();
+          } catch (e) {
+            console.error('Error starting voice recognition:', e);
+          }
+        }
+      }
+
+      function stopVoiceInput() {
+        if (speechRecognition && isRecording) {
+          speechRecognition.stop();
+        }
+      }
+
       // Note: Visualization type detection is now handled by structured output in finalResponseSchema
       // The detectVisualizationType() and detectVisualizationTypeWithGemini() functions have been removed.
 
@@ -2632,6 +2924,7 @@ When you receive **RAW MCP TOOL RESULTS**, you MUST:
       const chatMessages = document.getElementById('chat-messages');
       const chatInput = document.getElementById('chat-input');
       const sendBtn = document.getElementById('send-btn');
+      const micBtn = document.getElementById('mic-btn');
       const welcomeMessage = document.getElementById('welcome-message');
       const apiKeyInput = document.getElementById('api-key-input');
       const modelSelect = document.getElementById('model-select');
@@ -2801,6 +3094,9 @@ When you receive **RAW MCP TOOL RESULTS**, you MUST:
             chatInput.focus();
           });
         }
+
+        // Initialize voice input
+        initVoiceInput();
 
         // Auto-connect if config exists
         if (geminiApiKey) {
@@ -2994,6 +3290,12 @@ When you receive **RAW MCP TOOL RESULTS**, you MUST:
           ? 'Ask about Indian economic data, policies, or government schemes...'
           : 'Ask questions about policies or economic data...';
         sendBtn.disabled = false;
+        // Enable mic button and language selector if speech recognition is supported
+        if (micBtn && SpeechRecognition) {
+          micBtn.disabled = false;
+          const langSelect = document.getElementById('voice-lang-select');
+          if (langSelect) langSelect.disabled = false;
+        }
         document.querySelectorAll('.suggestion').forEach(btn => {
           btn.disabled = false;
         });
@@ -3650,6 +3952,11 @@ When you receive **RAW MCP TOOL RESULTS**, you MUST:
         isProcessing = true;
         sendBtn.disabled = true;
         chatInput.disabled = true;
+        // Stop voice input if recording and disable mic controls
+        stopVoiceInput();
+        if (micBtn) micBtn.disabled = true;
+        const langSelect = document.getElementById('voice-lang-select');
+        if (langSelect) langSelect.disabled = true;
         const typingEl = showTypingIndicator();
 
         const userMessage = message;
@@ -3713,6 +4020,11 @@ When you receive **RAW MCP TOOL RESULTS**, you MUST:
             isProcessing = false;
             sendBtn.disabled = false;
             chatInput.disabled = false;
+            if (micBtn && SpeechRecognition) {
+              micBtn.disabled = false;
+              const langSelect = document.getElementById('voice-lang-select');
+              if (langSelect) langSelect.disabled = false;
+            }
             chatInput.focus();
           }
           return;
@@ -3954,6 +4266,11 @@ ${rawResultsJson}
           isProcessing = false;
           sendBtn.disabled = false;
           chatInput.disabled = false;
+          if (micBtn && SpeechRecognition) {
+            micBtn.disabled = false;
+            const langSelect = document.getElementById('voice-lang-select');
+            if (langSelect) langSelect.disabled = false;
+          }
           chatInput.focus();
         }
       }
