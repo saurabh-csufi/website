@@ -30,6 +30,12 @@ __pycache__/
 .env.list
 custom_dc/.env-test
 
+# Backend config with API keys
+additional_features/config.json
+
+# Backend session logs
+additional_features/logs/
+
 # Mac
 .DS_Store
 
@@ -122,3 +128,6 @@ GEMINI.md
 .gemini/
 # Webdriver recordings (tracked as tar.gz)
 server/tests/test_data/webdriver_recordings/
+
+additional_features/config.json
+additional_features/logs/

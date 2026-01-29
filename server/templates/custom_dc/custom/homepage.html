@@ -1907,6 +1907,24 @@ When you receive **RAW MCP TOOL RESULTS**, you MUST:
     .dc-chart-wrapper {
       margin: 16px 0;
     }
+
+    /* Config Source Toggle Styles */
+    .config-source-section .radio-option {
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .config-source-section .radio-option:hover {
+      background: #e9ecef !important;
+    }
+
+    .config-source-section .radio-option:has(input:checked) {
+      border-color: var(--gov-blue) !important;
+      background: #f0f7ff !important;
+    }
+
+    .config-source-section input[type="radio"] {
+      accent-color: var(--gov-blue);
+    }
   </style>
 {% endblock %}
 
@@ -2001,6 +2019,47 @@ When you receive **RAW MCP TOOL RESULTS**, you MUST:
         <button class="sidebar-close" id="close-settings">×</button>
       </div>
       <div class="settings-content" id="settings-content">
+        <!-- Configuration Source Toggle -->
+        <div class="config-section config-source-section">
+          <label>Configuration Source</label>
+          <div class="source-options" style="display: flex; flex-direction: column; gap: 8px; margin-top: 8px;">
+            <label class="radio-option" style="display: flex; align-items: flex-start; gap: 8px; padding: 10px; background: #f8f9fa; border-radius: 6px; cursor: pointer; border: 2px solid transparent;" data-value="frontend">
+              <input type="radio" name="config-source" value="frontend" checked style="margin-top: 2px;">
+              <div>
+                <span style="font-weight: 600; color: var(--text-dark);">Frontend</span>
+                <small style="display: block; color: var(--text-muted); font-size: 0.75rem;">Configure API key and settings locally in browser</small>
+              </div>
+            </label>
+            <label class="radio-option" style="display: flex; align-items: flex-start; gap: 8px; padding: 10px; background: #f8f9fa; border-radius: 6px; cursor: pointer; border: 2px solid transparent;" data-value="backend">
+              <input type="radio" name="config-source" value="backend" style="margin-top: 2px;">
+              <div>
+                <span style="font-weight: 600; color: var(--text-dark);">Backend</span>
+                <small style="display: block; color: var(--text-muted); font-size: 0.75rem;">Use server-side config.json (no API key needed here)</small>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Backend Status (shown when backend mode selected) -->
+        <div class="config-section backend-status-section" id="backend-status-section" style="display: none;">
+          <div style="padding: 16px; background: #e8f5e9; border-radius: 8px; border-left: 4px solid var(--green);">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+              </svg>
+              <span style="font-weight: 600; color: var(--green);">Backend Mode Active</span>
+            </div>
+            <p style="margin: 0; font-size: 0.85rem; color: var(--text-dark);">
+              All Gemini API calls will go through the backend server.<br>
+              Configuration is managed in <code>config.json</code>
+            </p>
+            <div id="backend-config-info" style="margin-top: 12px; font-size: 0.8rem; color: var(--text-muted);"></div>
+          </div>
+        </div>
+
+        <!-- Frontend Settings (hidden when backend mode selected) -->
+        <div id="frontend-settings">
         <div class="config-section">
           <label for="api-key-input">Gemini API Key</label>
           <input type="password" id="api-key-input" placeholder="Enter your Gemini API key">
@@ -2080,6 +2139,7 @@ When you receive **RAW MCP TOOL RESULTS**, you MUST:
           </div>
           <textarea id="synthesis-prompt-input" class="prompt-textarea" placeholder="Synthesis/combining instructions..."></textarea>
         </div>
+        </div><!-- End frontend-settings -->
 
         <button class="btn-primary" id="save-config">Save and Connect</button>
         <button class="btn-secondary" id="reset-prompts">Reset Prompts to Defaults</button>
@@ -2236,6 +2296,13 @@ When you receive **RAW MCP TOOL RESULTS**, you MUST:
       // Thinking level config for Gemini 3 models (values: minimal, low, medium, high or budget number)
       let mcpThinkingLevel = localStorage.getItem('mcp_thinking_level') || 'low';
       let synthesisThinkingLevel = localStorage.getItem('synthesis_thinking_level') || 'low';
+
+      // Configuration source: 'frontend' or 'backend'
+      let configSource = localStorage.getItem('config_source') || 'frontend';
+      let backendConnected = false;
+
+      // Session ID for backend mode logging (persists across follow-up messages)
+      let currentConversationSessionId = null;
 
       // PDF Knowledge Base Source URLs - maps PDF filenames to their URLs
       const kbSourceUrls = {
@@ -2623,6 +2690,19 @@ When you receive **RAW MCP TOOL RESULTS**, you MUST:
         if (mcpThinkingInput) mcpThinkingInput.value = mcpThinkingLevel;
         if (synthesisThinkingInput) synthesisThinkingInput.value = synthesisThinkingLevel;
 
+        // Config source toggle listeners
+        document.querySelectorAll('input[name="config-source"]').forEach(radio => {
+          radio.addEventListener('change', (e) => {
+            configSource = e.target.value;
+            localStorage.setItem('config_source', configSource);
+            updateConfigSourceUI();
+            console.log(`Config source changed to: ${configSource}`);
+          });
+        });
+
+        // Initialize config source UI
+        updateConfigSourceUI();
+
         // Event listeners
         saveConfigBtn.addEventListener('click', saveConfig);
         document.getElementById('reset-prompts')?.addEventListener('click', resetPromptsToDefaults);
@@ -2707,6 +2787,12 @@ When you receive **RAW MCP TOOL RESULTS**, you MUST:
             // Clear conversation history
             conversationHistory = [];
 
+            // Clear session ID (for backend mode logging)
+            clearSessionId();
+
+            // Clear tool calls from sidebar
+            clearToolCalls();
+
             // Clear input
             chatInput.value = '';
             chatInput.style.height = 'auto';
@@ -2724,9 +2810,40 @@ When you receive **RAW MCP TOOL RESULTS**, you MUST:
 
       // Save configuration and connect
       async function saveConfig() {
+        const url = mcpUrlInput.value.trim();
+
+        // Always save MCP proxy URL (used by both modes)
+        mcpProxyUrl = url;
+        localStorage.setItem('mcp_proxy_url', url);
+
+        configStatus.textContent = 'Connecting...';
+        configStatus.style.color = 'var(--text-muted)';
+
+        // Handle Backend Mode
+        if (configSource === 'backend') {
+          console.log('=== Backend Mode Configuration ===');
+
+          // Check backend connection
+          backendConnected = await checkBackendConnection();
+
+          if (backendConnected) {
+            // Also initialize MCP session on backend proxy
+            const mcpOk = await checkMcpConnection();
+            mcpConnected = mcpOk;
+
+            enableChat();
+            updateStatusBadges();
+            configStatus.innerHTML = 'Backend connected! <span style="color: var(--success);">Ready to chat.</span>';
+          } else {
+            configStatus.textContent = 'Cannot connect to backend. Check if proxy server is running.';
+            configStatus.style.color = 'var(--danger)';
+          }
+          return;
+        }
+
+        // Handle Frontend Mode (original logic)
         const key = apiKeyInput.value.trim();
         const model = modelSelect?.value || 'gemini-3-flash-preview';
-        const url = mcpUrlInput.value.trim();
         const enabled = mcpEnabledCheckbox.checked;
         const kbStore = kbStoreInput.value.trim();
         const kbOn = kbEnabledCheckbox.checked;
@@ -2739,14 +2856,12 @@ When you receive **RAW MCP TOOL RESULTS**, you MUST:
 
         geminiApiKey = key;
         selectedModel = model;
-        mcpProxyUrl = url;
         mcpEnabled = enabled;
         kbStoreId = kbStore;
         kbEnabled = kbOn;
 
         localStorage.setItem('gemini_api_key', key);
         localStorage.setItem('selected_model', model);
-        localStorage.setItem('mcp_proxy_url', url);
         localStorage.setItem('mcp_enabled', enabled.toString());
         localStorage.setItem('kb_store_id', kbStore);
         localStorage.setItem('kb_enabled', kbOn.toString());
@@ -2777,6 +2892,7 @@ When you receive **RAW MCP TOOL RESULTS**, you MUST:
 
         // Console log the updated config
         console.group('📝 Config Updated (at ' + getCurrentDateTimeIST() + ')');
+        console.log('Config Source:', configSource);
         console.log('Selected Model:', selectedModel);
         console.log('MCP Thinking Level:', mcpThinkingLevel);
         console.log('Synthesis Thinking Level:', synthesisThinkingLevel);
@@ -2784,9 +2900,6 @@ When you receive **RAW MCP TOOL RESULTS**, you MUST:
         console.log('KB System Prompt (with DateTime):', injectDateTime(kbSystemInstruction));
         console.log('Synthesis Prompt (with DateTime):', injectDateTime(synthesisSystemInstruction));
         console.groupEnd();
-
-        configStatus.textContent = 'Connecting...';
-        configStatus.style.color = 'var(--text-muted)';
 
         // Check MCP connection if enabled
         if (mcpEnabled && url) {
@@ -2877,7 +2990,7 @@ When you receive **RAW MCP TOOL RESULTS**, you MUST:
 
       function enableChat() {
         chatInput.disabled = false;
-        chatInput.placeholder = mcpConnected
+        chatInput.placeholder = (mcpConnected || (configSource === 'backend' && backendConnected))
           ? 'Ask about Indian economic data, policies, or government schemes...'
           : 'Ask questions about policies or economic data...';
         sendBtn.disabled = false;
@@ -2888,6 +3001,213 @@ When you receive **RAW MCP TOOL RESULTS**, you MUST:
         if (brandingHeader) {
           brandingHeader.classList.remove('inactive');
         }
+      }
+
+      // ============================================================
+      // BACKEND MODE API FUNCTIONS
+      // ============================================================
+
+      /**
+       * Check backend connection and fetch config
+       */
+      async function checkBackendConnection() {
+        try {
+          const response = await fetch(`${mcpProxyUrl}/api/config`, {
+            method: 'GET',
+            headers: { 'Accept': 'application/json' }
+          });
+
+          if (!response.ok) return false;
+
+          const data = await response.json();
+          if (data.success && data.config) {
+            // Update backend config info display
+            const configInfo = document.getElementById('backend-config-info');
+            if (configInfo) {
+              configInfo.innerHTML = `
+                <div><strong>Model:</strong> ${data.config.gemini?.mcp_model || 'Not set'}</div>
+                <div><strong>MCP:</strong> ${data.config.mcp?.enabled ? 'Enabled' : 'Disabled'}</div>
+                <div><strong>KB:</strong> ${data.config.knowledge_base?.enabled ? 'Enabled' : 'Disabled'}</div>
+                <div><strong>API Key:</strong> ${data.config.has_api_key ? 'Configured' : 'Missing!'}</div>
+              `;
+            }
+            return data.config.has_api_key;
+          }
+          return false;
+        } catch (err) {
+          console.error('Backend connection error:', err);
+          return false;
+        }
+      }
+
+      /**
+       * Backend streaming chat - calls /api/chat/stream endpoint
+       */
+      async function backendChatStream(userMessage, streamingMessage) {
+        console.log('=== Backend Chat Stream ===');
+        clearToolCalls();
+
+        try {
+          const response = await fetch(`${mcpProxyUrl}/api/chat/stream`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              message: userMessage,
+              history: conversationHistory.slice(-20),  // Last 20 messages
+              session_id: currentConversationSessionId  // Send existing session ID for follow-ups
+            })
+          });
+
+          if (!response.ok) {
+            throw new Error(`Backend error: ${response.status}`);
+          }
+
+          const reader = response.body.getReader();
+          const decoder = new TextDecoder();
+          let fullText = '';
+          let chartConfig = null;
+          let durationMs = null;
+
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+
+            const chunk = decoder.decode(value, { stream: true });
+            const lines = chunk.split('\n');
+
+            for (const line of lines) {
+              if (!line.startsWith('data: ')) continue;
+
+              try {
+                const data = JSON.parse(line.slice(6));
+
+                // Capture and persist session ID
+                if (data.session_id) {
+                  currentConversationSessionId = data.session_id;
+                  showSessionId(data.session_id);
+                  console.log(`Session ID: ${data.session_id}`);
+                }
+
+                // Handle status updates
+                if (data.status) {
+                  console.log(`Status: ${data.status} - ${data.message || ''}`);
+                  // Could update a status indicator in UI here
+                }
+
+                // Handle tool calls (for left sidebar)
+                if (data.type === 'tool_call') {
+                  const toolEl = showToolCall(data.name, data.arguments);
+                  updateToolCallResult(toolEl, data.result, data.status === 'error', data.name);
+                }
+
+                // Handle streaming text
+                if (data.text) {
+                  fullText += data.text;
+                  streamingMessage.setText(fullText);
+                }
+
+                // Handle chart config
+                if (data.chart_config) {
+                  chartConfig = data.chart_config;
+                }
+
+                // Handle completion with duration
+                if (data.done) {
+                  console.log('Backend stream complete');
+                  if (data.duration_ms) {
+                    durationMs = data.duration_ms;
+                  }
+                }
+
+                // Handle errors
+                if (data.error) {
+                  console.error('Backend error:', data.error);
+                  streamingMessage.setText(`Error: ${data.error}`);
+                }
+              } catch (parseErr) {
+                // Skip invalid JSON lines
+                continue;
+              }
+            }
+          }
+
+          return { text: fullText, chartConfig, sessionId: currentConversationSessionId, durationMs };
+
+        } catch (err) {
+          console.error('Backend chat stream error:', err);
+          throw err;
+        }
+      }
+
+      /**
+       * Display session ID in the backend config section
+       */
+      function showSessionId(sessionId) {
+        // Display in backend config info section
+        const backendConfigInfo = document.getElementById('backend-config-info');
+        if (backendConfigInfo) {
+          // Find or create session ID row
+          let sessionRow = backendConfigInfo.querySelector('.session-id-row');
+          if (!sessionRow) {
+            sessionRow = document.createElement('div');
+            sessionRow.className = 'session-id-row';
+            sessionRow.style.cssText = 'margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(0,0,0,0.1);';
+            backendConfigInfo.appendChild(sessionRow);
+          }
+          sessionRow.innerHTML = `
+            <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 2px;">Session ID:</div>
+            <div style="font-family: monospace; font-size: 0.8rem; color: var(--primary); cursor: pointer; display: flex; align-items: center; gap: 6px;"
+                 title="Click to copy" id="session-id-value">
+              ${sessionId}
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="opacity: 0.6;">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+              </svg>
+            </div>
+          `;
+          sessionRow.querySelector('#session-id-value').onclick = () => {
+            navigator.clipboard.writeText(sessionId);
+            const valueEl = sessionRow.querySelector('#session-id-value');
+            const originalHtml = valueEl.innerHTML;
+            valueEl.innerHTML = '<span style="color: var(--green);">Copied!</span>';
+            setTimeout(() => valueEl.innerHTML = originalHtml, 1000);
+          };
+        }
+      }
+
+      /**
+       * Clear session ID display
+       */
+      function clearSessionId() {
+        currentConversationSessionId = null;
+        const sessionRow = document.querySelector('.session-id-row');
+        if (sessionRow) sessionRow.remove();
+      }
+
+      /**
+       * Toggle config source UI visibility
+       */
+      function updateConfigSourceUI() {
+        const frontendSettings = document.getElementById('frontend-settings');
+        const backendStatusSection = document.getElementById('backend-status-section');
+        const saveBtn = document.getElementById('save-config');
+
+        if (configSource === 'backend') {
+          // Hide frontend settings, show backend status
+          if (frontendSettings) frontendSettings.style.display = 'none';
+          if (backendStatusSection) backendStatusSection.style.display = 'block';
+          if (saveBtn) saveBtn.textContent = 'Connect to Backend';
+        } else {
+          // Show frontend settings, hide backend status
+          if (frontendSettings) frontendSettings.style.display = 'block';
+          if (backendStatusSection) backendStatusSection.style.display = 'none';
+          if (saveBtn) saveBtn.textContent = 'Save and Connect';
+        }
+
+        // Update radio button states
+        document.querySelectorAll('input[name="config-source"]').forEach(radio => {
+          radio.checked = radio.value === configSource;
+        });
       }
 
       // Auto-resize textarea
@@ -3296,10 +3616,17 @@ When you receive **RAW MCP TOOL RESULTS**, you MUST:
 
       // ============================================================
       // MAIN: Send message - calls BOTH MCP and KB, combines results
+      // Supports both frontend (direct Gemini) and backend (proxy) modes
       // ============================================================
       async function sendMessage() {
         const message = chatInput.value.trim();
-        if (!message || isProcessing || !geminiApiKey) return;
+
+        // Validate based on config source
+        if (configSource === 'backend') {
+          if (!message || isProcessing || !backendConnected) return;
+        } else {
+          if (!message || isProcessing || !geminiApiKey) return;
+        }
 
         // Hide welcome message
         if (welcomeMessage) {
@@ -3327,8 +3654,75 @@ When you receive **RAW MCP TOOL RESULTS**, you MUST:
 
         const userMessage = message;
 
+        // ============================================================
+        // BACKEND MODE: Use streaming API from proxy server
+        // ============================================================
+        if (configSource === 'backend') {
+          console.log('=== BACKEND MODE: Using proxy server for Gemini calls ===');
+
+          try {
+            // Remove typing indicator and create streaming message
+            typingEl.remove();
+            const streamingMessage = createStreamingMessage();
+            streamingMessage.setText('Agent is thinking...');
+
+            // Call backend streaming API
+            const result = await backendChatStream(userMessage, streamingMessage);
+
+            // Finalize the message
+            streamingMessage.finalize();
+
+            // Show response duration
+            if (result.durationMs) {
+              const messageEl = streamingMessage.getElement();
+              const durationEl = document.createElement('div');
+              durationEl.className = 'response-duration';
+              durationEl.style.cssText = 'font-size: 0.75rem; color: var(--text-tertiary); margin-top: 12px; padding-top: 8px; border-top: 1px solid var(--border-color); display: flex; align-items: center; gap: 4px;';
+              const seconds = (result.durationMs / 1000).toFixed(1);
+              durationEl.innerHTML = `
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+                Response generated in ${seconds}s
+              `;
+              messageEl.querySelector('.message-content').appendChild(durationEl);
+            }
+
+            // Handle chart if available
+            if (result.chartConfig && result.chartConfig.should_render) {
+              console.log('Backend chart config:', result.chartConfig);
+              const messageEl = streamingMessage.getElement();
+              await injectChartIntoMessage(messageEl, result.chartConfig);
+            }
+
+            // Add to conversation history
+            conversationHistory.push({ role: 'user', parts: [{ text: userMessage }] });
+            conversationHistory.push({ role: 'model', parts: [{ text: result.text }] });
+
+            // Keep history manageable
+            if (conversationHistory.length > 40) {
+              conversationHistory = conversationHistory.slice(-30);
+            }
+
+          } catch (err) {
+            console.error('Backend chat error:', err);
+            typingEl.remove();
+            addMessage('assistant', `Error: ${err.message}. Please check if the backend server is running.`);
+          } finally {
+            isProcessing = false;
+            sendBtn.disabled = false;
+            chatInput.disabled = false;
+            chatInput.focus();
+          }
+          return;
+        }
+
+        // ============================================================
+        // FRONTEND MODE: Direct Gemini API calls (existing logic)
+        // ============================================================
         try {
-          console.log('=== Processing Query with Structured Output ===');
+          console.log('=== FRONTEND MODE: Processing Query with Structured Output ===');
           console.log(`User message: ${userMessage}`);
           console.log(`MCP connected: ${mcpConnected}, Tools: ${mcpTools.length}`);
           console.log(`KB enabled: ${kbEnabled}, Store: ${kbStoreId}`);
@@ -3597,6 +3991,8 @@ ${rawResultsJson}
 
         return {
           element: messageEl,
+          // Get the element (for chart injection)
+          getElement: () => messageEl,
           // Update with new text chunk
           appendText: (text) => {
             currentText += text;
