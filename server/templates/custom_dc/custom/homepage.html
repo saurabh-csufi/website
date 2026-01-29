@@ -31,7 +31,7 @@
   <script src="/datacommons.js"></script>
   <script>
     window.CHAT_CONFIG = {
-      PROMPT_VERSION: '1.1.0',  // Increment when prompts change to auto-invalidate localStorage
+      PROMPT_VERSION: '1.4.0',  // Increment when prompts change to auto-invalidate localStorage
       models: {
         MCP_MODEL: 'gemini-3-flash-preview',
         KB_MODEL: 'gemini-3-flash-preview'
@@ -510,74 +510,75 @@ Before responding, classify the query:
 
 **Current Date & Time**: {{CURRENT_DATETIME}}
 
-### Role: Strategic Intelligence Synthesizer
+### CRITICAL GROUNDING RULES - ZERO TOLERANCE FOR HALLUCINATION
 
-You are Data Agent, synthesizing insights from both **Statistical Data** and **Policy Documents** into a unified, actionable response.
+**YOU MUST FOLLOW THESE RULES EXACTLY:**
 
-### Your Task
-Combine statistical data with policy information to create a comprehensive business narrative. Do NOT use labels like "From Data Commons" or "From Policy Documents" - weave the information naturally.
+1. **ONLY use information from the DATA RESULTS and POLICY INFORMATION provided below**
+2. **DO NOT use your training knowledge or make assumptions**
+3. **Every factual statement MUST include an inline citation**
+4. **If information is not in the provided context, say: "I don't have this specific data in the current dataset."**
+5. **If data shows source_id:unknown or alternative_sources:[], treat it as UNAVAILABLE - simply say the data is not available (do NOT mention these technical field names to the user)**
+6. **ONLY cite numbers that appear EXACTLY in the data results - do not calculate or derive new numbers**
+7. **Do NOT create comparison tables unless the data explicitly contains all values for each row**
+8. **If asked about state-wise data but only country-level exists, clearly state: "State-wise breakdown is not available in our dataset."**
+9. **NEVER expose technical details like field names, JSON structures, or internal identifiers to the user**
+
+### Citation Format (MANDATORY)
+
+- For statistics: [Source: <actual_provenance>] - Extract the actual data source from the tool results (e.g., MOSPI, Census, RBI, DGCIS). Look for source names in variable names, metadata, or provenance fields.
+- For Knowledge Base/policy docs: [Source: <exact_document_title>]
+
+**How to identify the source:**
+- If variable contains 'MOSPI' → [Source: MOSPI]
+- If variable contains 'Census' → [Source: Census of India]
+- If variable contains 'DGCIS' or 'EIDB' → [Source: DGCIS]
+- If variable contains 'RBI' → [Source: RBI]
+- If source unclear, use [Source: Data Commons]
+
+### Example Response with Inline Citations
+
+"Maharashtra's GSDP in FY 2024-25 was **Rs 45,31,518.42 Crore** [Source: MOSPI]."
+
+### What NOT to do - STRICTLY PROHIBITED
+
+- Do NOT make claims without citations
+- Do NOT use phrases like "typically", "generally", "approximately" without source
+- Do NOT fill gaps with general knowledge
+- Do NOT hallucinate statistics, percentages, or rankings
+- Do NOT create state/sector comparisons unless data exists for ALL items
+- Do NOT invent trends, drivers, or key factors not in the data
+- Do NOT name specific states/companies unless they appear in the data
+
+### When Data is Insufficient (MANDATORY)
+
+**ALWAYS end your response with this exact sentence when specific data is not available:**
+
+"If you'd like to see this data in Data Commons, you can [submit a data request](https://docs.datacommons.org/contributing)."
+
+This link MUST appear in your response whenever:
+- The specific metric asked for is not in the dataset
+- State-wise breakdown is not available
+- The data source shows "unknown"
+- You have to use related/proxy data instead of exact data requested
 
 ### Response Structure
 
-
 **Rich Formatting Rules**:
-- **Bold** for all numerical values: **₹2,380 Cr**, **23.69% growth**, **Top 5 markets**
-- *Italics* for scheme names: *PMEGP*, *RoDTEP*, *Udyam Registration*
-- Use bullet points for lists
-- Use tables for comparisons (if comparing 3+ items)
-- Use > blockquotes for important policy highlights or warnings
+- **Bold** for all numerical values with citation
+- *Italics* for scheme names with citation
+- Only use tables if data explicitly supports all cells
 
 **Indian Context**:
-- All currency in ₹ (Lakhs, Crores)
+- All currency in Rs (Lakhs, Crores)
 - Reference Indian fiscal years where relevant (FY 2020-21)
-- Mention relevant ministries (MoCI, MoMSME)
 
-### Follow-Up Suggestions (for follow_up_suggestions array)
+### Follow-Up Suggestions
 
-Include 3 relevant follow-up questions in the follow_up_suggestions array.
-
-**Rules for follow_up_suggestions:**
-- Write as **direct commands/queries** (imperative), NOT conversational questions
-- Do NOT use "Shall I...", "Would you like...", "Do you want..."
-- Keep suggestions concise (under 60 characters)
-- Make them specific and actionable
-
-**Example follow_up_suggestions array:**
-["Compare rural vs urban vegetable inflation", "Show food price index trend since 2020", "Which food category has highest inflation?"]
-
-**Topic-specific ideas:**
-- CPI/Prices: "Compare rural vs urban CPI for {category}", "Show {category} inflation trend"
-- Exports: "Show top export markets for {commodity}", "Compare {commodity} exports year over year"
-- Factory data: "Compare factory employment across states", "Show factory output trends"
-
-### Important Guidelines
-- Prioritize actionable insights over raw data
-- Connect export opportunities with available policy support
-- Always maintain Indian business context
-
-### CRITICAL: Handling RAW MCP TOOL RESULTS
-
-When you receive **RAW MCP TOOL RESULTS**, you MUST:
-
-1. **Look for actual numeric data** in the tool results:
-   - Search for "time_series", "observations", "values", "value" keys
-   - Look inside nested structures like "place_observations"
-   - Extract dates and their corresponding values
-
-2. **If numeric data exists, ALWAYS include it in your response**:
-   - Present actual numbers from the data (e.g., "Karnataka's GSDP was **₹21.08 Lakh Cr** in 2024")
-   - Show trends if multiple years are present
-   - Format numbers in Indian notation (Lakhs, Crores)
-
-3. **If NO data was found** (empty results, errors, or tool failures):
-   - Explain what was searched
-   - Suggest alternative queries or related data that might be available
-
-4. **Follow-up suggestions format**:
-   End your response with EXACTLY 3 follow-up suggestions using this format:
-   [suggestion: Your first follow-up suggestion here]
-   [suggestion: Your second follow-up suggestion here]
-   [suggestion: Your third follow-up suggestion here]`
+Include 3 relevant follow-up questions using this format:
+[suggestion: Your first follow-up suggestion here]
+[suggestion: Your second follow-up suggestion here]
+[suggestion: Your third follow-up suggestion here]`
       }
     };
   </script>
@@ -2033,6 +2034,41 @@ When you receive **RAW MCP TOOL RESULTS**, you MUST:
       text-decoration: underline;
     }
 
+    /* Inline citation styling */
+    .inline-citation {
+      color: var(--gov-blue);
+      font-size: 0.9em;
+      font-weight: 500;
+      cursor: help;
+      white-space: nowrap;
+    }
+
+    .inline-citation:hover {
+      text-decoration: underline;
+    }
+
+    /* No data notice styling */
+    .no-data-notice {
+      background: #fff3cd;
+      border: 1px solid #ffc107;
+      border-radius: 8px;
+      padding: 16px;
+      margin: 12px 0;
+    }
+
+    .no-data-notice p {
+      margin: 0 0 8px 0;
+    }
+
+    .no-data-notice p:last-child {
+      margin-bottom: 0;
+    }
+
+    .no-data-notice a {
+      color: var(--gov-blue);
+      font-weight: 600;
+    }
+
     /* DC Chart wrapper */
     .dc-chart-wrapper {
       margin: 16px 0;
@@ -3402,6 +3438,15 @@ When you receive **RAW MCP TOOL RESULTS**, you MUST:
                   updateToolCallResult(toolEl, data.result, data.status === 'error', data.name);
                 }
 
+                // Handle data availability status (no data found)
+                // NOTE: In backend mode, we just log this - let synthesis handle the response
+                // The backend will programmatically append the data request link after synthesis
+                if (data.data_status && !data.data_status.has_data) {
+                  console.log('Data status: No data found -', data.data_status);
+                  // Don't override fullText here - synthesis will handle the response gracefully
+                  // and backend will append the data request link programmatically
+                }
+
                 // Handle streaming text
                 if (data.text) {
                   fullText += data.text;
@@ -3605,15 +3650,9 @@ When you receive **RAW MCP TOOL RESULTS**, you MUST:
         const toolResultsCollector = [];
 
         try {
-          // Build contents with conversation history
-          const contents = [];
-          // Add conversation history (limit to last 10 turns to avoid token limits)
-          const historyLimit = Math.max(0, conversationHistory.length - 20);
-          for (let i = historyLimit; i < conversationHistory.length; i++) {
-            contents.push(conversationHistory[i]);
-          }
-          // Add current user message
-          contents.push({ role: 'user', parts: [{ text: userMessage }] });
+          // NO history for MCP calls - fresh search every time
+          // History is only used in synthesis phase for context
+          const contents = [{ role: 'user', parts: [{ text: userMessage }] }];
 
           // Function calling loop
           let maxIterations = 5;
@@ -3839,15 +3878,9 @@ When you receive **RAW MCP TOOL RESULTS**, you MUST:
         console.log(`KB Store: ${kbStoreId}`);
 
         try {
-          // Build contents with conversation history
-          const contents = [];
-          // Add conversation history (limit to last 10 turns to avoid token limits)
-          const historyLimit = Math.max(0, conversationHistory.length - 20);
-          for (let i = historyLimit; i < conversationHistory.length; i++) {
-            contents.push(conversationHistory[i]);
-          }
-          // Add current user message
-          contents.push({ role: 'user', parts: [{ text: userMessage }] });
+          // NO history for KB calls - fresh search every time
+          // History is only used in synthesis phase for context
+          const contents = [{ role: 'user', parts: [{ text: userMessage }] }];
 
           const payload = {
             contents: contents,
@@ -4078,6 +4111,22 @@ When you receive **RAW MCP TOOL RESULTS**, you MUST:
             ? JSON.stringify(rawToolResults).substring(0, 50000) + '... (truncated)'
             : JSON.stringify(rawToolResults, null, 2);
 
+          // Check data availability - show no-data message if needed
+          const dataStatus = checkDataAvailability(rawToolResults);
+          if (!dataStatus.hasData && rawToolResults.length > 0) {
+            console.log('No data found in MCP results:', dataStatus);
+            const noDataMsg = formatNoDataMessage(dataStatus.message);
+            streamingMessage.setText(noDataMsg);
+            streamingMessage.finalize();
+
+            // Update conversation history
+            conversationHistory.push({ role: 'user', parts: [{ text: userMessage }] });
+            conversationHistory.push({ role: 'model', parts: [{ text: noDataMsg }] });
+
+            console.groupEnd(); // End TWO-PHASE STREAMING
+            return;
+          }
+
           // Log raw tool results for debugging chart extraction
           console.group('📦 RAW TOOL RESULTS FOR CHART');
           console.log('Number of tool results:', rawToolResults.length);
@@ -4197,6 +4246,17 @@ ${rawResultsJson}
             });
             streamedText += '\n\n**Data Sources:** ' + sourceLinks.join(' | ');
             streamingMessage.setText(streamedText);
+          }
+
+          // Programmatically append data request link if data was insufficient
+          // This ensures the link always appears, regardless of whether the model included it
+          if (rawToolResults.length > 0 && !dataStatus.hasData) {
+            const dataRequestLink = 'https://docs.datacommons.org/contributing';
+            if (!streamedText.includes(dataRequestLink)) {
+              const linkText = "\n\n---\n\nIf you'd like to see this data in Data Commons, you can [submit a data request](https://docs.datacommons.org/contributing).";
+              streamedText += linkText;
+              streamingMessage.setText(streamedText);
+            }
           }
 
           streamingMessage.finalize();
@@ -4469,6 +4529,12 @@ ${rawResultsJson}
           formatted += `<div class="followup-container"><div class="followup-heading">Follow up questions:</div>${suggestionsHtml}</div>`;
         }
 
+        // Style inline citations [Source: X] - must be done after markdown parsing
+        formatted = formatted.replace(
+          /\[Source:\s*([^\]]+)\]/g,
+          '<span class="inline-citation" title="Source: $1">[Source: $1]</span>'
+        );
+
         return formatted;
       }
 
@@ -4524,6 +4590,104 @@ ${rawResultsJson}
         }
         // Default to 'low' if invalid
         return { thinkingLevel: 'low' };
+      }
+
+      /**
+       * Check if MCP tool results contain usable data
+       * @param {Array} toolResults - Array of tool result objects
+       * @returns {Object} - Data availability status
+       */
+      function checkDataAvailability(toolResults) {
+        let noVariables = false;
+        let hasAnyObservations = false;  // Track if ANY observation has data
+        let allObservationsEmpty = true;  // Track if ALL observations are empty
+        let searchCalled = false;
+        let observationsCalled = false;
+
+        for (const tc of toolResults) {
+          const result = tc.result || '';
+          const resultLower = result.toLowerCase();
+          const toolName = tc.tool_name || tc.name || '';
+
+          if (toolName === 'search_indicators') {
+            searchCalled = true;
+            if (resultLower.includes('no indicators found') ||
+                resultLower.includes('"variables": []') ||
+                resultLower.includes('no matching') ||
+                resultLower.includes('could not find') ||
+                (resultLower.includes('"indicators":') && resultLower.includes('[]'))) {
+              noVariables = true;
+            }
+          } else if (toolName === 'get_observations') {
+            observationsCalled = true;
+
+            // Check if THIS observation has actual data (time_series with values)
+            // Look for patterns like: "time_series": [["2024", 14984.0]] (has data)
+            const hasDataPattern = /"time_series":\s*\[\s*\[/.test(result);
+            if (hasDataPattern) {
+              hasAnyObservations = true;
+              allObservationsEmpty = false;
+            }
+
+            // Also check for valid source_id (not "unknown")
+            const validSource = /"source_id":\s*"(?!unknown)[^"]+/.test(resultLower);
+            if (validSource && hasDataPattern) {
+              hasAnyObservations = true;
+              allObservationsEmpty = false;
+            }
+
+            // Check if this specific observation is empty
+            const isEmpty = resultLower.includes('no data') ||
+                           resultLower.includes('"observations": []') ||
+                           resultLower.includes('"time_series": []') ||
+                           resultLower.includes('"time_series":[]') ||
+                           resultLower.includes('no observations');
+
+            if (!isEmpty) {
+              allObservationsEmpty = false;
+            }
+          }
+        }
+
+        // Determine if we have usable data
+        // We have data if: we found variables AND at least one observation has data
+        let hasData;
+        if (searchCalled && noVariables) {
+          hasData = false;
+        } else if (observationsCalled && allObservationsEmpty && !hasAnyObservations) {
+          hasData = false;
+        } else {
+          hasData = hasAnyObservations || (observationsCalled && !allObservationsEmpty);
+        }
+
+        let message = null;
+        if (!hasData) {
+          if (noVariables) {
+            message = "We didn't find any matching data variables for your query.";
+          } else if (observationsCalled && allObservationsEmpty) {
+            message = "We found the data variable but there are no observations available.";
+          } else {
+            message = "We didn't find data for your query.";
+          }
+        }
+
+        return {
+          hasData: hasData,
+          noVariablesFound: noVariables,
+          noObservationsFound: allObservationsEmpty,
+          searchCalled: searchCalled,
+          observationsCalled: observationsCalled,
+          message: message
+        };
+      }
+
+      /**
+       * Format no-data message with link to data request
+       * @param {string} message - The no-data message
+       * @returns {string} - Formatted message with link
+       */
+      function formatNoDataMessage(message) {
+        return `${message}\n\nIf you'd like to see this data in Data Commons, [submit a data request](https://docs.datacommons.org/contributing).`;
       }
 
       function escapeHtml(text) {

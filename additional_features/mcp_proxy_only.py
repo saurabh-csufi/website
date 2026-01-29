@@ -28,6 +28,7 @@ Usage:
 
 import json
 import logging
+import re
 import os
 import subprocess
 import sys
@@ -457,6 +458,95 @@ def call_tool(name: str, arguments: dict, session_logger: Optional[SessionLogger
     return error_result
 
 
+def check_data_availability(tool_calls_list: list) -> dict:
+    """Check if MCP tool calls returned useful data.
+
+    Returns:
+        dict with keys:
+        - has_data: bool
+        - no_variables_found: bool (search_indicators returned empty)
+        - no_observations_found: bool (get_observations returned empty)
+        - message: str (user-friendly message if no data)
+    """
+    no_variables = False
+    has_any_observations = False  # Track if ANY observation has data
+    all_observations_empty = True  # Track if ALL observations are empty
+    search_called = False
+    observations_called = False
+
+    for tc in tool_calls_list:
+        result_str = tc.get('result', '')
+        result_str_lower = result_str.lower()
+        tool_name = tc.get('name', '')
+
+        if tool_name == 'search_indicators':
+            search_called = True
+            # Check if no variables found
+            if 'no indicators found' in result_str_lower or \
+               '"variables": []' in result_str_lower or \
+               'no matching' in result_str_lower or \
+               'could not find' in result_str_lower or \
+               ('"indicators":' in result_str_lower and '[]' in result_str_lower):
+                no_variables = True
+
+        elif tool_name == 'get_observations':
+            observations_called = True
+
+            # Check if THIS observation has actual data (time_series with values)
+            # Look for patterns like: "time_series": [["2024", 14984.0]] (has data)
+            # vs: "time_series": [] (empty)
+
+            # Check for non-empty time_series with actual values
+            has_data_pattern = re.search(r'"time_series":\s*\[\s*\[', result_str)
+            if has_data_pattern:
+                has_any_observations = True
+                all_observations_empty = False
+
+            # Also check for valid source_id (not "unknown")
+            valid_source = re.search(r'"source_id":\s*"(?!unknown)[^"]+', result_str_lower)
+            if valid_source and has_data_pattern:
+                has_any_observations = True
+                all_observations_empty = False
+
+            # Check if this specific observation is empty
+            is_empty = ('no data' in result_str_lower or
+                       '"observations": []' in result_str_lower or
+                       '"time_series": []' in result_str_lower or
+                       '"time_series":[]' in result_str_lower or
+                       'no observations' in result_str_lower)
+
+            if not is_empty:
+                all_observations_empty = False
+
+    # Determine if we have usable data
+    # We have data if: we found variables AND at least one observation has data
+    if search_called and no_variables:
+        has_data = False
+    elif observations_called and all_observations_empty and not has_any_observations:
+        has_data = False
+    else:
+        has_data = has_any_observations or (observations_called and not all_observations_empty)
+
+    # Build user-friendly message
+    message = None
+    if not has_data:
+        if no_variables:
+            message = "We didn't find any matching data variables for your query."
+        elif observations_called and all_observations_empty:
+            message = "We found the data variable but there are no observations available."
+        else:
+            message = "We didn't find data for your query."
+
+    return {
+        'has_data': has_data,
+        'no_variables_found': no_variables,
+        'no_observations_found': all_observations_empty,
+        'search_called': search_called,
+        'observations_called': observations_called,
+        'message': message
+    }
+
+
 # Flask Routes
 
 @app.route("/health", methods=["GET"])
@@ -758,8 +848,9 @@ def execute_mcp_tool_loop(
         "parameters": t.get("inputSchema", {"type": "object", "properties": {}})
     } for t in tools]
 
-    # Build conversation
-    contents = list(history) if history else []
+    # Build conversation - NO history for MCP calls (fresh search every time)
+    # History is only used in synthesis phase for context
+    contents = []
     contents.append({"role": "user", "parts": [{"text": user_message}]})
 
     tool_calls_list = []
@@ -868,20 +959,26 @@ def execute_mcp_tool_loop(
     return tool_results_text, tool_calls_list, "Max tool iterations reached"
 
 
-def execute_kb_query(user_message: str, session_logger: Optional[SessionLogger] = None) -> str:
-    """Execute Knowledge Base query using file search."""
+def execute_kb_query(user_message: str, session_logger: Optional[SessionLogger] = None) -> dict:
+    """Execute Knowledge Base query using file search.
+
+    Returns:
+        dict with keys:
+        - response: str (the response text)
+        - sources: list of dicts with 'title' and 'uri'
+    """
     config = load_config()
     kb_config = config.get("knowledge_base", {})
 
     if not kb_config.get("enabled", False):
-        return ""
+        return {"response": "", "sources": []}
 
     kb_prompt = config.get("prompts", {}).get("kb", "")
     kb_model = config.get("gemini", {}).get("kb_model", "gemini-3-flash-preview")
     store_id = kb_config.get("store_id", "")
 
     if not store_id:
-        return ""
+        return {"response": "", "sources": []}
 
     api_key = config.get("gemini", {}).get("api_key", "")
     api_base = config.get("gemini", {}).get("api_base", "https://generativelanguage.googleapis.com/v1beta/models")
@@ -918,21 +1015,45 @@ def execute_kb_query(user_message: str, session_logger: Optional[SessionLogger] 
         data = response.json()
 
         candidates = data.get("candidates", [])
-        result = ""
+        result_text = ""
+        sources = []
+
         if candidates:
-            parts = candidates[0].get("content", {}).get("parts", [])
-            result = "".join([p.get("text", "") for p in parts])
+            candidate = candidates[0]
+            parts = candidate.get("content", {}).get("parts", [])
+            result_text = "".join([p.get("text", "") for p in parts])
+
+            # Extract grounding metadata for source citations
+            grounding_metadata = candidate.get("groundingMetadata", {})
+            grounding_chunks = grounding_metadata.get("groundingChunks", [])
+
+            seen_titles = set()
+            for chunk in grounding_chunks:
+                retrieved_context = chunk.get("retrievedContext", {})
+                if retrieved_context:
+                    title = retrieved_context.get("title", "Unknown")
+                    uri = retrieved_context.get("uri", "")
+                    # Deduplicate by title
+                    if title not in seen_titles:
+                        seen_titles.add(title)
+                        sources.append({
+                            "title": title,
+                            "uri": uri
+                        })
 
         # Log KB query
         if session_logger:
             duration_ms = (time.time() - start_time) * 1000
-            session_logger.log_kb_query(user_message, result, duration_ms)
+            session_logger.log_kb_query(user_message, result_text, duration_ms)
+            if sources:
+                session_logger.log("KB_SOURCES", {"sources": sources})
 
-        return result
+        return {"response": result_text, "sources": sources}
     except Exception as e:
         logger.error(f"KB query error: {e}")
         if session_logger:
             session_logger.log_error("KB_QUERY_ERROR", str(e), {"query": user_message})
+        return {"response": "", "sources": []}
         return ""
 
 
@@ -1080,17 +1201,28 @@ def chat_stream():
                 yield f"data: {json.dumps({'type': 'tool_call', 'name': tc['name'], 'arguments': tc['arguments'], 'result': tc['result'], 'status': tc['status']})}\n\n"
 
             yield f"data: {json.dumps({'status': 'mcp_complete', 'tool_count': len(tool_calls_list)})}\n\n"
+
+            # Check data availability and send status to frontend
+            data_status = check_data_availability(tool_calls_list)
+            yield f"data: {json.dumps({'data_status': data_status})}\n\n"
+
         elif mcp_enabled and not mcp_ready:
             session_logger.log("MCP_SKIPPED", {"reason": "MCP not connected or no tools available"})
             yield f"data: {json.dumps({'status': 'mcp_skipped', 'message': 'MCP server not connected'})}\n\n"
 
         # Phase 2: KB Query (if enabled)
-        kb_results = ""
+        kb_response = ""
+        kb_sources = []
         kb_enabled = config.get("knowledge_base", {}).get("enabled", False)
 
         if kb_enabled:
             yield f"data: {json.dumps({'status': 'kb_start', 'message': 'Searching knowledge base...'})}\n\n"
-            kb_results = execute_kb_query(user_message, session_logger=session_logger)
+            kb_result = execute_kb_query(user_message, session_logger=session_logger)
+            kb_response = kb_result.get("response", "")
+            kb_sources = kb_result.get("sources", [])
+            # Send KB sources to frontend for inline citations
+            if kb_sources:
+                yield f"data: {json.dumps({'kb_sources': kb_sources})}\n\n"
             yield f"data: {json.dumps({'status': 'kb_complete'})}\n\n"
 
         # Phase 3: Synthesis with streaming
@@ -1100,15 +1232,17 @@ def chat_stream():
         mcp_model = config.get("gemini", {}).get("mcp_model", "gemini-3-flash-preview")
         thinking_level = config.get("thinking", {}).get("synthesis_level", "low")
 
-        # Build synthesis context
+        # Build synthesis context with source labels for citations
         context_parts = []
         if mcp_results:
-            context_parts.append(f"**DATA RESULTS:**\n{mcp_results}")
-        if kb_results:
-            context_parts.append(f"**POLICY INFORMATION:**\n{kb_results}")
+            context_parts.append(f"**DATA RESULTS [Source: Data Commons]:**\n{mcp_results}")
+        if kb_response:
+            # Include document names from kb_sources for proper citation
+            kb_source_names = ", ".join([s['title'] for s in kb_sources]) if kb_sources else "Knowledge Base"
+            context_parts.append(f"**POLICY INFORMATION [Sources: {kb_source_names}]:**\n{kb_response}")
 
         # Log synthesis start
-        session_logger.log_synthesis_start(["MCP" if mcp_results else None, "KB" if kb_results else None])
+        session_logger.log_synthesis_start(["MCP" if mcp_results else None, "KB" if kb_response else None])
 
         synthesis_message = f"""User Query: {user_message}
 
@@ -1136,6 +1270,18 @@ Please provide a comprehensive response combining all available information."""
             for text_chunk in stream_gen:
                 full_text += text_chunk
                 yield f"data: {json.dumps({'text': text_chunk})}\n\n"
+
+            # After streaming, programmatically append data request link if data was insufficient
+            # This ensures the link always appears, regardless of whether the model included it
+            if tool_calls_list:  # Only if we actually tried MCP tools
+                data_avail = check_data_availability(tool_calls_list)
+                if not data_avail.get('has_data', True):
+                    # Check if link is already in the response
+                    data_request_link = "https://docs.datacommons.org/contributing"
+                    if data_request_link not in full_text:
+                        link_text = "\n\n---\n\nIf you'd like to see this data in Data Commons, you can [submit a data request](https://docs.datacommons.org/contributing)."
+                        full_text += link_text
+                        yield f"data: {json.dumps({'text': link_text})}\n\n"
 
         except Exception as e:
             logger.error(f"Synthesis streaming error: {e}")
