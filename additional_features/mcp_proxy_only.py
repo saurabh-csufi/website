@@ -26,8 +26,10 @@ Usage:
     python mcp_proxy_only.py
 """
 
+import copy
 import json
 import logging
+import random
 import re
 import os
 import subprocess
@@ -116,6 +118,57 @@ def get_current_datetime_ist() -> str:
 def inject_datetime(prompt: str) -> str:
     """Replace {{CURRENT_DATETIME}} placeholder with current IST datetime."""
     return prompt.replace('{{CURRENT_DATETIME}}', get_current_datetime_ist())
+
+
+def get_api_keys() -> list:
+    """Load API keys from config (list or single key for backward compat)."""
+    config = load_config()
+    gemini_config = config.get("gemini", {})
+    keys = gemini_config.get("api_keys", [])
+    if not keys:
+        # Fallback to single api_key for backward compatibility
+        single_key = gemini_config.get("api_key", "")
+        if single_key and not single_key.startswith("DEPRECATED"):
+            keys = [single_key]
+    return keys
+
+
+def get_query_param_key() -> str:
+    """Get the secret key for query param overrides from config."""
+    config = load_config()
+    return config.get("query_param_key", "AISummit2026")  # Default fallback
+
+
+def apply_query_overrides(config: dict, query_params: dict) -> dict:
+    """Apply query parameter overrides to config.
+
+    Returns a new config dict with overrides applied (does not modify original).
+    """
+    if not query_params:
+        return config
+
+    # Deep copy to avoid modifying cached config
+    effective = copy.deepcopy(config)
+
+    # Model override
+    if query_params.get("model"):
+        effective["gemini"]["mcp_model"] = query_params["model"]
+        effective["gemini"]["kb_model"] = query_params["model"]
+
+    # Knowledge base toggle
+    if query_params.get("kb_enabled"):
+        enabled = query_params["kb_enabled"].lower() == "true"
+        effective["knowledge_base"]["enabled"] = enabled
+
+    # MCP thinking budget override
+    if query_params.get("mcp_thinking"):
+        effective["thinking"]["mcp_level"] = query_params["mcp_thinking"]
+
+    # Synthesis thinking budget override
+    if query_params.get("synthesis_thinking"):
+        effective["thinking"]["synthesis_level"] = query_params["synthesis_thinking"]
+
+    return effective
 
 
 # ============================================================
@@ -682,7 +735,7 @@ def gemini_request(
     stream: bool = False,
     session_logger: Optional[SessionLogger] = None
 ) -> Generator | dict:
-    """Make a request to the Gemini API.
+    """Make a request to the Gemini API with key rotation and retry.
 
     Args:
         messages: Conversation history in Gemini format
@@ -700,13 +753,18 @@ def gemini_request(
         If stream=True: Generator yielding text chunks
     """
     config = load_config()
-    api_key = config.get("gemini", {}).get("api_key", "")
     api_base = config.get("gemini", {}).get("api_base", "https://generativelanguage.googleapis.com/v1beta/models")
 
-    if not api_key:
-        return {"error": "Gemini API key not configured in config.json"}
+    # Get all available keys
+    all_keys = get_api_keys()
+    if not all_keys:
+        return {"error": "No Gemini API keys configured in config.json"}
 
-    # Build the payload
+    # Shuffle keys for random order
+    keys_to_try = all_keys.copy()
+    random.shuffle(keys_to_try)
+
+    # Build the payload (same for all attempts)
     payload = {
         "contents": messages,
         "generationConfig": {
@@ -730,13 +788,8 @@ def gemini_request(
         payload["generationConfig"]["responseSchema"] = response_schema
 
     endpoint = "streamGenerateContent" if stream else "generateContent"
-    url = f"{api_base}/{model}:{endpoint}"
-    if stream:
-        url += f"?key={api_key}&alt=sse"
-    else:
-        url += f"?key={api_key}"
 
-    # Log request
+    # Log request (once, before attempting)
     if session_logger:
         session_logger.log_gemini_request(model, endpoint, {
             "messages_count": len(messages),
@@ -745,41 +798,98 @@ def gemini_request(
             "temperature": temperature,
             "thinking_level": thinking_level,
             "has_response_schema": bool(response_schema),
-            "stream": stream
+            "stream": stream,
+            "total_keys_available": len(all_keys)
         })
 
-    start_time = time.time()
+    last_error = None
+    attempt_count = 0
 
-    try:
+    for api_key in keys_to_try:
+        attempt_count += 1
+
+        # Build URL with current key
+        url = f"{api_base}/{model}:{endpoint}"
         if stream:
-            response = requests.post(
-                url,
-                json=payload,
-                headers={"Content-Type": "application/json"},
-                stream=True,
-                timeout=120
-            )
-            return _stream_gemini_response(response, session_logger)
+            url += f"?key={api_key}&alt=sse"
         else:
-            response = requests.post(
-                url,
-                json=payload,
-                headers={"Content-Type": "application/json"},
-                timeout=120
-            )
-            result = response.json()
+            url += f"?key={api_key}"
 
-            # Log response
+        # Log retry attempt (if not first attempt)
+        if attempt_count > 1 and session_logger:
+            session_logger.log("GEMINI_KEY_ROTATION", {
+                "attempt": attempt_count,
+                "total_keys": len(all_keys),
+                "reason": str(last_error)
+            })
+
+        start_time = time.time()
+
+        try:
+            if stream:
+                response = requests.post(
+                    url,
+                    json=payload,
+                    headers={"Content-Type": "application/json"},
+                    stream=True,
+                    timeout=120
+                )
+                # Check for rate limit before streaming
+                if response.status_code == 429:
+                    last_error = "Rate limited (429)"
+                    logger.warning(f"API key rate limited, switching to next key...")
+                    continue  # Immediately try next key
+                if response.status_code in [500, 503]:
+                    last_error = f"Server error ({response.status_code})"
+                    logger.warning(f"Server error {response.status_code}, switching to next key...")
+                    continue  # Try next key
+                return _stream_gemini_response(response, session_logger)
+            else:
+                response = requests.post(
+                    url,
+                    json=payload,
+                    headers={"Content-Type": "application/json"},
+                    timeout=120
+                )
+
+                # Check for rate limit - immediately switch key
+                if response.status_code == 429:
+                    last_error = "Rate limited (429)"
+                    logger.warning(f"API key rate limited, switching to next key...")
+                    continue  # Immediately try next key
+
+                # Check for other retryable errors (500, 503)
+                if response.status_code in [500, 503]:
+                    last_error = f"Server error ({response.status_code})"
+                    logger.warning(f"Server error {response.status_code}, switching to next key...")
+                    continue  # Try next key
+
+                result = response.json()
+
+                # Log response
+                if session_logger:
+                    duration_ms = (time.time() - start_time) * 1000
+                    session_logger.log_gemini_response(model, result, duration_ms)
+
+                return result
+
+        except requests.exceptions.Timeout:
+            last_error = "Request timeout"
+            logger.warning(f"Request timeout, trying next key...")
+            continue
+        except Exception as e:
+            last_error = str(e)
+            logger.error(f"Gemini API error: {e}")
             if session_logger:
-                duration_ms = (time.time() - start_time) * 1000
-                session_logger.log_gemini_response(model, result, duration_ms)
+                session_logger.log_error("GEMINI_API_ERROR", str(e), {"attempt": attempt_count, "model": model})
+            continue
 
-            return result
-    except Exception as e:
-        logger.error(f"Gemini API error: {e}")
-        if session_logger:
-            session_logger.log_error("GEMINI_API_ERROR", str(e), {"model": model, "endpoint": endpoint})
-        return {"error": str(e)}
+    # All keys exhausted
+    error_msg = f"All {len(all_keys)} API keys failed. Last error: {last_error}"
+    logger.error(error_msg)
+    if session_logger:
+        session_logger.log_error("GEMINI_ALL_KEYS_EXHAUSTED", error_msg, {"total_keys": len(all_keys)})
+    return {"error": error_msg}
 
 
 def _stream_gemini_response(response, session_logger: Optional[SessionLogger] = None) -> Generator:
@@ -816,7 +926,8 @@ def execute_mcp_tool_loop(
     user_message: str,
     history: list,
     max_iterations: int = 5,
-    session_logger: Optional[SessionLogger] = None
+    session_logger: Optional[SessionLogger] = None,
+    effective_config: dict = None
 ) -> tuple:
     """Execute the MCP tool calling loop.
 
@@ -825,11 +936,12 @@ def execute_mcp_tool_loop(
         history: Conversation history
         max_iterations: Maximum tool calling iterations
         session_logger: Optional SessionLogger for comprehensive logging
+        effective_config: Optional config dict with query param overrides applied
 
     Returns:
         tuple: (tool_results_text, tool_calls_list, final_response_text)
     """
-    config = load_config()
+    config = effective_config if effective_config else load_config()
     mcp_prompt = config.get("prompts", {}).get("mcp", "")
     mcp_model = config.get("gemini", {}).get("mcp_model", "gemini-3-flash-preview")
     thinking_level = config.get("thinking", {}).get("mcp_level", "low")
@@ -960,7 +1072,7 @@ def execute_mcp_tool_loop(
 
 
 def execute_kb_query(user_message: str, session_logger: Optional[SessionLogger] = None) -> dict:
-    """Execute Knowledge Base query using file search.
+    """Execute Knowledge Base query using file search with key rotation.
 
     Returns:
         dict with keys:
@@ -980,8 +1092,16 @@ def execute_kb_query(user_message: str, session_logger: Optional[SessionLogger] 
     if not store_id:
         return {"response": "", "sources": []}
 
-    api_key = config.get("gemini", {}).get("api_key", "")
+    # Get all available keys
+    all_keys = get_api_keys()
+    if not all_keys:
+        return {"response": "", "sources": []}
+
     api_base = config.get("gemini", {}).get("api_base", "https://generativelanguage.googleapis.com/v1beta/models")
+
+    # Shuffle keys for random order
+    keys_to_try = all_keys.copy()
+    random.shuffle(keys_to_try)
 
     payload = {
         "contents": [{"role": "user", "parts": [{"text": user_message}]}],
@@ -1002,59 +1122,96 @@ def execute_kb_query(user_message: str, session_logger: Optional[SessionLogger] 
         }
     }
 
-    start_time = time.time()
+    last_error = None
+    attempt_count = 0
 
-    try:
-        url = f"{api_base}/{kb_model}:generateContent?key={api_key}"
-        response = requests.post(
-            url,
-            json=payload,
-            headers={"Content-Type": "application/json"},
-            timeout=60
-        )
-        data = response.json()
+    for api_key in keys_to_try:
+        attempt_count += 1
+        start_time = time.time()
 
-        candidates = data.get("candidates", [])
-        result_text = ""
-        sources = []
+        # Log retry attempt (if not first attempt)
+        if attempt_count > 1 and session_logger:
+            session_logger.log("KB_KEY_ROTATION", {
+                "attempt": attempt_count,
+                "total_keys": len(all_keys),
+                "reason": str(last_error)
+            })
 
-        if candidates:
-            candidate = candidates[0]
-            parts = candidate.get("content", {}).get("parts", [])
-            result_text = "".join([p.get("text", "") for p in parts])
+        try:
+            url = f"{api_base}/{kb_model}:generateContent?key={api_key}"
+            response = requests.post(
+                url,
+                json=payload,
+                headers={"Content-Type": "application/json"},
+                timeout=60
+            )
 
-            # Extract grounding metadata for source citations
-            grounding_metadata = candidate.get("groundingMetadata", {})
-            grounding_chunks = grounding_metadata.get("groundingChunks", [])
+            # Check for rate limit - immediately switch key
+            if response.status_code == 429:
+                last_error = "Rate limited (429)"
+                logger.warning(f"KB API key rate limited, switching to next key...")
+                continue
 
-            seen_titles = set()
-            for chunk in grounding_chunks:
-                retrieved_context = chunk.get("retrievedContext", {})
-                if retrieved_context:
-                    title = retrieved_context.get("title", "Unknown")
-                    uri = retrieved_context.get("uri", "")
-                    # Deduplicate by title
-                    if title not in seen_titles:
-                        seen_titles.add(title)
-                        sources.append({
-                            "title": title,
-                            "uri": uri
-                        })
+            # Check for other retryable errors
+            if response.status_code in [500, 503]:
+                last_error = f"Server error ({response.status_code})"
+                logger.warning(f"KB server error {response.status_code}, switching to next key...")
+                continue
 
-        # Log KB query
-        if session_logger:
-            duration_ms = (time.time() - start_time) * 1000
-            session_logger.log_kb_query(user_message, result_text, duration_ms)
-            if sources:
-                session_logger.log("KB_SOURCES", {"sources": sources})
+            data = response.json()
 
-        return {"response": result_text, "sources": sources}
-    except Exception as e:
-        logger.error(f"KB query error: {e}")
-        if session_logger:
-            session_logger.log_error("KB_QUERY_ERROR", str(e), {"query": user_message})
-        return {"response": "", "sources": []}
-        return ""
+            candidates = data.get("candidates", [])
+            result_text = ""
+            sources = []
+
+            if candidates:
+                candidate = candidates[0]
+                parts = candidate.get("content", {}).get("parts", [])
+                result_text = "".join([p.get("text", "") for p in parts])
+
+                # Extract grounding metadata for source citations
+                grounding_metadata = candidate.get("groundingMetadata", {})
+                grounding_chunks = grounding_metadata.get("groundingChunks", [])
+
+                seen_titles = set()
+                for chunk in grounding_chunks:
+                    retrieved_context = chunk.get("retrievedContext", {})
+                    if retrieved_context:
+                        title = retrieved_context.get("title", "Unknown")
+                        uri = retrieved_context.get("uri", "")
+                        # Deduplicate by title
+                        if title not in seen_titles:
+                            seen_titles.add(title)
+                            sources.append({
+                                "title": title,
+                                "uri": uri
+                            })
+
+            # Log KB query
+            if session_logger:
+                duration_ms = (time.time() - start_time) * 1000
+                session_logger.log_kb_query(user_message, result_text, duration_ms)
+                if sources:
+                    session_logger.log("KB_SOURCES", {"sources": sources})
+
+            return {"response": result_text, "sources": sources}
+
+        except requests.exceptions.Timeout:
+            last_error = "Request timeout"
+            logger.warning(f"KB request timeout, trying next key...")
+            continue
+        except Exception as e:
+            last_error = str(e)
+            logger.error(f"KB query error: {e}")
+            if session_logger:
+                session_logger.log_error("KB_QUERY_ERROR", str(e), {"query": user_message, "attempt": attempt_count})
+            continue
+
+    # All keys exhausted
+    logger.error(f"KB query failed: All {len(all_keys)} API keys exhausted. Last error: {last_error}")
+    if session_logger:
+        session_logger.log_error("KB_ALL_KEYS_EXHAUSTED", f"All keys failed: {last_error}", {"total_keys": len(all_keys)})
+    return {"response": "", "sources": []}
 
 
 # Chart config schema for Gemini structured output (hardcoded - not user configurable)
@@ -1129,6 +1286,13 @@ def chat_stream():
         "session_id": "optional session ID for follow-up messages"
     }
 
+    Query params (optional, requires valid key):
+    - key: Secret key for config overrides (must match query_param_key in config)
+    - model: Override mcp_model and kb_model
+    - kb: "true" or "false" to toggle knowledge base
+    - mcp_thinking: Override MCP thinking level
+    - synthesis_thinking: Override synthesis thinking level
+
     Response: Server-Sent Events stream
     """
     global session_id  # MCP session ID
@@ -1141,6 +1305,27 @@ def chat_stream():
     history = data.get("history", [])
     existing_session_id = data.get("session_id")  # From follow-up messages
 
+    # Parse query parameters for config overrides
+    query_params = {}
+    secret_key = request.args.get("key", "")
+    expected_key = get_query_param_key()
+
+    if secret_key == expected_key:
+        # Valid key - extract override params
+        query_params = {
+            "model": request.args.get("model"),  # e.g., "gemini-2.0-flash"
+            "kb_enabled": request.args.get("kb"),  # "true" or "false"
+            "mcp_thinking": request.args.get("mcp_thinking"),  # "low", "medium", "high", or budget number
+            "synthesis_thinking": request.args.get("synthesis_thinking"),  # same options
+        }
+        # Remove None values
+        query_params = {k: v for k, v in query_params.items() if v is not None}
+        if query_params:
+            logger.info(f"Query params override applied: {query_params}")
+    elif secret_key:
+        # Invalid key provided - log warning but continue with defaults
+        logger.warning(f"Invalid query param key provided, ignoring overrides")
+
     # Create or resume session logger
     session_logger = SessionLogger(session_id=existing_session_id)
 
@@ -1152,6 +1337,10 @@ def chat_stream():
         # Send session ID first so frontend can display it
         yield f"data: {json.dumps({'session_id': session_logger.session_id})}\n\n"
 
+        # Log query params if present
+        if query_params:
+            session_logger.log("QUERY_PARAMS_OVERRIDE", query_params)
+
         # Log user message
         session_logger.log_user_message(user_message, len(history))
 
@@ -1160,6 +1349,9 @@ def chat_stream():
             session_logger.log_error("CONFIG_ERROR", "Backend config not loaded")
             yield f"data: {json.dumps({'error': 'Backend config not loaded'})}\n\n"
             return
+
+        # Apply query param overrides to config
+        effective_config = apply_query_overrides(config, query_params)
 
         # Ensure MCP is initialized (fix for tool calls not showing)
         mcp_ready = False
@@ -1185,7 +1377,7 @@ def chat_stream():
             session_logger.log("MCP_NO_TOOLS", {"session_id": session_id})
 
         # Phase 1: MCP Tools
-        mcp_enabled = config.get("mcp", {}).get("enabled", True)
+        mcp_enabled = effective_config.get("mcp", {}).get("enabled", True)
         mcp_results = ""
         tool_calls_list = []
 
@@ -1193,7 +1385,8 @@ def chat_stream():
             yield f"data: {json.dumps({'status': 'mcp_start', 'message': 'Querying data tools...'})}\n\n"
 
             mcp_results, tool_calls_list, mcp_text = execute_mcp_tool_loop(
-                user_message, history, session_logger=session_logger
+                user_message, history, session_logger=session_logger,
+                effective_config=effective_config
             )
 
             # Send each tool call for left sidebar
@@ -1213,7 +1406,7 @@ def chat_stream():
         # Phase 2: KB Query (if enabled)
         kb_response = ""
         kb_sources = []
-        kb_enabled = config.get("knowledge_base", {}).get("enabled", False)
+        kb_enabled = effective_config.get("knowledge_base", {}).get("enabled", False)
 
         if kb_enabled:
             yield f"data: {json.dumps({'status': 'kb_start', 'message': 'Searching knowledge base...'})}\n\n"
@@ -1228,9 +1421,9 @@ def chat_stream():
         # Phase 3: Synthesis with streaming
         yield f"data: {json.dumps({'status': 'synthesis_start', 'message': 'Generating response...'})}\n\n"
 
-        synthesis_prompt = config.get("prompts", {}).get("synthesis", "")
-        mcp_model = config.get("gemini", {}).get("mcp_model", "gemini-3-flash-preview")
-        thinking_level = config.get("thinking", {}).get("synthesis_level", "low")
+        synthesis_prompt = effective_config.get("prompts", {}).get("synthesis", "")
+        synthesis_model = effective_config.get("gemini", {}).get("mcp_model", "gemini-3-flash-preview")
+        thinking_level = effective_config.get("thinking", {}).get("synthesis_level", "low")
 
         # Build synthesis context with source labels for citations
         context_parts = []
@@ -1255,7 +1448,7 @@ Please provide a comprehensive response combining all available information."""
             stream_gen = gemini_request(
                 messages=[{"role": "user", "parts": [{"text": synthesis_message}]}],
                 system_instruction=synthesis_prompt,
-                model=mcp_model,
+                model=synthesis_model,
                 temperature=0.3,
                 thinking_level=thinking_level,
                 stream=True,

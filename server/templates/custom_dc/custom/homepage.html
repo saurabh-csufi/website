@@ -2496,6 +2496,21 @@ Include 3 relevant follow-up questions using this format:
       // Session ID for backend mode logging (persists across follow-up messages)
       let currentConversationSessionId = null;
 
+      // Read URL query params for config overrides (for demo/presentation mode)
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlConfigOverrides = {
+        key: urlParams.get('key'),
+        model: urlParams.get('model'),
+        kb: urlParams.get('kb'),
+        mcp_thinking: urlParams.get('mcp_thinking'),
+        synthesis_thinking: urlParams.get('synthesis_thinking')
+      };
+
+      // Log if any overrides present
+      if (urlConfigOverrides.key) {
+        console.log('🔑 URL Config Overrides detected:', urlConfigOverrides);
+      }
+
       // PDF Knowledge Base Source URLs - maps PDF filenames to their URLs
       const kbSourceUrls = {
         "02-Trade-in-Goods.pdf": "https://commerce.gov.in/wp-content/uploads/2022/06/02-Trade-in-Goods.pdf",
@@ -3032,6 +3047,23 @@ Include 3 relevant follow-up questions using this format:
         // Initialize config source UI
         updateConfigSourceUI();
 
+        // Show config override indicator if URL params are present
+        if (urlConfigOverrides.key) {
+          const indicator = document.createElement('div');
+          indicator.className = 'config-override-indicator';
+          const overrideDetails = [];
+          if (urlConfigOverrides.model) overrideDetails.push(`model: ${urlConfigOverrides.model}`);
+          if (urlConfigOverrides.kb) overrideDetails.push(`kb: ${urlConfigOverrides.kb}`);
+          if (urlConfigOverrides.mcp_thinking) overrideDetails.push(`mcp_thinking: ${urlConfigOverrides.mcp_thinking}`);
+          if (urlConfigOverrides.synthesis_thinking) overrideDetails.push(`synthesis_thinking: ${urlConfigOverrides.synthesis_thinking}`);
+          indicator.innerHTML = `🔧 <strong>Config Override Active</strong>: ${overrideDetails.length > 0 ? overrideDetails.join(', ') : 'using defaults'}`;
+          indicator.style.cssText = 'background: #f0f9ff; padding: 8px 12px; border-radius: 6px; margin-bottom: 12px; font-size: 12px; border: 1px solid #bfdbfe; color: #1e40af; text-align: center;';
+          const chatContainer = document.querySelector('.chat-container');
+          if (chatContainer) {
+            chatContainer.insertBefore(indicator, chatContainer.firstChild);
+          }
+        }
+
         // Event listeners
         saveConfigBtn.addEventListener('click', saveConfig);
         document.getElementById('reset-prompts')?.addEventListener('click', resetPromptsToDefaults);
@@ -3386,7 +3418,21 @@ Include 3 relevant follow-up questions using this format:
         clearToolCalls();
 
         try {
-          const response = await fetch(`${mcpProxyUrl}/api/chat/stream`, {
+          // Build URL with query params for config overrides (if secret key is present)
+          let apiUrl = `${mcpProxyUrl}/api/chat/stream`;
+
+          if (urlConfigOverrides.key) {
+            const params = new URLSearchParams();
+            if (urlConfigOverrides.key) params.append('key', urlConfigOverrides.key);
+            if (urlConfigOverrides.model) params.append('model', urlConfigOverrides.model);
+            if (urlConfigOverrides.kb) params.append('kb', urlConfigOverrides.kb);
+            if (urlConfigOverrides.mcp_thinking) params.append('mcp_thinking', urlConfigOverrides.mcp_thinking);
+            if (urlConfigOverrides.synthesis_thinking) params.append('synthesis_thinking', urlConfigOverrides.synthesis_thinking);
+            apiUrl += '?' + params.toString();
+            console.log('🔗 Backend API URL with overrides:', apiUrl);
+          }
+
+          const response = await fetch(apiUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({

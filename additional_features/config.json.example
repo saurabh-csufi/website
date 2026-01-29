@@ -1,10 +1,16 @@
 {
   "gemini": {
-    "api_key": "YOUR_GEMINI_API_KEY_HERE",
+    "api_keys": [
+      "YOUR_GEMINI_API_KEY_1",
+      "YOUR_GEMINI_API_KEY_2",
+      "YOUR_GEMINI_API_KEY_3"
+    ],
+    "api_key": "DEPRECATED_FALLBACK_USE_api_keys_ARRAY_INSTEAD",
     "api_base": "https://generativelanguage.googleapis.com/v1beta/models",
     "mcp_model": "gemini-3-flash-preview",
     "kb_model": "gemini-3-flash-preview"
   },
+  "query_param_key": "AISummit2026",
   "mcp": {
     "server_url": "http://localhost:3000",
     "enabled": true
