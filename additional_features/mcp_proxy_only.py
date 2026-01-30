@@ -1464,18 +1464,6 @@ Please provide a comprehensive response combining all available information."""
                 full_text += text_chunk
                 yield f"data: {json.dumps({'text': text_chunk})}\n\n"
 
-            # After streaming, programmatically append data request link if data was insufficient
-            # This ensures the link always appears, regardless of whether the model included it
-            if tool_calls_list:  # Only if we actually tried MCP tools
-                data_avail = check_data_availability(tool_calls_list)
-                if not data_avail.get('has_data', True):
-                    # Check if link is already in the response
-                    data_request_link = "https://docs.datacommons.org/contributing"
-                    if data_request_link not in full_text:
-                        link_text = "\n\n---\n\nIf you'd like to see this data in Data Commons, you can [submit a data request](https://docs.datacommons.org/contributing)."
-                        full_text += link_text
-                        yield f"data: {json.dumps({'text': link_text})}\n\n"
-
         except Exception as e:
             logger.error(f"Synthesis streaming error: {e}")
             session_logger.log_error("SYNTHESIS_STREAM_ERROR", str(e))

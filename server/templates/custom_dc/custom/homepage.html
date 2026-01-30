@@ -89,6 +89,16 @@ This instance includes **all public Data Commons data** plus custom India-specif
 - Geographic Coverage: State-wise data with Rural/Urban breakdown
 - Metrics: Number of factories, workers, emoluments, fixed capital, input/output values, productivity ratios
 - Year: 2024
+- **Key Variable DCIDs for ASI**:
+  - Count_Establishment_Factory - Number of factories
+  - Count_Establishment_Factory_Rural - Factories in rural areas
+  - Count_Worker_Factory - Factory workers count
+  - Count_Person_Factory_TotalEngaged - Total persons engaged in factories
+  - Amount_EconomicActivity_Factory_FixedCapital - Fixed capital of factories
+  - Amount_EconomicActivity_Factory_Output - Factory output value
+  - Amount_EconomicActivity_Factory_GrossValueAdded - Gross value added
+  - NetValueAdded_EconomicActivity_Factory - Net value added
+  - Amount_EconomicActivity_Factory_Emolument - Emoluments paid
 
 **Custom Dataset 5: MOSPI Nutritional Intake in India (NII)**:
 - Dietary Intake: Daily average calorie, protein, and fat intake per person/consumer unit
@@ -524,21 +534,39 @@ Before responding, classify the query:
 8. **If asked about state-wise data but only country-level exists, clearly state: "State-wise breakdown is not available in our dataset."**
 9. **NEVER expose technical details like field names, JSON structures, or internal identifiers to the user**
 
-### Citation Format (MANDATORY)
+### Citation Format (MANDATORY - NotebookLM Style)
 
-- For statistics: [Source: <actual_provenance>] - Extract the actual data source from the tool results (e.g., MOSPI, Census, RBI, DGCIS). Look for source names in variable names, metadata, or provenance fields.
-- For Knowledge Base/policy docs: [Source: <exact_document_title>]
+Use numbered citations inline [1], [2], [3] and list all sources at the end.
 
-**How to identify the source:**
-- If variable contains 'MOSPI' → [Source: MOSPI]
-- If variable contains 'Census' → [Source: Census of India]
-- If variable contains 'DGCIS' or 'EIDB' → [Source: DGCIS]
-- If variable contains 'RBI' → [Source: RBI]
-- If source unclear, use [Source: Data Commons]
+**Inline Citation Rules:**
+- Place [1], [2], etc. immediately after the fact/statistic
+- Each unique source gets a unique number (start from 1)
+- Reuse the same number if citing the same source again
 
-### Example Response with Inline Citations
+**How to identify and number sources:**
+- MOSPI → for CPI, GDP, GSDP, ASI, NII data
+- DGCIS → for export/import data
+- Census of India → for population/demographic data
+- RBI → for financial/banking data
+- Data Commons → if source unclear
+- [Document Name] → for Knowledge Base/policy docs
 
-"Maharashtra's GSDP in FY 2024-25 was **Rs 45,31,518.42 Crore** [Source: MOSPI]."
+**End of Response - Sources Section (MANDATORY):**
+ALWAYS end your response with a Sources section:
+
+---
+**Sources:**
+[1] Source Name - Full description
+[2] Source Name - Full description
+
+### Example Response
+
+"Maharashtra's GSDP in FY 2024-25 was **Rs 45,31,518.42 Crore** [1]. The state has **12,500** registered factories [1] and contributed **Rs 2,380 Crore** in exports [2].
+
+---
+**Sources:**
+[1] MOSPI - Ministry of Statistics and Programme Implementation
+[2] DGCIS - Directorate General of Commercial Intelligence and Statistics"
 
 ### What NOT to do - STRICTLY PROHIBITED
 
@@ -550,17 +578,21 @@ Before responding, classify the query:
 - Do NOT invent trends, drivers, or key factors not in the data
 - Do NOT name specific states/companies unless they appear in the data
 
-### When Data is Insufficient (MANDATORY)
+### When to Include Data Request Link
 
-**ALWAYS end your response with this exact sentence when specific data is not available:**
+**ONLY include the data request link when NO relevant data was found at all.**
 
-"If you'd like to see this data in Data Commons, you can [submit a data request](https://docs.datacommons.org/contributing)."
+Include: "If you'd like to see this data in Data Commons, you can [submit a data request](https://docs.datacommons.org/contributing)."
 
-This link MUST appear in your response whenever:
-- The specific metric asked for is not in the dataset
-- State-wise breakdown is not available
-- The data source shows "unknown"
-- You have to use related/proxy data instead of exact data requested
+**ONLY when:**
+- The search found ZERO matching variables for the user's query
+- The query topic is completely outside our dataset coverage
+
+**DO NOT include the link when:**
+- You found data for SOME states/places (partial coverage is still useful)
+- You found related data that answers the core question
+- Data exists but for different time periods than requested
+- You successfully provided numerical answers with citations
 
 ### Response Structure
 
@@ -4292,17 +4324,6 @@ ${rawResultsJson}
             });
             streamedText += '\n\n**Data Sources:** ' + sourceLinks.join(' | ');
             streamingMessage.setText(streamedText);
-          }
-
-          // Programmatically append data request link if data was insufficient
-          // This ensures the link always appears, regardless of whether the model included it
-          if (rawToolResults.length > 0 && !dataStatus.hasData) {
-            const dataRequestLink = 'https://docs.datacommons.org/contributing';
-            if (!streamedText.includes(dataRequestLink)) {
-              const linkText = "\n\n---\n\nIf you'd like to see this data in Data Commons, you can [submit a data request](https://docs.datacommons.org/contributing).";
-              streamedText += linkText;
-              streamingMessage.setText(streamedText);
-            }
           }
 
           streamingMessage.finalize();
