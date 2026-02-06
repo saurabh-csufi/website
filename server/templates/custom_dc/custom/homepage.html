@@ -27,6 +27,8 @@
   <meta http-equiv="Expires" content="0">
   <!-- Marked.js for markdown rendering -->
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <!-- html2canvas for chart image capture -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <!-- Data Commons Web Components - use local custom DC version for proper API routing -->
   <script src="/datacommons.js"></script>
   <script>
@@ -2306,6 +2308,82 @@ When you receive **RAW MCP TOOL RESULTS**, you MUST:
     .config-source-section input[type="radio"] {
       accent-color: var(--gov-blue);
     }
+
+    /* Export Actions Bar */
+    .export-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border-color);
+      flex-wrap: wrap;
+    }
+
+    .export-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      font-size: 0.8rem;
+      font-family: inherit;
+      background: #f8f9fa;
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      cursor: pointer;
+      color: var(--text-muted);
+      transition: all 0.2s ease;
+    }
+
+    .export-btn:hover {
+      background: #e9ecef;
+      border-color: var(--gov-blue);
+      color: var(--gov-blue);
+    }
+
+    .export-btn svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    .export-btn.exporting {
+      opacity: 0.6;
+      pointer-events: none;
+    }
+
+    .export-toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #333;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 8px;
+      z-index: 10000;
+      animation: fadeInOut 3s ease forwards;
+    }
+
+    @keyframes fadeInOut {
+      0% { opacity: 0; transform: translateX(-50%) translateY(20px); }
+      10% { opacity: 1; transform: translateX(-50%) translateY(0); }
+      90% { opacity: 1; transform: translateX(-50%) translateY(0); }
+      100% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+    }
+
+    /* Mobile adjustments for export buttons */
+    @media (max-width: 480px) {
+      .export-actions {
+        gap: 6px;
+      }
+      .export-btn {
+        padding: 5px 10px;
+        font-size: 0.75rem;
+      }
+      .export-btn svg {
+        width: 12px;
+        height: 12px;
+      }
+    }
   </style>
 {% endblock %}
 
@@ -2934,6 +3012,316 @@ When you receive **RAW MCP TOOL RESULTS**, you MUST:
         }
       }
 
+      // ============================================================
+      // EXPORT FUNCTIONALITY
+      // ============================================================
+
+      // Global store for export data (maps messageId to export info)
+      const exportDataStore = new Map();
+
+      // Create export action bar with buttons
+      function createExportActionBar(messageId) {
+        const actionBar = document.createElement('div');
+        actionBar.className = 'export-actions';
+        actionBar.innerHTML = `
+          <button class="export-btn export-gmail" data-message-id="${messageId}" title="Send via email">
+            <svg viewBox="0 0 24 24"><path fill="currentColor" d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+            <span>Email</span>
+          </button>
+          <button class="export-btn export-docs" data-message-id="${messageId}" title="Export as document">
+            <svg viewBox="0 0 24 24"><path fill="currentColor" d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+            <span>Export to Docs</span>
+          </button>
+        `;
+        return actionBar;
+      }
+
+      // Handle Gmail export - opens Gmail compose in browser
+      async function handleExportGmail(messageId) {
+        const exportData = exportDataStore.get(messageId);
+        if (!exportData) {
+          console.error('Export data not found for message:', messageId);
+          return;
+        }
+
+        const chartTitle = exportData.chartConfigs[0]?.title || 'Data Analysis Report';
+        const subject = encodeURIComponent(`Data Analysis: ${chartTitle}`);
+
+        // Build email body
+        let body = exportData.textResponse || '';
+
+        // Add chart info
+        if (exportData.chartConfigs.length > 0) {
+          const chart = exportData.chartConfigs[0];
+          body += `\n\n---\nChart: ${chart.title || 'Data Visualization'}`;
+          if (chart.variableDcids && chart.variableDcids.length > 0) {
+            body += `\nVariables: ${chart.variableDcids.join(', ')}`;
+          }
+          if (chart.placeDcids && chart.placeDcids.length > 0) {
+            body += `\nLocations: ${chart.placeDcids.join(', ')}`;
+          }
+        }
+
+        body += '\n\n---\nExported from Data Agent | Powered by Google Data Commons';
+
+        // Gmail URL has a larger limit than mailto, but still truncate if very long
+        if (body.length > 5000) {
+          body = body.substring(0, 5000) + '... [truncated]';
+        }
+
+        // Open Gmail compose in new tab
+        const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&su=${subject}&body=${encodeURIComponent(body)}`;
+        window.open(gmailUrl, '_blank');
+      }
+
+      // Extract SVG from Data Commons chart component (handles Shadow DOM)
+      function extractChartSvg(chartWrapper) {
+        try {
+          // Find the datacommons-* element
+          const dcComponent = chartWrapper.querySelector('[class*="datacommons-"]') ||
+                              chartWrapper.querySelector('datacommons-line') ||
+                              chartWrapper.querySelector('datacommons-bar') ||
+                              chartWrapper.querySelector('datacommons-map') ||
+                              chartWrapper.querySelector('datacommons-ranking') ||
+                              chartWrapper.querySelector('datacommons-pie') ||
+                              chartWrapper.querySelector('datacommons-scatter') ||
+                              chartWrapper.querySelector('datacommons-highlight');
+
+          if (!dcComponent) {
+            console.log('No DC component found in wrapper');
+            return null;
+          }
+
+          // Try to access shadow root
+          const shadowRoot = dcComponent.shadowRoot;
+          if (shadowRoot) {
+            const svg = shadowRoot.querySelector('svg');
+            if (svg) {
+              // Clone and serialize the SVG
+              const svgClone = svg.cloneNode(true);
+              // Set explicit dimensions
+              const bbox = svg.getBoundingClientRect();
+              svgClone.setAttribute('width', bbox.width || 600);
+              svgClone.setAttribute('height', bbox.height || 400);
+              svgClone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+              return svgClone.outerHTML;
+            }
+          }
+
+          // Fallback: try to find SVG in light DOM
+          const svg = chartWrapper.querySelector('svg');
+          if (svg) {
+            const svgClone = svg.cloneNode(true);
+            svgClone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+            return svgClone.outerHTML;
+          }
+
+          return null;
+        } catch (err) {
+          console.warn('SVG extraction failed:', err);
+          return null;
+        }
+      }
+
+      // Handle Google Docs export - downloads a .doc file with chart
+      async function handleExportDocs(messageId) {
+        const btn = document.querySelector(`.export-docs[data-message-id="${messageId}"]`);
+        if (btn) btn.classList.add('exporting');
+
+        try {
+          const exportData = exportDataStore.get(messageId);
+          if (!exportData) {
+            console.error('Export data not found for message:', messageId);
+            showExportToast('Export data not found');
+            return;
+          }
+
+          showExportToast('Preparing export... please wait');
+
+          const dateStr = new Date().toLocaleDateString('en-IN', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+          });
+
+          // Convert markdown-like text to HTML
+          let analysisHtml = (exportData.textResponse || '')
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')  // Bold
+            .replace(/\*(.*?)\*/g, '<em>$1</em>')  // Italic
+            .replace(/^### (.*$)/gm, '<h3>$1</h3>')  // H3
+            .replace(/^## (.*$)/gm, '<h2>$1</h2>')  // H2
+            .replace(/^# (.*$)/gm, '<h1>$1</h1>')  // H1
+            .replace(/^\- (.*$)/gm, '<li>$1</li>')  // List items
+            .replace(/\n/g, '<br>');  // Line breaks
+
+          // Wrap consecutive <li> items in <ul>
+          analysisHtml = analysisHtml.replace(/(<li>.*?<\/li>)(<br>)?(<li>)/g, '$1$3');
+          analysisHtml = analysisHtml.replace(/(<li>.*?<\/li>)/g, '<ul>$1</ul>');
+          analysisHtml = analysisHtml.replace(/<\/ul><ul>/g, '');
+
+          // Try to extract chart SVG
+          let chartHtml = '';
+          const messageEl = document.querySelector(`.message[data-message-id="${messageId}"]`);
+          if (messageEl) {
+            const chartContainer = messageEl.querySelector('.dc-charts-container');
+            if (chartContainer) {
+              // Wait for charts to fully render
+              await new Promise(resolve => setTimeout(resolve, 1500));
+
+              const chartWrappers = chartContainer.querySelectorAll('.dc-chart-wrapper');
+              for (const wrapper of chartWrappers) {
+                // Try SVG extraction first
+                const svgHtml = extractChartSvg(wrapper);
+                if (svgHtml) {
+                  chartHtml += `
+                    <div style="margin: 20px 0; text-align: center; border: 1px solid #ddd; padding: 10px; border-radius: 8px;">
+                      ${svgHtml}
+                    </div>
+                  `;
+                  console.log('✅ SVG extracted successfully');
+                } else {
+                  // Fallback to html2canvas if SVG extraction fails
+                  console.log('SVG extraction failed, trying html2canvas...');
+                  if (window.html2canvas) {
+                    try {
+                      const canvas = await html2canvas(wrapper, {
+                        backgroundColor: '#ffffff',
+                        scale: 2,
+                        useCORS: true,
+                        logging: false,
+                        allowTaint: true
+                      });
+                      const imageDataUrl = canvas.toDataURL('image/png');
+                      chartHtml += `
+                        <div style="margin: 20px 0; text-align: center;">
+                          <img src="${imageDataUrl}" style="max-width: 100%; border: 1px solid #ddd; border-radius: 8px;" />
+                        </div>
+                      `;
+                      console.log('✅ Chart captured via html2canvas');
+                    } catch (canvasErr) {
+                      console.warn('html2canvas failed:', canvasErr);
+                    }
+                  }
+                }
+              }
+            }
+          }
+
+          // Build chart details HTML
+          let chartDetailsHtml = '';
+          if (exportData.chartConfigs.length > 0) {
+            const chart = exportData.chartConfigs[0];
+            chartDetailsHtml = `
+              <h3 style="color: #555; margin-top: 10px;">Data Source Details</h3>
+              <table border="1" cellpadding="8" cellspacing="0" style="border-collapse: collapse; font-size: 10pt;">
+                <tr><td><strong>Title</strong></td><td>${chart.title || 'Data Visualization'}</td></tr>
+                <tr><td><strong>Chart Type</strong></td><td>${chart.vizType || 'line'}</td></tr>
+                ${chart.variableDcids?.length ? `<tr><td><strong>Variables</strong></td><td>${chart.variableDcids.join(', ')}</td></tr>` : ''}
+                ${chart.placeDcids?.length ? `<tr><td><strong>Locations</strong></td><td>${chart.placeDcids.join(', ')}</td></tr>` : ''}
+              </table>
+            `;
+          }
+
+          // Create Word-compatible HTML document
+          const docContent = `
+            <html xmlns:o="urn:schemas-microsoft-com:office:office"
+                  xmlns:w="urn:schemas-microsoft-com:office:word"
+                  xmlns="http://www.w3.org/TR/REC-html40">
+            <head>
+              <meta charset="utf-8">
+              <title>Data Analysis Report</title>
+              <style>
+                body { font-family: Arial, sans-serif; font-size: 12pt; line-height: 1.6; margin: 40px; }
+                h1 { color: #1a73e8; font-size: 24pt; margin-bottom: 10px; }
+                h2 { color: #333; font-size: 16pt; margin-top: 20px; }
+                h3 { color: #555; font-size: 14pt; }
+                .date { color: #666; font-size: 10pt; margin-bottom: 20px; }
+                hr { border: none; border-top: 1px solid #ddd; margin: 20px 0; }
+                table { margin-top: 10px; }
+                td { border: 1px solid #ddd; padding: 8px; }
+                strong { color: #333; }
+                img { max-width: 600px; }
+                svg { max-width: 100%; height: auto; }
+              </style>
+            </head>
+            <body>
+              <h1>Data Analysis Report</h1>
+              <p class="date">Generated: ${dateStr}</p>
+              <hr>
+
+              <h2>Analysis</h2>
+              <div>${analysisHtml}</div>
+
+              ${chartHtml ? `
+                <hr>
+                <h2>Visualization</h2>
+                ${chartHtml}
+                ${chartDetailsHtml}
+              ` : chartDetailsHtml ? `
+                <hr>
+                <h2>Chart Information</h2>
+                ${chartDetailsHtml}
+              ` : ''}
+
+              <hr>
+              <p style="color: #888; font-size: 10pt;">
+                Exported from Data Agent | Powered by Google Data Commons
+              </p>
+            </body>
+            </html>
+          `;
+
+          // Create and download the .doc file
+          const blob = new Blob([docContent], { type: 'application/msword' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          const chartTitle = exportData.chartConfigs[0]?.title || 'data-analysis';
+          const safeTitle = chartTitle.replace(/[^a-z0-9]/gi, '-').toLowerCase().substring(0, 30);
+          a.download = `${safeTitle}-report.doc`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+
+          showExportToast('Document downloaded!');
+        } catch (err) {
+          console.error('Export to Docs failed:', err);
+          showExportToast('Export failed. Please try again.');
+        } finally {
+          if (btn) btn.classList.remove('exporting');
+        }
+      }
+
+      // Show toast notification
+      function showExportToast(message) {
+        // Remove any existing toasts
+        const existingToast = document.querySelector('.export-toast');
+        if (existingToast) existingToast.remove();
+
+        const toast = document.createElement('div');
+        toast.className = 'export-toast';
+        toast.textContent = message;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+      }
+
+      // Event delegation for export button clicks
+      document.addEventListener('click', function(e) {
+        const gmailBtn = e.target.closest('.export-gmail');
+        const docsBtn = e.target.closest('.export-docs');
+
+        if (gmailBtn) {
+          handleExportGmail(gmailBtn.dataset.messageId);
+        }
+        if (docsBtn) {
+          handleExportDocs(docsBtn.dataset.messageId);
+        }
+      });
+
       // Note: Visualization type detection is now handled by structured output in finalResponseSchema
       // The detectVisualizationType() and detectVisualizationTypeWithGemini() functions have been removed.
 
@@ -3225,6 +3613,35 @@ When you receive **RAW MCP TOOL RESULTS**, you MUST:
 
           chatMessages.scrollTop = chatMessages.scrollHeight;
           console.log(`✅ ${chartsRendered} chart(s) injected successfully into DOM`);
+
+          // Add export functionality
+          const messageId = `msg-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+          messageEl.dataset.messageId = messageId;
+
+          // Get text response from message content
+          const responseContent = messageEl.querySelector('.response-content');
+          const textResponse = responseContent ? responseContent.textContent : '';
+
+          // Store export data for later use
+          exportDataStore.set(messageId, {
+            messageId,
+            textResponse,
+            chartConfigs: chartsToRender.map(chart => ({
+              title: chart.title || 'Data Visualization',
+              vizType: chart.viz_type || 'line',
+              variableDcids: chart.variable_dcids || [],
+              placeDcids: chart.place_dcids || [],
+              parentPlace: chart.parent_place || 'country/IND',
+              childPlaceType: chart.child_place_type || 'State'
+            })),
+            timestamp: new Date()
+          });
+
+          // Add export action bar to charts container
+          const exportBar = createExportActionBar(messageId);
+          chartsContainer.appendChild(exportBar);
+          console.log('✅ Export buttons added for message:', messageId);
+
           console.groupEnd();
 
         } catch (err) {
