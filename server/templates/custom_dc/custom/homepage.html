@@ -2872,23 +2872,23 @@ When you receive **RAW MCP TOOL RESULTS**, you MUST:
       // State
       let geminiApiKey = localStorage.getItem('gemini_api_key') || '';
       // Dynamic default: uses same hostname as page (works for localhost AND public IPs)
-      // const dynamicProxyPort = window.location.protocol === "https:" ? 5001 : 5002;  // HTTPS:5001, HTTP:5002
-      // const dynamicProxyUrl = `${window.location.protocol}//${window.location.hostname}:${dynamicProxyPort}`;
+      const dynamicProxyPort = window.location.protocol === "https:" ? 5001 : 5002;  // HTTPS:5001, HTTP:5002
+      const dynamicProxyUrl = `${window.location.protocol}//${window.location.hostname}:${dynamicProxyPort}`;
       let mcpProxyUrl = localStorage.getItem('mcp_proxy_url') || config.defaults?.mcpProxyUrl || dynamicProxyUrl;
       // Auto-migrate protocol and port based on current page
-      // if (window.location.protocol === "https:" && mcpProxyUrl.includes(":5002")) {
-      //   mcpProxyUrl = mcpProxyUrl.replace(":5002", ":5001").replace("http://", "https://");
-      //   localStorage.setItem("mcp_proxy_url", mcpProxyUrl);
-      //   console.log("🔒 Auto-migrated to HTTPS:5001:", mcpProxyUrl);
-      // } else if (window.location.protocol === "http:" && mcpProxyUrl.includes(":5001")) {
-      //   mcpProxyUrl = mcpProxyUrl.replace(":5001", ":5002").replace("https://", "http://");
-      //   localStorage.setItem("mcp_proxy_url", mcpProxyUrl);
-      //   console.log("📖 Auto-migrated to HTTP:5002:", mcpProxyUrl);
-      // } else if (window.location.protocol === "https:" && mcpProxyUrl.startsWith("http://")) {
-      //   mcpProxyUrl = mcpProxyUrl.replace("http://", "https://");
-      //   localStorage.setItem("mcp_proxy_url", mcpProxyUrl);
-      //   console.log("🔒 Auto-migrated to HTTPS:", mcpProxyUrl);
-      // }
+      if (window.location.protocol === "https:" && mcpProxyUrl.includes(":5002")) {
+        mcpProxyUrl = mcpProxyUrl.replace(":5002", ":5001").replace("http://", "https://");
+        localStorage.setItem("mcp_proxy_url", mcpProxyUrl);
+        console.log("🔒 Auto-migrated to HTTPS:5001:", mcpProxyUrl);
+      } else if (window.location.protocol === "http:" && mcpProxyUrl.includes(":5001")) {
+        mcpProxyUrl = mcpProxyUrl.replace(":5001", ":5002").replace("https://", "http://");
+        localStorage.setItem("mcp_proxy_url", mcpProxyUrl);
+        console.log("📖 Auto-migrated to HTTP:5002:", mcpProxyUrl);
+      } else if (window.location.protocol === "https:" && mcpProxyUrl.startsWith("http://")) {
+        mcpProxyUrl = mcpProxyUrl.replace("http://", "https://");
+        localStorage.setItem("mcp_proxy_url", mcpProxyUrl);
+        console.log("🔒 Auto-migrated to HTTPS:", mcpProxyUrl);
+      }
       let mcpEnabled = localStorage.getItem('mcp_enabled') !== 'false';
       let kbStoreId = localStorage.getItem('kb_store_id') || config.defaults?.kbStoreId || 'fileSearchStores/msmepolicies-8pibj9lwmrws';
       // Knowledge base is OFF by default - only enable if explicitly set to 'true' in localStorage
