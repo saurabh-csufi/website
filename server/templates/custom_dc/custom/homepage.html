@@ -44,7 +44,7 @@
       },
       defaults: {
         // Dynamic: uses same hostname as the page (works for localhost AND public IPs)
-        mcpProxyUrl: `${window.location.protocol}//${window.location.hostname}:${window.location.protocol === "https:" ? 5001 : 5002}`,
+        mcpProxyUrl: `${window.location.protocol}//${window.location.hostname}:5001`,
         kbStoreId: 'fileSearchStores/msmepolicies-8pibj9lwmrws',
         kbEnabled: false  // Knowledge base is OFF by default
       },
@@ -2855,7 +2855,7 @@ When you receive **RAW MCP TOOL RESULTS**, you MUST:
 
       // Migration: Clear stale localhost proxy URLs when accessing from external IP
       // This ensures users get the correct dynamic URL based on their access method
-      const PROXY_URL_VERSION = 'proxy_url_v3';
+      const PROXY_URL_VERSION = 'proxy_url_v4';
       if (!localStorage.getItem(PROXY_URL_VERSION)) {
         const savedProxyUrl = localStorage.getItem('mcp_proxy_url') || '';
         const isLocalAccess = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
@@ -2866,29 +2866,32 @@ When you receive **RAW MCP TOOL RESULTS**, you MUST:
           console.log('Clearing stale localhost proxy URL:', savedProxyUrl);
           localStorage.removeItem('mcp_proxy_url');
         }
+        // Fix port 5002 → 5001 (backend always runs on 5001)
+        if (savedProxyUrl.includes(':5002')) {
+          const fixedUrl = savedProxyUrl.replace(':5002', ':5001');
+          localStorage.setItem('mcp_proxy_url', fixedUrl);
+          console.log('Fixed proxy URL port 5002→5001:', fixedUrl);
+        }
         localStorage.setItem(PROXY_URL_VERSION, 'true');
       }
 
       // State
       let geminiApiKey = localStorage.getItem('gemini_api_key') || '';
-      // Dynamic default: uses same hostname as page (works for localhost AND public IPs)
-      // const dynamicProxyPort = window.location.protocol === "https:" ? 5001 : 5002;  // HTTPS:5001, HTTP:5002
-      // const dynamicProxyUrl = `${window.location.protocol}//${window.location.hostname}:${dynamicProxyPort}`;
+      // Dynamic default: uses same hostname as page, always port 5001
+      const dynamicProxyUrl = `${window.location.protocol}//${window.location.hostname}:5001`;
       let mcpProxyUrl = localStorage.getItem('mcp_proxy_url') || config.defaults?.mcpProxyUrl || dynamicProxyUrl;
-      // Auto-migrate protocol and port based on current page
-      // if (window.location.protocol === "https:" && mcpProxyUrl.includes(":5002")) {
-      //   mcpProxyUrl = mcpProxyUrl.replace(":5002", ":5001").replace("http://", "https://");
-      //   localStorage.setItem("mcp_proxy_url", mcpProxyUrl);
-      //   console.log("🔒 Auto-migrated to HTTPS:5001:", mcpProxyUrl);
-      // } else if (window.location.protocol === "http:" && mcpProxyUrl.includes(":5001")) {
-      //   mcpProxyUrl = mcpProxyUrl.replace(":5001", ":5002").replace("https://", "http://");
-      //   localStorage.setItem("mcp_proxy_url", mcpProxyUrl);
-      //   console.log("📖 Auto-migrated to HTTP:5002:", mcpProxyUrl);
-      // } else if (window.location.protocol === "https:" && mcpProxyUrl.startsWith("http://")) {
-      //   mcpProxyUrl = mcpProxyUrl.replace("http://", "https://");
-      //   localStorage.setItem("mcp_proxy_url", mcpProxyUrl);
-      //   console.log("🔒 Auto-migrated to HTTPS:", mcpProxyUrl);
-      // }
+      // Always fix port 5002 → 5001 (backend always runs on 5001)
+      if (mcpProxyUrl.includes(':5002')) {
+        mcpProxyUrl = mcpProxyUrl.replace(':5002', ':5001');
+        localStorage.setItem('mcp_proxy_url', mcpProxyUrl);
+        console.log('Fixed proxy URL port to 5001:', mcpProxyUrl);
+      }
+      // Match protocol to page
+      if (window.location.protocol === "https:" && mcpProxyUrl.startsWith("http://")) {
+        mcpProxyUrl = mcpProxyUrl.replace("http://", "https://");
+        localStorage.setItem("mcp_proxy_url", mcpProxyUrl);
+        console.log("🔒 Auto-migrated to HTTPS:", mcpProxyUrl);
+      }
       let mcpEnabled = localStorage.getItem('mcp_enabled') !== 'false';
       let kbStoreId = localStorage.getItem('kb_store_id') || config.defaults?.kbStoreId || 'fileSearchStores/msmepolicies-8pibj9lwmrws';
       // Knowledge base is OFF by default - only enable if explicitly set to 'true' in localStorage
