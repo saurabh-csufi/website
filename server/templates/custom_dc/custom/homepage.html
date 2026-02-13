@@ -1699,6 +1699,16 @@ When you receive **RAW MCP TOOL RESULTS**, you MUST:
       cursor: not-allowed;
     }
 
+    /* Stop Button State */
+    #send-btn.stop-mode {
+      background: #EA4335; /* Google Red */
+    }
+
+    #send-btn.stop-mode:hover:not(:disabled) {
+      background: #d33828;
+      transform: scale(1.05);
+    }
+
     #send-btn svg {
       width: 22px;
       height: 22px;
@@ -2862,23 +2872,23 @@ When you receive **RAW MCP TOOL RESULTS**, you MUST:
       // State
       let geminiApiKey = localStorage.getItem('gemini_api_key') || '';
       // Dynamic default: uses same hostname as page (works for localhost AND public IPs)
-      const dynamicProxyPort = window.location.protocol === "https:" ? 5001 : 5002;  // HTTPS:5001, HTTP:5002
-      const dynamicProxyUrl = `${window.location.protocol}//${window.location.hostname}:${dynamicProxyPort}`;
+      // const dynamicProxyPort = window.location.protocol === "https:" ? 5001 : 5002;  // HTTPS:5001, HTTP:5002
+      // const dynamicProxyUrl = `${window.location.protocol}//${window.location.hostname}:${dynamicProxyPort}`;
       let mcpProxyUrl = localStorage.getItem('mcp_proxy_url') || config.defaults?.mcpProxyUrl || dynamicProxyUrl;
       // Auto-migrate protocol and port based on current page
-      if (window.location.protocol === "https:" && mcpProxyUrl.includes(":5002")) {
-        mcpProxyUrl = mcpProxyUrl.replace(":5002", ":5001").replace("http://", "https://");
-        localStorage.setItem("mcp_proxy_url", mcpProxyUrl);
-        console.log("🔒 Auto-migrated to HTTPS:5001:", mcpProxyUrl);
-      } else if (window.location.protocol === "http:" && mcpProxyUrl.includes(":5001")) {
-        mcpProxyUrl = mcpProxyUrl.replace(":5001", ":5002").replace("https://", "http://");
-        localStorage.setItem("mcp_proxy_url", mcpProxyUrl);
-        console.log("📖 Auto-migrated to HTTP:5002:", mcpProxyUrl);
-      } else if (window.location.protocol === "https:" && mcpProxyUrl.startsWith("http://")) {
-        mcpProxyUrl = mcpProxyUrl.replace("http://", "https://");
-        localStorage.setItem("mcp_proxy_url", mcpProxyUrl);
-        console.log("🔒 Auto-migrated to HTTPS:", mcpProxyUrl);
-      }
+      // if (window.location.protocol === "https:" && mcpProxyUrl.includes(":5002")) {
+      //   mcpProxyUrl = mcpProxyUrl.replace(":5002", ":5001").replace("http://", "https://");
+      //   localStorage.setItem("mcp_proxy_url", mcpProxyUrl);
+      //   console.log("🔒 Auto-migrated to HTTPS:5001:", mcpProxyUrl);
+      // } else if (window.location.protocol === "http:" && mcpProxyUrl.includes(":5001")) {
+      //   mcpProxyUrl = mcpProxyUrl.replace(":5001", ":5002").replace("https://", "http://");
+      //   localStorage.setItem("mcp_proxy_url", mcpProxyUrl);
+      //   console.log("📖 Auto-migrated to HTTP:5002:", mcpProxyUrl);
+      // } else if (window.location.protocol === "https:" && mcpProxyUrl.startsWith("http://")) {
+      //   mcpProxyUrl = mcpProxyUrl.replace("http://", "https://");
+      //   localStorage.setItem("mcp_proxy_url", mcpProxyUrl);
+      //   console.log("🔒 Auto-migrated to HTTPS:", mcpProxyUrl);
+      // }
       let mcpEnabled = localStorage.getItem('mcp_enabled') !== 'false';
       let kbStoreId = localStorage.getItem('kb_store_id') || config.defaults?.kbStoreId || 'fileSearchStores/msmepolicies-8pibj9lwmrws';
       // Knowledge base is OFF by default - only enable if explicitly set to 'true' in localStorage
@@ -2888,6 +2898,9 @@ When you receive **RAW MCP TOOL RESULTS**, you MUST:
       let mcpConnected = false;
       let conversationHistory = [];
       let isProcessing = false;
+      let currentAbortController = null;  // AbortController for cancelling fetch
+      let pendingUserQuery = null;        // Store query in case user stops
+      let currentStreamingMessage = null; // Reference to current streaming message for stop handling
       // Thinking level config for Gemini 3 models (values: minimal, low, medium, high or budget number)
       let mcpThinkingLevel = localStorage.getItem('mcp_thinking_level') || 'low';
       let synthesisThinkingLevel = localStorage.getItem('synthesis_thinking_level') || 'low';
@@ -4446,7 +4459,14 @@ When you receive **RAW MCP TOOL RESULTS**, you MUST:
         // Event listeners
         saveConfigBtn.addEventListener('click', saveConfig);
         document.getElementById('reset-prompts')?.addEventListener('click', resetPromptsToDefaults);
-        sendBtn.addEventListener('click', sendMessage);
+        // Send button toggles between send and stop modes
+        sendBtn.addEventListener('click', () => {
+          if (isProcessing) {
+            stopGeneration();
+          } else {
+            sendMessage();
+          }
+        });
         chatInput.addEventListener('keydown', handleKeyDown);
         chatInput.addEventListener('input', autoResize);
 
@@ -4835,8 +4855,11 @@ When you receive **RAW MCP TOOL RESULTS**, you MUST:
 
       /**
        * Backend streaming chat - calls /api/chat/stream endpoint
+       * @param {string} userMessage - The user's message
+       * @param {object} streamingMessage - The streaming message UI component
+       * @param {AbortSignal} [abortSignal] - Optional abort signal for cancellation
        */
-      async function backendChatStream(userMessage, streamingMessage) {
+      async function backendChatStream(userMessage, streamingMessage, abortSignal = null) {
         console.log('=== Backend Chat Stream ===');
         clearToolCalls();
 
@@ -4856,7 +4879,7 @@ When you receive **RAW MCP TOOL RESULTS**, you MUST:
             console.log('🔗 Backend API URL with overrides:', apiUrl);
           }
 
-          const response = await fetch(apiUrl, {
+          const fetchOptions = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -4864,7 +4887,14 @@ When you receive **RAW MCP TOOL RESULTS**, you MUST:
               history: conversationHistory.slice(-20),  // Last 20 messages
               session_id: currentConversationSessionId  // Send existing session ID for follow-ups
             })
-          });
+          };
+
+          // Add abort signal if provided
+          if (abortSignal) {
+            fetchOptions.signal = abortSignal;
+          }
+
+          const response = await fetch(apiUrl, fetchOptions);
 
           if (!response.ok) {
             throw new Error(`Backend error: ${response.status}`);
@@ -5495,7 +5525,17 @@ When you receive **RAW MCP TOOL RESULTS**, you MUST:
         // Start processing
         isProcessing = true;
         currentDataStatus = null;  // Reset data status for new message
-        sendBtn.disabled = true;
+
+        // Setup abort controller for stop functionality
+        console.log('DEBUG: Setting up abort controller');
+        currentAbortController = new AbortController();
+        pendingUserQuery = message;  // Store for potential restoration if stopped
+
+        // Transform send button to stop mode
+        console.log('DEBUG: Transforming send button to stop mode');
+        updateSendButtonState(true);
+        console.log('DEBUG: Button transformed successfully');
+
         chatInput.disabled = true;
         // Stop voice input if recording and disable mic controls
         stopVoiceInput();
@@ -5509,17 +5549,29 @@ When you receive **RAW MCP TOOL RESULTS**, you MUST:
         // ============================================================
         // BACKEND MODE: Use streaming API from proxy server
         // ============================================================
+        console.log('DEBUG: configSource =', configSource);
         if (configSource === 'backend') {
           console.log('=== BACKEND MODE: Using proxy server for Gemini calls ===');
 
           try {
             // Remove typing indicator and create streaming message
+            console.log('DEBUG: About to remove typing indicator');
             typingEl.remove();
+            console.log('DEBUG: Creating streaming message');
             const streamingMessage = createStreamingMessage();
+            console.log('DEBUG: Setting initial text');
             streamingMessage.setText('Agent is thinking...');
+            console.log('DEBUG: Streaming message created successfully');
 
-            // Call backend streaming API
-            const result = await backendChatStream(userMessage, streamingMessage);
+            // Store reference for stop handling
+            currentStreamingMessage = streamingMessage;
+
+            // Call backend streaming API with abort signal
+            const result = await backendChatStream(userMessage, streamingMessage, currentAbortController.signal);
+
+            // Clear pending query on successful completion
+            pendingUserQuery = null;
+            currentStreamingMessage = null;
 
             // Finalize the message
             streamingMessage.finalize();
@@ -5551,7 +5603,7 @@ When you receive **RAW MCP TOOL RESULTS**, you MUST:
             // Add export button to the message
             addExportButton(streamingMessage.getElement());
 
-            // Add to conversation history
+            // Add to conversation history ONLY on successful completion (not when stopped)
             conversationHistory.push({ role: 'user', parts: [{ text: userMessage }] });
             conversationHistory.push({ role: 'model', parts: [{ text: result.text }] });
 
@@ -5561,19 +5613,34 @@ When you receive **RAW MCP TOOL RESULTS**, you MUST:
             }
 
           } catch (err) {
+            console.log('DEBUG: Caught error in backend mode:', err.name, err.message);
+            // Check if this was a user-initiated abort (stop button)
+            if (err.name === 'AbortError') {
+              console.log('Request aborted by user');
+              // stopGeneration() already handles UI cleanup
+              return;
+            }
+
             console.error('Backend chat error:', err);
-            typingEl.remove();
+            if (typingEl && typingEl.parentNode) {
+              typingEl.remove();
+            }
             addMessage('assistant', `Error: ${err.message}. Please check if the backend server is running.`);
           } finally {
-            isProcessing = false;
-            sendBtn.disabled = false;
-            chatInput.disabled = false;
-            if (micBtn && SpeechRecognition) {
-              micBtn.disabled = false;
-              const langSelect = document.getElementById('voice-lang-select');
-              if (langSelect) langSelect.disabled = false;
+            // Reset processing state (only if not already reset by stopGeneration)
+            if (isProcessing) {
+              isProcessing = false;
+              updateSendButtonState(false);
+              chatInput.disabled = false;
+              if (micBtn && SpeechRecognition) {
+                micBtn.disabled = false;
+                const langSelect = document.getElementById('voice-lang-select');
+                if (langSelect) langSelect.disabled = false;
+              }
+              chatInput.focus();
             }
-            chatInput.focus();
+            // Clean up abort controller
+            currentAbortController = null;
           }
           return;
         }
@@ -5581,6 +5648,7 @@ When you receive **RAW MCP TOOL RESULTS**, you MUST:
         // ============================================================
         // FRONTEND MODE: Direct Gemini API calls (existing logic)
         // ============================================================
+        console.log('DEBUG: Entering FRONTEND mode (configSource was not "backend")');
         try {
           console.log('=== FRONTEND MODE: Processing Query with Structured Output ===');
           console.log(`User message: ${userMessage}`);
@@ -5600,6 +5668,9 @@ When you receive **RAW MCP TOOL RESULTS**, you MUST:
           typingEl.remove();
           const streamingMessage = createStreamingMessage();
           streamingMessage.setText('Analyzing data...');
+
+          // Store reference for stop handling
+          currentStreamingMessage = streamingMessage;
 
           // Get KB response content (if relevant)
           let kbContent = '';
@@ -5636,6 +5707,10 @@ When you receive **RAW MCP TOOL RESULTS**, you MUST:
 
             // Add export button to the message
             addExportButton(streamingMessage.getElement());
+
+            // Clear pending query on successful completion
+            pendingUserQuery = null;
+            currentStreamingMessage = null;
 
             // Update conversation history
             conversationHistory.push({ role: 'user', parts: [{ text: userMessage }] });
@@ -5816,11 +5891,22 @@ ${rawResultsJson}
           // Add export button to the message
           addExportButton(streamingMessage.element);
 
-          // Update conversation history
+          // Clear pending query and streaming message on successful completion
+          pendingUserQuery = null;
+          currentStreamingMessage = null;
+
+          // Update conversation history ONLY on successful completion (not when stopped)
           conversationHistory.push({ role: 'user', parts: [{ text: userMessage }] });
           conversationHistory.push({ role: 'model', parts: [{ text: streamedText }] });
 
         } catch (err) {
+          // Check if this was a user-initiated abort (stop button)
+          if (err.name === 'AbortError') {
+            console.log('Frontend request aborted by user');
+            // stopGeneration() already handles UI cleanup
+            return;
+          }
+
           // Safely remove typing indicator if it still exists
           if (typingEl && typingEl.parentNode) {
             typingEl.remove();
@@ -5833,16 +5919,108 @@ ${rawResultsJson}
             showError(`Error: ${err.message}`);
           }
         } finally {
-          isProcessing = false;
-          sendBtn.disabled = false;
+          // Reset processing state (only if not already reset by stopGeneration)
+          if (isProcessing) {
+            isProcessing = false;
+            updateSendButtonState(false);
+            chatInput.disabled = false;
+            if (micBtn && SpeechRecognition) {
+              micBtn.disabled = false;
+              const langSelect = document.getElementById('voice-lang-select');
+              if (langSelect) langSelect.disabled = false;
+            }
+            chatInput.focus();
+          }
+          // Clean up
+          currentAbortController = null;
+          pendingUserQuery = null;
+          currentStreamingMessage = null;
+        }
+      }
+
+      // ============================================================
+      // STOP GENERATION: Cancel response mid-stream
+      // ============================================================
+
+      /**
+       * Update send button appearance based on processing state
+       */
+      function updateSendButtonState(isStopMode) {
+        const sendBtn = document.getElementById('send-btn');
+        if (!sendBtn) return;
+
+        if (isStopMode) {
+          sendBtn.classList.add('stop-mode');
+          sendBtn.innerHTML = `
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <rect x="6" y="6" width="12" height="12" rx="2"></rect>
+            </svg>
+          `;
+          sendBtn.title = 'Stop generation';
+          sendBtn.disabled = false;  // Enable stop button even during processing
+        } else {
+          sendBtn.classList.remove('stop-mode');
+          sendBtn.innerHTML = `
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
+            </svg>
+          `;
+          sendBtn.title = 'Send message';
+        }
+      }
+
+      /**
+       * Stop response generation mid-stream
+       */
+      function stopGeneration() {
+        if (!isProcessing || !currentAbortController) return;
+
+        console.log('Stopping generation...');
+
+        // Abort the fetch request
+        currentAbortController.abort();
+
+        // Reset processing state
+        isProcessing = false;
+
+        // Handle the streaming message - show "Response stopped" if empty
+        if (currentStreamingMessage) {
+          const currentText = currentStreamingMessage.getText();
+          // Check if no real content has been received yet
+          if (!currentText || currentText === 'Agent is thinking...' || currentText === 'Analyzing data...') {
+            currentStreamingMessage.setText('*Response stopped*');
+          }
+          currentStreamingMessage.finalize();
+          currentStreamingMessage = null;
+        }
+
+        // Transform button back to send mode
+        updateSendButtonState(false);
+
+        // Re-enable input controls
+        const chatInput = document.getElementById('chat-input');
+        const micBtn = document.getElementById('mic-btn');
+        const langSelect = document.getElementById('voice-lang-select');
+
+        if (chatInput) {
           chatInput.disabled = false;
-          if (micBtn && SpeechRecognition) {
-            micBtn.disabled = false;
-            const langSelect = document.getElementById('voice-lang-select');
-            if (langSelect) langSelect.disabled = false;
+          // Restore the original query to input
+          if (pendingUserQuery) {
+            chatInput.value = pendingUserQuery;
+            pendingUserQuery = null;
           }
           chatInput.focus();
         }
+
+        // Enable mic if available
+        if (micBtn && SpeechRecognition) {
+          micBtn.disabled = false;
+        }
+        if (langSelect) {
+          langSelect.disabled = false;
+        }
+
+        console.log('Generation stopped');
       }
 
       // UI helpers
