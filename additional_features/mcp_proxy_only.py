@@ -733,6 +733,7 @@ def index():
         <li>POST /api/call - Execute tool</li>
         <li><a href="/api/config">/api/config</a> - Get backend config (no API key)</li>
         <li>POST /api/chat/stream - Full chat with streaming</li>
+        <li><a href="/logs?key=">/logs</a> - Query Analytics Dashboard (requires ?key=SECRET)</li>
     </ul>
     <h3>Prerequisite</h3>
     <p>Make sure the MCP server is running:</p>
@@ -2108,6 +2109,788 @@ Please provide a comprehensive response combining all available information."""
             'Connection': 'keep-alive'
         }
     )
+
+
+# ============================================================
+# LOGS ANALYTICS DASHBOARD
+# ============================================================
+
+def parse_log_file(log_path: Path) -> dict:
+    """Parse a single log file and extract metrics for analytics.
+
+    Returns:
+        dict with session_id, query, timestamp, status, duration_ms,
+        tool_calls, errors, model, thinking_level, kb_enabled
+    """
+    result = {
+        "session_id": log_path.stem,
+        "query": None,
+        "timestamp": None,
+        "status": "unknown",
+        "duration_ms": None,
+        "tool_calls": [],
+        "stat_vars": [],  # List of unique stat vars fetched
+        "errors": [],
+        "model": None,
+        "thinking_level": None,
+        "kb_enabled": False,
+        "text_length": 0
+    }
+
+    def process_event(event_name: str, data_lines: list):
+        """Process a single event's data."""
+        if not event_name or not data_lines:
+            return
+        try:
+            data_str = '\n'.join(data_lines)
+            data = json.loads(data_str)
+
+            if event_name == 'USER_MESSAGE':
+                result['query'] = data.get('message', '')
+            elif event_name == 'GEMINI_REQUEST':
+                if not result['model']:
+                    result['model'] = data.get('model', '')
+                if not result['thinking_level']:
+                    payload = data.get('payload', {})
+                    result['thinking_level'] = payload.get('thinking_level', '')
+            elif event_name == 'MCP_TOOL_REQUEST':
+                tool_name = data.get('tool_name', '')
+                arguments = data.get('arguments', {})
+                result['tool_calls'].append({
+                    'name': tool_name,
+                    'arguments': arguments
+                })
+                # Extract stat var from get_observations calls
+                if tool_name == 'get_observations':
+                    var_dcid = arguments.get('variable_dcid', '')
+                    if var_dcid and var_dcid not in result['stat_vars']:
+                        result['stat_vars'].append(var_dcid)
+            elif event_name == 'MCP_TOOL_RESPONSE':
+                if result['tool_calls']:
+                    result['tool_calls'][-1]['status'] = data.get('status', 'unknown')
+                    result['tool_calls'][-1]['duration_ms'] = data.get('duration_ms', 0)
+            elif event_name == 'ERROR':
+                result['errors'].append({
+                    'type': data.get('error_type', ''),
+                    'message': data.get('error_message', '')
+                })
+            elif event_name == 'KB_QUERY':
+                result['kb_enabled'] = True
+            elif event_name == 'QUERY_PARAMS_OVERRIDE':
+                if data.get('kb_enabled') == 'true':
+                    result['kb_enabled'] = True
+            elif event_name == 'FINAL_RESPONSE':
+                result['duration_ms'] = data.get('total_duration_ms')
+                result['text_length'] = data.get('text_length', 0)
+        except json.JSONDecodeError:
+            pass
+
+    try:
+        with open(log_path, 'r') as f:
+            content = f.read()
+
+        # Parse each event block
+        current_event = None
+        current_data = []
+
+        for line in content.split('\n'):
+            # Check for event header
+            if line.startswith('--- ') and ' @ ' in line:
+                # Process previous event BEFORE starting new one
+                process_event(current_event, current_data)
+
+                # Extract event type from header
+                parts = line.split(' @ ')
+                current_event = parts[0].replace('--- ', '').strip()
+                if len(parts) > 1:
+                    timestamp_str = parts[1].replace(' ---', '').strip()
+                    if not result['timestamp']:
+                        result['timestamp'] = timestamp_str
+                current_data = []
+            elif line.startswith('{') or (current_data and not line.startswith('=')):
+                current_data.append(line)
+
+        # IMPORTANT: Process the LAST event (usually FINAL_RESPONSE)
+        process_event(current_event, current_data)
+
+        # Determine success/failure status
+        if result['errors']:
+            result['status'] = 'failed'
+        elif result['text_length'] and result['text_length'] > 0:
+            result['status'] = 'success'
+        elif result['duration_ms'] and result['duration_ms'] > 0:
+            result['status'] = 'success'
+        else:
+            result['status'] = 'unknown'
+
+    except Exception as e:
+        logger.error(f"Error parsing log file {log_path}: {e}")
+        result['status'] = 'parse_error'
+
+    return result
+
+
+def calculate_percentiles(values: list) -> dict:
+    """Calculate response time percentiles."""
+    if not values:
+        return {"p50": 0, "p75": 0, "p90": 0, "p95": 0, "p99": 0}
+
+    sorted_values = sorted(values)
+    n = len(sorted_values)
+
+    def percentile(p):
+        k = (n - 1) * p / 100
+        f = int(k)
+        c = f + 1 if f + 1 < n else f
+        return sorted_values[f] + (k - f) * (sorted_values[c] - sorted_values[f]) if c != f else sorted_values[f]
+
+    return {
+        "p50": round(percentile(50), 0),
+        "p75": round(percentile(75), 0),
+        "p90": round(percentile(90), 0),
+        "p95": round(percentile(95), 0),
+        "p99": round(percentile(99), 0)
+    }
+
+
+def get_all_logs_analytics() -> dict:
+    """Aggregate analytics from all log files in the logs folder."""
+    logs_dir = Path(__file__).parent / 'logs'
+
+    if not logs_dir.exists():
+        return {"error": "Logs directory not found"}
+
+    log_files = sorted(logs_dir.glob('*.log'), reverse=True)
+
+    # Parse all logs
+    parsed_logs = []
+    for log_file in log_files:
+        parsed = parse_log_file(log_file)
+        if parsed['query']:  # Only include logs with actual queries
+            parsed_logs.append(parsed)
+
+    # Calculate aggregated stats
+    total = len(parsed_logs)
+    successful = sum(1 for p in parsed_logs if p['status'] == 'success')
+    failed = sum(1 for p in parsed_logs if p['status'] == 'failed')
+    unknown = sum(1 for p in parsed_logs if p['status'] in ('unknown', 'parse_error'))
+
+    # Response times
+    durations = [p['duration_ms'] for p in parsed_logs if p['duration_ms'] is not None]
+    avg_duration = sum(durations) / len(durations) if durations else 0
+    percentiles = calculate_percentiles(durations)
+
+    # By date
+    by_date = {}
+    for p in parsed_logs:
+        if p['timestamp']:
+            date = p['timestamp'][:10]  # Extract YYYY-MM-DD
+            if date not in by_date:
+                by_date[date] = {"queries": 0, "successful": 0, "failed": 0}
+            by_date[date]["queries"] += 1
+            if p['status'] == 'success':
+                by_date[date]["successful"] += 1
+            elif p['status'] == 'failed':
+                by_date[date]["failed"] += 1
+
+    # MCP tools summary
+    tool_counts = {}
+    total_tool_calls = 0
+    for p in parsed_logs:
+        for tc in p['tool_calls']:
+            name = tc.get('name', 'unknown')
+            tool_counts[name] = tool_counts.get(name, 0) + 1
+            total_tool_calls += 1
+
+    # Model stats
+    model_counts = {}
+    for p in parsed_logs:
+        model = p['model'] or 'unknown'
+        model_counts[model] = model_counts.get(model, 0) + 1
+
+    # Config stats
+    kb_enabled_count = sum(1 for p in parsed_logs if p['kb_enabled'])
+    thinking_levels = {}
+    for p in parsed_logs:
+        level = p['thinking_level'] or 'unknown'
+        thinking_levels[level] = thinking_levels.get(level, 0) + 1
+
+    # Error summary
+    error_types = {}
+    for p in parsed_logs:
+        for e in p['errors']:
+            etype = e.get('type', 'unknown')
+            error_types[etype] = error_types.get(etype, 0) + 1
+
+    # Recent queries (last 50)
+    recent_queries = []
+    for p in parsed_logs[:50]:
+        # Map 'unknown' status to 'stopped' for display
+        status = 'stopped' if p['status'] == 'unknown' else p['status']
+        recent_queries.append({
+            "session_id": p['session_id'],
+            "query": p['query'][:100] + "..." if p['query'] and len(p['query']) > 100 else p['query'],
+            "full_query": p['query'],
+            "timestamp": p['timestamp'],
+            "status": status,
+            "duration_ms": p['duration_ms'],
+            "tool_count": len(p['tool_calls']),
+            "tool_calls": p['tool_calls'],
+            "stat_vars": p.get('stat_vars', []),
+            "model": p['model'],
+            "kb_enabled": p['kb_enabled']
+        })
+
+    return {
+        "total_queries": total,
+        "successful": successful,
+        "failed": failed,
+        "stopped": unknown,  # Renamed from 'unknown' to 'stopped'
+        "success_rate": round(successful / total * 100, 1) if total > 0 else 0,
+        "response_times": {
+            "avg_ms": round(avg_duration, 0),
+            **percentiles
+        },
+        "by_date": dict(sorted(by_date.items())),
+        "mcp_summary": {
+            "total_calls": total_tool_calls,
+            "by_tool": tool_counts,
+            "avg_per_query": round(total_tool_calls / total, 1) if total > 0 else 0
+        },
+        "error_summary": error_types,
+        "recent_queries": recent_queries,
+        "generated_at": datetime.now().isoformat()
+    }
+
+
+@app.route("/api/logs/analytics")
+def logs_analytics():
+    """API endpoint for logs analytics - requires ?key=<secret_key>."""
+    secret_key = request.args.get("key", "")
+    expected_key = get_query_param_key()
+
+    if secret_key != expected_key:
+        return jsonify({"error": "Invalid or missing key parameter"}), 401
+
+    analytics = get_all_logs_analytics()
+    return jsonify({"success": True, **analytics})
+
+
+@app.route("/api/logs/session/<session_id>")
+def logs_session_detail(session_id):
+    """API endpoint for single session details - requires ?key=<secret_key>."""
+    secret_key = request.args.get("key", "")
+    expected_key = get_query_param_key()
+
+    if secret_key != expected_key:
+        return jsonify({"error": "Invalid or missing key parameter"}), 401
+
+    logs_dir = Path(__file__).parent / 'logs'
+    log_file = logs_dir / f"{session_id}.log"
+
+    if not log_file.exists():
+        return jsonify({"error": "Session not found"}), 404
+
+    parsed = parse_log_file(log_file)
+
+    # Also include raw log content
+    try:
+        with open(log_file, 'r') as f:
+            raw_content = f.read()
+    except:
+        raw_content = ""
+
+    return jsonify({
+        "success": True,
+        "session": parsed,
+        "raw_log": raw_content
+    })
+
+
+@app.route("/logs")
+def logs_dashboard():
+    """HTML dashboard for logs analytics - requires ?key=<secret_key>."""
+    secret_key = request.args.get("key", "")
+    expected_key = get_query_param_key()
+
+    if secret_key != expected_key:
+        return """
+        <html>
+        <head><title>Access Denied</title></head>
+        <body style="background: #f8f9fa; color: #3C4043; font-family: 'Google Sans', system-ui, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0;">
+            <div style="text-align: center; background: white; padding: 40px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                <h1 style="color: #EA4335; margin-bottom: 16px;">Access Denied</h1>
+                <p style="color: #5f6368;">Please provide a valid key parameter: /logs?key=YOUR_KEY</p>
+            </div>
+        </body>
+        </html>
+        """, 401
+
+    return f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Query Analytics Dashboard</title>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <style>
+            /* Google Colors - Light Mode Theme */
+            :root {{
+                --google-blue: #4285F4;
+                --google-red: #EA4335;
+                --google-yellow: #FBBC04;
+                --google-green: #34A853;
+                --text-dark: #3C4043;
+                --text-muted: #5f6368;
+                --bg-light: #f8f9fa;
+                --bg-white: #ffffff;
+                --border-color: #dadce0;
+            }}
+            * {{ margin: 0; padding: 0; box-sizing: border-box; }}
+            body {{
+                background: var(--bg-light);
+                color: var(--text-dark);
+                font-family: 'Google Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                padding: 20px;
+                min-height: 100vh;
+            }}
+            .header {{
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 24px;
+                padding-bottom: 16px;
+                border-bottom: 1px solid var(--border-color);
+            }}
+            .header h1 {{ font-size: 24px; color: var(--text-dark); }}
+            .header-actions {{ display: flex; gap: 12px; align-items: center; }}
+            .refresh-btn {{
+                background: var(--google-blue);
+                color: #fff;
+                border: none;
+                padding: 8px 16px;
+                border-radius: 6px;
+                cursor: pointer;
+                font-size: 14px;
+            }}
+            .refresh-btn:hover {{ background: #3367d6; }}
+            .auto-refresh {{ font-size: 12px; color: var(--text-muted); }}
+            .last-updated {{ font-size: 12px; color: var(--text-muted); }}
+
+            .cards {{
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+                gap: 16px;
+                margin-bottom: 24px;
+            }}
+            .card {{
+                background: var(--bg-white);
+                border-radius: 12px;
+                padding: 20px;
+                border: 1px solid var(--border-color);
+                box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            }}
+            .card-label {{ font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }}
+            .card-value {{ font-size: 32px; font-weight: 700; color: var(--text-dark); margin: 8px 0; }}
+            .card-sub {{ font-size: 14px; color: var(--text-muted); }}
+            .card.success .card-value {{ color: var(--google-green); }}
+            .card.error .card-value {{ color: var(--google-red); }}
+            .card.warning .card-value {{ color: var(--google-yellow); }}
+
+            .grid {{ display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-bottom: 24px; }}
+            @media (max-width: 1200px) {{ .grid {{ grid-template-columns: 1fr; }} }}
+
+            .panel {{
+                background: var(--bg-white);
+                border-radius: 12px;
+                padding: 20px;
+                border: 1px solid var(--border-color);
+                box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            }}
+            .panel-title {{ font-size: 16px; font-weight: 600; margin-bottom: 16px; color: var(--text-dark); }}
+
+            .chart-container {{ height: 250px; }}
+
+            .tool-bar {{
+                display: flex;
+                align-items: center;
+                margin-bottom: 8px;
+            }}
+            .tool-name {{ width: 160px; font-size: 13px; color: var(--text-dark); }}
+            .tool-progress {{
+                flex: 1;
+                height: 20px;
+                background: #e8eaed;
+                border-radius: 4px;
+                overflow: hidden;
+                margin: 0 12px;
+            }}
+            .tool-fill {{
+                height: 100%;
+                background: linear-gradient(90deg, var(--google-blue), #5a9cf8);
+                border-radius: 4px;
+            }}
+            .tool-count {{ width: 80px; text-align: right; font-size: 13px; color: var(--text-muted); }}
+
+            .stats-grid {{ display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }}
+            .stat-item {{ padding: 12px; background: var(--bg-light); border-radius: 8px; }}
+            .stat-label {{ font-size: 11px; color: var(--text-muted); }}
+            .stat-value {{ font-size: 18px; font-weight: 600; color: var(--text-dark); }}
+
+            .table-container {{ overflow-x: auto; }}
+            table {{ width: 100%; border-collapse: collapse; font-size: 13px; }}
+            th {{ text-align: left; padding: 12px 8px; border-bottom: 2px solid var(--border-color); color: var(--text-muted); font-weight: 500; }}
+            td {{ padding: 12px 8px; border-bottom: 1px solid var(--border-color); }}
+            tr:hover {{ background: var(--bg-light); }}
+            .status-success {{ color: var(--google-green); font-weight: 600; }}
+            .status-failed {{ color: var(--google-red); font-weight: 600; }}
+            .status-stopped {{ color: var(--google-yellow); font-weight: 600; }}
+            .stat-vars-cell {{ max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; color: var(--text-muted); }}
+            .query-text {{ max-width: 400px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }}
+            .expandable {{ cursor: pointer; }}
+            .tool-details {{
+                display: none;
+                padding: 12px;
+                background: var(--bg-light);
+                margin: 4px 0;
+                border-radius: 6px;
+                font-size: 12px;
+                border: 1px solid var(--border-color);
+            }}
+            .tool-details.show {{ display: block; }}
+            .filter-row {{
+                display: flex;
+                gap: 12px;
+                margin-bottom: 16px;
+                flex-wrap: wrap;
+                align-items: center;
+            }}
+            .search-box {{
+                flex: 1;
+                min-width: 200px;
+                padding: 10px 14px;
+                background: var(--bg-white);
+                border: 1px solid var(--border-color);
+                border-radius: 8px;
+                color: var(--text-dark);
+                font-size: 14px;
+            }}
+            .search-box::placeholder {{ color: var(--text-muted); }}
+            .search-box:focus {{ outline: none; border-color: var(--google-blue); box-shadow: 0 0 0 2px rgba(66,133,244,0.2); }}
+            .date-input {{
+                padding: 10px 14px;
+                background: var(--bg-white);
+                border: 1px solid var(--border-color);
+                border-radius: 8px;
+                color: var(--text-dark);
+                font-size: 14px;
+            }}
+            .date-input:focus {{ outline: none; border-color: var(--google-blue); box-shadow: 0 0 0 2px rgba(66,133,244,0.2); }}
+            .filter-label {{ font-size: 12px; color: var(--text-muted); }}
+
+            .percentile-bar {{
+                display: flex;
+                align-items: center;
+                margin-bottom: 8px;
+            }}
+            .percentile-label {{ width: 50px; font-size: 12px; color: var(--text-muted); }}
+            .percentile-track {{
+                flex: 1;
+                height: 24px;
+                background: #e8eaed;
+                border-radius: 4px;
+                position: relative;
+                overflow: hidden;
+            }}
+            .percentile-fill {{
+                height: 100%;
+                background: linear-gradient(90deg, var(--google-green), #45c362);
+                border-radius: 4px;
+                display: flex;
+                align-items: center;
+                justify-content: flex-end;
+                padding-right: 8px;
+                font-size: 11px;
+                color: #fff;
+                font-weight: 500;
+            }}
+        </style>
+    </head>
+    <body>
+        <div class="header">
+            <h1>Query Analytics Dashboard</h1>
+            <div class="header-actions">
+                <span class="last-updated" id="lastUpdated">Loading...</span>
+                <label class="auto-refresh">
+                    <input type="checkbox" id="autoRefresh" checked> Auto-refresh (30s)
+                </label>
+                <button class="refresh-btn" onclick="loadData()">Refresh</button>
+            </div>
+        </div>
+
+        <div class="cards" id="summaryCards">
+            <div class="card"><div class="card-label">Total Queries</div><div class="card-value" id="totalQueries">-</div></div>
+            <div class="card success"><div class="card-label">Successful</div><div class="card-value" id="successful">-</div><div class="card-sub" id="successRate">-</div></div>
+            <div class="card error"><div class="card-label">Failed</div><div class="card-value" id="failed">-</div></div>
+            <div class="card warning"><div class="card-label">Stopped</div><div class="card-value" id="stopped">-</div></div>
+            <div class="card"><div class="card-label">Avg Response</div><div class="card-value" id="avgTime">-</div><div class="card-sub">seconds</div></div>
+            <div class="card"><div class="card-label">p95 Response</div><div class="card-value" id="p95Time">-</div><div class="card-sub">seconds</div></div>
+        </div>
+
+        <div class="grid">
+            <div class="panel">
+                <div class="panel-title">Queries by Day</div>
+                <div class="chart-container"><canvas id="dailyChart"></canvas></div>
+            </div>
+            <div class="panel">
+                <div class="panel-title">MCP Tool Usage</div>
+                <div id="toolBars"></div>
+                <div class="stats-grid" style="margin-top: 16px;">
+                    <div class="stat-item"><div class="stat-label">Total Calls</div><div class="stat-value" id="totalCalls">-</div></div>
+                    <div class="stat-item"><div class="stat-label">Avg per Query</div><div class="stat-value" id="avgCalls">-</div></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel" style="margin-bottom: 24px;">
+            <div class="panel-title">Response Time Percentiles</div>
+            <div id="percentileBars"></div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-title">Recent Queries</div>
+            <div class="filter-row">
+                <input type="text" class="search-box" id="searchBox" placeholder="Search queries..." oninput="filterQueries()">
+                <span class="filter-label">From:</span>
+                <input type="date" class="date-input" id="dateFrom" onchange="filterQueries()">
+                <span class="filter-label">To:</span>
+                <input type="date" class="date-input" id="dateTo" onchange="filterQueries()">
+                <button class="refresh-btn" onclick="clearDateFilter()" style="background: #5f6368;">Clear Dates</button>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date/Time</th>
+                            <th>Query</th>
+                            <th>Stat Vars</th>
+                            <th>Status</th>
+                            <th>Duration</th>
+                            <th>Tools</th>
+                        </tr>
+                    </thead>
+                    <tbody id="queriesTable"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <script>
+            const API_KEY = '{secret_key}';
+            let analyticsData = null;
+            let dailyChart = null;
+            let autoRefreshInterval = null;
+
+            async function loadData() {{
+                try {{
+                    const res = await fetch('/api/logs/analytics?key=' + API_KEY);
+                    const data = await res.json();
+                    if (data.success) {{
+                        analyticsData = data;
+                        renderDashboard(data);
+                        document.getElementById('lastUpdated').textContent = 'Updated: ' + new Date().toLocaleTimeString();
+                    }}
+                }} catch (e) {{
+                    console.error('Failed to load data:', e);
+                }}
+            }}
+
+            function renderDashboard(data) {{
+                // Summary cards
+                document.getElementById('totalQueries').textContent = data.total_queries;
+                document.getElementById('successful').textContent = data.successful;
+                document.getElementById('successRate').textContent = data.success_rate + '% success';
+                document.getElementById('failed').textContent = data.failed;
+                document.getElementById('stopped').textContent = data.stopped || 0;
+                document.getElementById('avgTime').textContent = (data.response_times.avg_ms / 1000).toFixed(1);
+                document.getElementById('p95Time').textContent = (data.response_times.p95 / 1000).toFixed(1);
+
+                // Daily chart
+                renderDailyChart(data.by_date);
+
+                // Tool bars
+                renderToolBars(data.mcp_summary);
+                document.getElementById('totalCalls').textContent = data.mcp_summary.total_calls;
+                document.getElementById('avgCalls').textContent = data.mcp_summary.avg_per_query;
+
+                // Percentile bars
+                renderPercentileBars(data.response_times);
+
+                // Queries table
+                renderQueriesTable(data.recent_queries);
+            }}
+
+            // Google Colors
+            const GOOGLE_COLORS = {{
+                blue: '#4285F4',
+                red: '#EA4335',
+                yellow: '#FBBC05',
+                green: '#34A853'
+            }};
+
+            function renderDailyChart(byDate) {{
+                const labels = Object.keys(byDate).slice(-14);
+                const successData = labels.map(d => byDate[d].successful);
+                const failedData = labels.map(d => byDate[d].failed);
+
+                const ctx = document.getElementById('dailyChart').getContext('2d');
+                if (dailyChart) dailyChart.destroy();
+
+                dailyChart = new Chart(ctx, {{
+                    type: 'bar',
+                    data: {{
+                        labels: labels.map(d => d.slice(5)),
+                        datasets: [
+                            {{ label: 'Success', data: successData, backgroundColor: GOOGLE_COLORS.green }},
+                            {{ label: 'Failed', data: failedData, backgroundColor: GOOGLE_COLORS.red }}
+                        ]
+                    }},
+                    options: {{
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {{
+                            x: {{ stacked: true, grid: {{ color: '#e8eaed' }}, ticks: {{ color: '#5f6368' }} }},
+                            y: {{ stacked: true, grid: {{ color: '#e8eaed' }}, ticks: {{ color: '#5f6368' }} }}
+                        }},
+                        plugins: {{ legend: {{ labels: {{ color: '#5f6368' }} }} }}
+                    }}
+                }});
+            }}
+
+            function renderToolBars(mcpSummary) {{
+                const container = document.getElementById('toolBars');
+                const maxCount = Math.max(...Object.values(mcpSummary.by_tool));
+
+                container.innerHTML = Object.entries(mcpSummary.by_tool)
+                    .sort((a, b) => b[1] - a[1])
+                    .map(([name, count]) => `
+                        <div class="tool-bar">
+                            <span class="tool-name">${{name}}</span>
+                            <div class="tool-progress">
+                                <div class="tool-fill" style="width: ${{count / maxCount * 100}}%"></div>
+                            </div>
+                            <span class="tool-count">${{count}} calls</span>
+                        </div>
+                    `).join('');
+            }}
+
+            function renderPercentileBars(times) {{
+                const container = document.getElementById('percentileBars');
+                const maxTime = times.p99 || 1;
+                const percentiles = ['p50', 'p75', 'p90', 'p95', 'p99'];
+
+                container.innerHTML = percentiles.map(p => `
+                    <div class="percentile-bar">
+                        <span class="percentile-label">${{p}}</span>
+                        <div class="percentile-track">
+                            <div class="percentile-fill" style="width: ${{(times[p] / maxTime * 100)}}%">
+                                ${{(times[p] / 1000).toFixed(1)}}s
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            }}
+
+            function renderQueriesTable(queries) {{
+                const tbody = document.getElementById('queriesTable');
+                tbody.innerHTML = queries.map((q, i) => {{
+                    let statusClass = 'status-stopped';
+                    let statusSymbol = '⏹';
+                    if (q.status === 'success') {{
+                        statusClass = 'status-success';
+                        statusSymbol = '✓';
+                    }} else if (q.status === 'failed') {{
+                        statusClass = 'status-failed';
+                        statusSymbol = '✗';
+                    }}
+                    // Format stat vars for display
+                    const statVars = q.stat_vars || [];
+                    const statVarsDisplay = statVars.length > 0
+                        ? statVars.slice(0, 2).join(', ') + (statVars.length > 2 ? ` (+${{statVars.length - 2}})` : '')
+                        : '-';
+                    const statVarsTitle = statVars.join('\\n');
+                    return `
+                    <tr class="expandable" onclick="toggleDetails(${{i}})">
+                        <td>${{q.timestamp ? q.timestamp.slice(0, 16).replace('T', ' ') : '-'}}</td>
+                        <td class="query-text" title="${{q.full_query || ''}}">${{q.query || '-'}}</td>
+                        <td class="stat-vars-cell" title="${{statVarsTitle}}">${{statVarsDisplay}}</td>
+                        <td class="${{statusClass}}">${{statusSymbol}}</td>
+                        <td>${{q.duration_ms ? (q.duration_ms / 1000).toFixed(1) + 's' : '-'}}</td>
+                        <td>${{q.tool_count || 0}}</td>
+                    </tr>
+                    <tr><td colspan="6">
+                        <div class="tool-details" id="details-${{i}}">
+                            <strong>Session:</strong> ${{q.session_id}}<br>
+                            <strong>Model:</strong> ${{q.model || 'unknown'}}<br>
+                            <strong>KB Enabled:</strong> ${{q.kb_enabled ? 'Yes' : 'No'}}<br>
+                            <strong>Stat Vars:</strong> ${{statVars.length > 0 ? statVars.join(', ') : 'None'}}<br>
+                            <strong>Tools:</strong> ${{q.tool_calls ? q.tool_calls.map(t => t.name).join(', ') : 'None'}}
+                        </div>
+                    </td></tr>
+                `}}).join('');
+            }}
+
+            function toggleDetails(idx) {{
+                const el = document.getElementById('details-' + idx);
+                el.classList.toggle('show');
+            }}
+
+            function filterQueries() {{
+                const search = document.getElementById('searchBox').value.toLowerCase();
+                const dateFrom = document.getElementById('dateFrom').value;
+                const dateTo = document.getElementById('dateTo').value;
+
+                if (!analyticsData) return;
+
+                const filtered = analyticsData.recent_queries.filter(q => {{
+                    // Text search filter
+                    const matchesSearch = !search ||
+                        (q.query && q.query.toLowerCase().includes(search)) ||
+                        (q.session_id && q.session_id.toLowerCase().includes(search));
+
+                    // Date filter
+                    let matchesDate = true;
+                    if (q.timestamp) {{
+                        const queryDate = q.timestamp.slice(0, 10); // YYYY-MM-DD
+                        if (dateFrom && queryDate < dateFrom) matchesDate = false;
+                        if (dateTo && queryDate > dateTo) matchesDate = false;
+                    }}
+
+                    return matchesSearch && matchesDate;
+                }});
+                renderQueriesTable(filtered);
+            }}
+
+            function clearDateFilter() {{
+                document.getElementById('dateFrom').value = '';
+                document.getElementById('dateTo').value = '';
+                filterQueries();
+            }}
+
+            // Auto-refresh
+            document.getElementById('autoRefresh').addEventListener('change', function() {{
+                if (this.checked) {{
+                    autoRefreshInterval = setInterval(loadData, 30000);
+                }} else {{
+                    clearInterval(autoRefreshInterval);
+                }}
+            }});
+
+            // Initial load
+            loadData();
+            autoRefreshInterval = setInterval(loadData, 30000);
+        </script>
+    </body>
+    </html>
+    """
 
 
 def main():
