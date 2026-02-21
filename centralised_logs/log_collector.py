@@ -46,17 +46,51 @@ SUMMIT_START_DATE = datetime(2026, 2, 16, 1, 30, 0)  # UTC
 
 
 def load_config() -> Dict[str, Any]:
-    """Load configuration from config.json."""
+    """Load configuration from environment variables or config.json.
+
+    Environment variables (take priority over config.json):
+        - LOG_COLLECTOR_SOURCES: Comma-separated list of source URLs
+        - LOG_COLLECTOR_SECRET_KEY: Secret key for dashboard access
+        - LOG_COLLECTOR_FETCH_INTERVAL: Fetch interval in seconds
+        - PORT: Port to run on (Cloud Run sets this automatically)
+    """
+    # Start with defaults
+    config = {
+        "sources": [],
+        "secret_key": "default",
+        "fetch_interval_seconds": 30,
+        "port": 5003
+    }
+
+    # Try to load from config.json
     config_path = Path(__file__).parent / 'config.json'
     try:
         with open(config_path, 'r') as f:
-            return json.load(f)
+            file_config = json.load(f)
+            config.update(file_config)
     except FileNotFoundError:
-        logger.error("config.json not found. Please create it from config.json.example")
-        return {"sources": [], "secret_key": "default", "fetch_interval_seconds": 30, "port": 5003}
+        logger.warning("config.json not found, using environment variables or defaults")
     except json.JSONDecodeError as e:
         logger.error(f"Invalid JSON in config.json: {e}")
-        return {"sources": [], "secret_key": "default", "fetch_interval_seconds": 30, "port": 5003}
+
+    # Override with environment variables if set
+    if os.environ.get('LOG_COLLECTOR_SOURCES'):
+        # Parse comma-separated URLs
+        sources_str = os.environ['LOG_COLLECTOR_SOURCES']
+        config['sources'] = [s.strip() for s in sources_str.split(',') if s.strip()]
+        logger.info(f"Using sources from environment: {len(config['sources'])} sources")
+
+    if os.environ.get('LOG_COLLECTOR_SECRET_KEY'):
+        config['secret_key'] = os.environ['LOG_COLLECTOR_SECRET_KEY']
+        logger.info("Using secret_key from environment")
+
+    if os.environ.get('LOG_COLLECTOR_FETCH_INTERVAL'):
+        try:
+            config['fetch_interval_seconds'] = int(os.environ['LOG_COLLECTOR_FETCH_INTERVAL'])
+        except ValueError:
+            logger.warning("Invalid LOG_COLLECTOR_FETCH_INTERVAL, using default")
+
+    return config
 
 
 def fetch_from_source(url: str, timeout: int = 10) -> Optional[Dict[str, Any]]:

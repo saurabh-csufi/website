@@ -18,7 +18,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application files
 COPY log_collector.py .
-COPY config.json .
 
 # Expose the port (Cloud Run uses 8080 by default)
 EXPOSE 8080
