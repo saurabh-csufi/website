@@ -1,0 +1,10 @@
+{
+    "sources": [
+        "http://server1-ip:5001/api/logs/analytics?key=YOUR_SECRET_KEY",
+        "http://server2-ip:5001/api/logs/analytics?key=YOUR_SECRET_KEY",
+        "http://server3-ip:5001/api/logs/analytics?key=YOUR_SECRET_KEY"
+    ],
+    "secret_key": "YOUR_DASHBOARD_SECRET_KEY",
+    "fetch_interval_seconds": 30,
+    "port": 5003
+}
