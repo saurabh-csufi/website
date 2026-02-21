@@ -182,18 +182,26 @@ def aggregate_analytics(sources_data: List[Dict[str, Any]]) -> Dict[str, Any]:
         # Filter by summit date first
         data = filter_by_summit_date(data)
 
-        total_queries += data.get('total_queries', 0)
-        successful += data.get('successful', 0)
-        failed += data.get('failed', 0)
-        stopped += data.get('stopped', 0)
-
-        # Aggregate by_date
+        # Aggregate by_date (we'll calculate totals from this filtered data)
         for date, stats in data.get('by_date', {}).items():
             if date not in by_date:
                 by_date[date] = {"queries": 0, "successful": 0, "failed": 0}
             by_date[date]["queries"] += stats.get("queries", 0)
             by_date[date]["successful"] += stats.get("successful", 0)
             by_date[date]["failed"] += stats.get("failed", 0)
+
+    # Calculate totals from filtered by_date data (not from source totals)
+    for date, stats in by_date.items():
+        total_queries += stats.get("queries", 0)
+        successful += stats.get("successful", 0)
+        failed += stats.get("failed", 0)
+
+    # Stopped = total - successful - failed (queries that were interrupted)
+    stopped = total_queries - successful - failed
+
+    # Second pass for other aggregations
+    for data in sources_data:
+        data = filter_by_summit_date(data)
 
         # Aggregate MCP tool counts
         mcp = data.get('mcp_summary', {})
