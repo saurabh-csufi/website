@@ -17,7 +17,7 @@ import logging
 import os
 import threading
 import time
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Dict, List, Any, Optional
 
@@ -43,6 +43,15 @@ fetch_lock = threading.Lock()
 # AI India Summit start date: 16 Feb 2026, 7:00 AM IST
 # IST is UTC+5:30, so 7:00 AM IST = 1:30 AM UTC
 SUMMIT_START_DATE = datetime(2026, 2, 16, 1, 30, 0)  # UTC
+
+# IST timezone offset: UTC+5:30
+IST_OFFSET = timedelta(hours=5, minutes=30)
+
+
+def get_ist_now() -> datetime:
+    """Get current time in IST (Indian Standard Time = UTC+5:30)."""
+    utc_now = datetime.now(timezone.utc)
+    return utc_now + IST_OFFSET
 
 
 def load_config() -> Dict[str, Any]:
@@ -162,7 +171,7 @@ def aggregate_analytics(sources_data: List[Dict[str, Any]]) -> Dict[str, Any]:
             "stat_vars_failed": {},
             "recent_queries": [],
             "sources_count": 0,
-            "generated_at": datetime.now().isoformat()
+            "generated_at": get_ist_now().isoformat()
         }
 
     # Initialize aggregated data
@@ -224,21 +233,22 @@ def aggregate_analytics(sources_data: List[Dict[str, Any]]) -> Dict[str, Any]:
                     stat_vars_failed[sv] = stat_vars_failed.get(sv, 0) + 1
 
     # Calculate queries in last 24 hours and previous 24 hours for comparison
-    now = datetime.now()
-    today_str = now.strftime('%Y-%m-%d')
-    yesterday_str = (now - timedelta(days=1)).strftime('%Y-%m-%d')
-    day_before_str = (now - timedelta(days=2)).strftime('%Y-%m-%d')
+    # Use IST timezone for date calculations
+    now_ist = get_ist_now()
+    today_str = now_ist.strftime('%Y-%m-%d')
+    yesterday_str = (now_ist - timedelta(days=1)).strftime('%Y-%m-%d')
+    day_before_str = (now_ist - timedelta(days=2)).strftime('%Y-%m-%d')
 
     queries_24h = by_date.get(today_str, {}).get('queries', 0)
     # Add partial day queries if available
     if yesterday_str in by_date:
-        # Approximate: add yesterday's queries weighted by time passed today
-        hour_fraction = now.hour / 24
+        # Approximate: add yesterday's queries weighted by time passed today (in IST)
+        hour_fraction = now_ist.hour / 24
         queries_24h += int(by_date[yesterday_str].get('queries', 0) * (1 - hour_fraction))
 
     queries_prev_24h = by_date.get(yesterday_str, {}).get('queries', 0)
     if day_before_str in by_date:
-        hour_fraction = now.hour / 24
+        hour_fraction = now_ist.hour / 24
         queries_prev_24h += int(by_date[day_before_str].get('queries', 0) * hour_fraction)
 
     # Calculate percentage change
@@ -308,7 +318,7 @@ def aggregate_analytics(sources_data: List[Dict[str, Any]]) -> Dict[str, Any]:
         "stat_vars_failed": top_stat_vars_failed,
         "recent_queries": all_recent_queries[:100],  # Limit to 100 most recent
         "sources_count": len(sources_data),
-        "generated_at": datetime.now().isoformat()
+        "generated_at": get_ist_now().isoformat()
     }
 
 
@@ -717,7 +727,7 @@ def logs_dashboard():
                 <table>
                     <thead>
                         <tr>
-                            <th>Date/Time</th>
+                            <th>Date/Time (IST)</th>
                             <th>Query</th>
                             <th>Stat Vars</th>
                             <th>Status</th>
@@ -736,6 +746,21 @@ def logs_dashboard():
             let dailyChart = null;
             let autoRefreshInterval = null;
 
+            // Convert UTC timestamp to IST (Indian Standard Time = UTC+5:30)
+            function toIST(timestamp) {{
+                if (!timestamp) return {{ display: '-', date: '' }};
+                try {{
+                    const utcDate = new Date(timestamp);
+                    // Add 5 hours 30 minutes for IST
+                    const istDate = new Date(utcDate.getTime() + (5.5 * 60 * 60 * 1000));
+                    const display = istDate.toISOString().slice(0, 16).replace('T', ' ');
+                    const date = istDate.toISOString().slice(0, 10); // YYYY-MM-DD for filtering
+                    return {{ display, date }};
+                }} catch (e) {{
+                    return {{ display: timestamp.slice(0, 16).replace('T', ' '), date: timestamp.slice(0, 10) }};
+                }}
+            }}
+
             async function loadData() {{
                 try {{
                     const res = await fetch('/api/logs/analytics?key=' + API_KEY);
@@ -743,7 +768,7 @@ def logs_dashboard():
                     if (data.success) {{
                         analyticsData = data;
                         renderDashboard(data);
-                        document.getElementById('lastUpdated').textContent = 'Updated: ' + new Date().toLocaleTimeString();
+                        document.getElementById('lastUpdated').textContent = 'Updated: ' + new Date().toLocaleTimeString('en-IN', {{ timeZone: 'Asia/Kolkata' }});
                     }}
                 }} catch (e) {{
                     console.error('Failed to load data:', e);
@@ -912,9 +937,13 @@ def logs_dashboard():
                         ? statVars.slice(0, 2).join(', ') + (statVars.length > 2 ? ` (+${{statVars.length - 2}})` : '')
                         : '-';
                     const statVarsTitle = statVars.join('\\n');
+                    // Convert timestamp to IST
+                    const ist = toIST(q.timestamp);
+                    // Store IST date for filtering
+                    q._istDate = ist.date;
                     return `
                     <tr class="expandable" onclick="toggleDetails(${{i}})">
-                        <td>${{q.timestamp ? q.timestamp.slice(0, 16).replace('T', ' ') : '-'}}</td>
+                        <td>${{ist.display}}</td>
                         <td class="query-text" title="${{q.full_query || ''}}">${{q.query || '-'}}</td>
                         <td class="stat-vars-cell" title="${{statVarsTitle}}">${{statVarsDisplay}}</td>
                         <td class="${{statusClass}}">${{statusSymbol}}</td>
@@ -952,14 +981,15 @@ def logs_dashboard():
                         (q.session_id && q.session_id.toLowerCase().includes(search)) ||
                         (q.stat_vars && q.stat_vars.some(sv => sv.toLowerCase().includes(search)));
 
-                    // Date filter
+                    // Date filter (using IST converted date)
                     let matchesDate = true;
                     if (q.timestamp) {{
-                        const queryDate = q.timestamp.slice(0, 10); // YYYY-MM-DD
-                        if (dateFrom && queryDate < dateFrom) {{
+                        const ist = toIST(q.timestamp);
+                        const queryDateIST = ist.date; // YYYY-MM-DD in IST
+                        if (dateFrom && queryDateIST < dateFrom) {{
                             matchesDate = false;
                         }}
-                        if (dateTo && queryDate > dateTo) {{
+                        if (dateTo && queryDateIST > dateTo) {{
                             matchesDate = false;
                         }}
                     }}
