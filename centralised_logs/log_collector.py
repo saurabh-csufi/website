@@ -187,29 +187,9 @@ def aggregate_analytics(sources_data: List[Dict[str, Any]]) -> Dict[str, Any]:
     stat_vars_failed: Dict[str, int] = {}
     all_recent_queries: List[Dict] = []
 
+    # First pass: collect all queries and MCP data
     for data in sources_data:
         # Filter by summit date first
-        data = filter_by_summit_date(data)
-
-        # Aggregate by_date (we'll calculate totals from this filtered data)
-        for date, stats in data.get('by_date', {}).items():
-            if date not in by_date:
-                by_date[date] = {"queries": 0, "successful": 0, "failed": 0}
-            by_date[date]["queries"] += stats.get("queries", 0)
-            by_date[date]["successful"] += stats.get("successful", 0)
-            by_date[date]["failed"] += stats.get("failed", 0)
-
-    # Calculate totals from filtered by_date data (not from source totals)
-    for date, stats in by_date.items():
-        total_queries += stats.get("queries", 0)
-        successful += stats.get("successful", 0)
-        failed += stats.get("failed", 0)
-
-    # Stopped = total - successful - failed (queries that were interrupted)
-    stopped = total_queries - successful - failed
-
-    # Second pass for other aggregations
-    for data in sources_data:
         data = filter_by_summit_date(data)
 
         # Aggregate MCP tool counts
@@ -218,38 +198,90 @@ def aggregate_analytics(sources_data: List[Dict[str, Any]]) -> Dict[str, Any]:
         for tool, count in mcp.get('by_tool', {}).items():
             tool_counts[tool] = tool_counts.get(tool, 0) + count
 
-        # Aggregate recent queries and extract stat vars by status
+        # Collect all recent queries
         for q in data.get('recent_queries', []):
             all_recent_queries.append(q)
 
-            # Track stat vars by query status
-            status = q.get('status', 'unknown')
-            stat_vars = q.get('stat_vars', [])
+    # Build by_date from individual query timestamps using IST dates
+    # This ensures the daily chart shows IST dates correctly
+    for q in all_recent_queries:
+        if q.get('timestamp'):
+            try:
+                # Parse timestamp and convert to IST date
+                ts_str = q['timestamp']
+                if ts_str.endswith('Z'):
+                    ts = datetime.fromisoformat(ts_str.replace('Z', '+00:00'))
+                elif '+' in ts_str or ts_str.count('-') > 2:
+                    ts = datetime.fromisoformat(ts_str)
+                else:
+                    # No timezone - treat as UTC
+                    ts = datetime.fromisoformat(ts_str).replace(tzinfo=timezone.utc)
 
-            for sv in stat_vars:
-                if status == 'success':
-                    stat_vars_successful[sv] = stat_vars_successful.get(sv, 0) + 1
-                elif status in ('failed', 'stopped'):
-                    stat_vars_failed[sv] = stat_vars_failed.get(sv, 0) + 1
+                # Convert to IST and get date string
+                ist_time = ts + IST_OFFSET
+                date_str = ist_time.strftime('%Y-%m-%d')
 
-    # Calculate queries in last 24 hours and previous 24 hours for comparison
-    # Use IST timezone for date calculations
-    now_ist = get_ist_now()
-    today_str = now_ist.strftime('%Y-%m-%d')
-    yesterday_str = (now_ist - timedelta(days=1)).strftime('%Y-%m-%d')
-    day_before_str = (now_ist - timedelta(days=2)).strftime('%Y-%m-%d')
+                # Only include dates from summit start (16 Feb)
+                if date_str >= '2026-02-16':
+                    if date_str not in by_date:
+                        by_date[date_str] = {"queries": 0, "successful": 0, "failed": 0, "stopped": 0}
+                    by_date[date_str]["queries"] += 1
 
-    queries_24h = by_date.get(today_str, {}).get('queries', 0)
-    # Add partial day queries if available
-    if yesterday_str in by_date:
-        # Approximate: add yesterday's queries weighted by time passed today (in IST)
-        hour_fraction = now_ist.hour / 24
-        queries_24h += int(by_date[yesterday_str].get('queries', 0) * (1 - hour_fraction))
+                    status = q.get('status', 'unknown')
+                    if status == 'success':
+                        by_date[date_str]["successful"] += 1
+                    elif status == 'failed':
+                        by_date[date_str]["failed"] += 1
+                    else:
+                        # stopped or unknown status
+                        by_date[date_str]["stopped"] += 1
+            except (ValueError, TypeError):
+                pass
 
-    queries_prev_24h = by_date.get(yesterday_str, {}).get('queries', 0)
-    if day_before_str in by_date:
-        hour_fraction = now_ist.hour / 24
-        queries_prev_24h += int(by_date[day_before_str].get('queries', 0) * hour_fraction)
+        # Track stat vars by query status
+        status = q.get('status', 'unknown')
+        stat_vars = q.get('stat_vars', [])
+
+        for sv in stat_vars:
+            if status == 'success':
+                stat_vars_successful[sv] = stat_vars_successful.get(sv, 0) + 1
+            elif status in ('failed', 'stopped'):
+                stat_vars_failed[sv] = stat_vars_failed.get(sv, 0) + 1
+
+    # Calculate totals from IST-bucketed by_date data
+    for date, stats in by_date.items():
+        total_queries += stats.get("queries", 0)
+        successful += stats.get("successful", 0)
+        failed += stats.get("failed", 0)
+        stopped += stats.get("stopped", 0)
+
+    # Calculate queries in last 24 hours from individual query timestamps (more accurate)
+    now_utc = datetime.now(timezone.utc)
+    last_24h_start = now_utc - timedelta(hours=24)
+    prev_24h_start = now_utc - timedelta(hours=48)
+
+    queries_24h = 0
+    queries_prev_24h = 0
+
+    for q in all_recent_queries:
+        if q.get('timestamp'):
+            try:
+                # Parse timestamp - assume UTC if no timezone
+                ts_str = q['timestamp']
+                if ts_str.endswith('Z'):
+                    ts = datetime.fromisoformat(ts_str.replace('Z', '+00:00'))
+                elif '+' in ts_str or ts_str.count('-') > 2:
+                    ts = datetime.fromisoformat(ts_str)
+                else:
+                    # No timezone - treat as UTC
+                    ts = datetime.fromisoformat(ts_str).replace(tzinfo=timezone.utc)
+
+                if ts >= last_24h_start:
+                    queries_24h += 1
+                elif ts >= prev_24h_start:
+                    queries_prev_24h += 1
+            except (ValueError, TypeError):
+                pass
 
     # Calculate percentage change
     if queries_prev_24h > 0:
@@ -746,16 +778,37 @@ def logs_dashboard():
             let dailyChart = null;
             let autoRefreshInterval = null;
 
-            // Convert UTC timestamp to IST (Indian Standard Time = UTC+5:30)
+            // Convert timestamp to IST (Indian Standard Time)
             function toIST(timestamp) {{
                 if (!timestamp) return {{ display: '-', date: '' }};
                 try {{
-                    const utcDate = new Date(timestamp);
-                    // Add 5 hours 30 minutes for IST
-                    const istDate = new Date(utcDate.getTime() + (5.5 * 60 * 60 * 1000));
-                    const display = istDate.toISOString().slice(0, 16).replace('T', ' ');
-                    const date = istDate.toISOString().slice(0, 10); // YYYY-MM-DD for filtering
-                    return {{ display, date }};
+                    // If timestamp has no timezone, treat it as UTC by appending 'Z'
+                    let ts = timestamp;
+                    if (!ts.endsWith('Z') && !ts.includes('+') && !ts.includes('-', 10)) {{
+                        ts = ts + 'Z';
+                    }}
+                    const date = new Date(ts);
+
+                    // Use toLocaleString with Asia/Kolkata timezone for correct conversion
+                    const options = {{
+                        timeZone: 'Asia/Kolkata',
+                        year: 'numeric',
+                        month: '2-digit',
+                        day: '2-digit',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        hour12: false
+                    }};
+
+                    // Format: DD/MM/YYYY, HH:MM -> convert to YYYY-MM-DD HH:MM
+                    const parts = date.toLocaleString('en-GB', options).split(', ');
+                    const dateParts = parts[0].split('/'); // DD/MM/YYYY
+                    const timePart = parts[1]; // HH:MM
+
+                    const isoDate = `${{dateParts[2]}}-${{dateParts[1]}}-${{dateParts[0]}}`; // YYYY-MM-DD
+                    const display = `${{isoDate}} ${{timePart}}`;
+
+                    return {{ display, date: isoDate }};
                 }} catch (e) {{
                     return {{ display: timestamp.slice(0, 16).replace('T', ' '), date: timestamp.slice(0, 10) }};
                 }}
@@ -828,8 +881,9 @@ def logs_dashboard():
 
             function renderDailyChart(byDate) {{
                 const labels = Object.keys(byDate);
-                const successData = labels.map(d => byDate[d].successful);
-                const failedData = labels.map(d => byDate[d].failed);
+                const successData = labels.map(d => byDate[d].successful || 0);
+                const failedData = labels.map(d => byDate[d].failed || 0);
+                const stoppedData = labels.map(d => byDate[d].stopped || 0);
 
                 const ctx = document.getElementById('dailyChart').getContext('2d');
                 if (dailyChart) dailyChart.destroy();
@@ -840,7 +894,8 @@ def logs_dashboard():
                         labels: labels.map(d => d.slice(5)),
                         datasets: [
                             {{ label: 'Success', data: successData, backgroundColor: GOOGLE_COLORS.green }},
-                            {{ label: 'Failed', data: failedData, backgroundColor: GOOGLE_COLORS.red }}
+                            {{ label: 'Failed', data: failedData, backgroundColor: GOOGLE_COLORS.red }},
+                            {{ label: 'Stopped', data: stoppedData, backgroundColor: GOOGLE_COLORS.yellow }}
                         ]
                     }},
                     options: {{
