@@ -409,7 +409,7 @@ def logs_dashboard():
     <!DOCTYPE html>
     <html>
     <head>
-        <title>AI India Summit - Centralized Analytics Dashboard</title>
+        <title>India Data Commons: AI Agent Analytics</title>
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <style>
             /* Google Colors - Light Mode Theme */
@@ -648,7 +648,7 @@ def logs_dashboard():
         </div>
 
         <div class="header">
-            <h1>Centralized Analytics Dashboard</h1>
+            <h1>India Data Commons: AI Agent Analytics</h1>
             <div class="header-actions">
                 <span class="sources-badge" id="sourcesBadge">0 sources</span>
                 <span class="last-updated" id="lastUpdated">Loading...</span>
