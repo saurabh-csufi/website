@@ -64,12 +64,13 @@ You need **3 terminals** to run the full stack.
 cd /Users/saurabhgupta/Documents/2026/website
 
 docker run -it \
-  --env-file custom_dc/env.list \
-  -p 8080:8080 \
-  -e DEBUG=true \
-  -v /Users/saurabhgupta/Documents/2026/website/custom_dc:/Users/saurabhgupta/Documents/2026/website/custom_dc \
-  -v /Users/saurabhgupta/Documents/2026/website/server/templates/custom_dc/custom:/workspace/server/templates/custom_dc/custom \
-  gcr.io/datcom-ci/datacommons-services:stable
+    --env-file custom_dc/env.list \
+    -p 8080:8080 \
+    -e DEBUG=true \
+    -v /Users/saurabhgupta/Documents/website/custom_dc:/Users/saurabhgupta/Documents/website/custom_dc \
+    -v ./server/templates/custom_dc/custom:/workspace/server/templates/custom_dc/custom \
+    -v ./static/custom_dc/custom:/workspace/server/dist/custom_dc/custom \
+    gcr.io/datcom-ci/datacommons-services@sha256:60a43ea2eabf0cd4e957a715d97b0ab44047001c9f4e5f55b5cf37e4cb6e6ec3
 ```
 
 **Wait 30-60 seconds** until you see the server is ready (Flask/gunicorn listening).
@@ -82,22 +83,13 @@ curl http://localhost:8080/core/api/v2/node?nodes=country/USA
 
 ### Terminal 2: Data Commons MCP Server (Start After Docker is Ready!)
 
-**Option A: Using Public Data Commons API**
-```bash
-export DC_API_KEY="your-data-commons-api-key"
-python3 -m uv tool run datacommons-mcp serve http --port 3000
-```
 
 **Option B: Using Local Custom DC Instance** (see [Custom DC Configuration](#pointing-mcp-to-custom-data-commons) below)
 ```bash
 export DC_TYPE="custom"
 export CUSTOM_DC_URL="http://localhost:8080"
-python3 -m uv tool run datacommons-mcp serve http --port 3000  --host 0.0.0.0 
-
---skip-api-key-validation
-
-
-  python -m uv tool run --from datacommons-mcp==1.1.4 datacommons-mcp serve http --port 3000 --host 0.0.0.0
+export CUSTOM_DC_API="<key>"
+python -m uv tool run --from datacommons-mcp==1.1.4 datacommons-mcp serve http --port 3000 --host 0.0.0.0
 
 ```
 
