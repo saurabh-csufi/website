@@ -469,6 +469,62 @@ def get_tools() -> list:
     return []
 
 
+def transform_schema_for_gemini(schema: dict) -> dict:
+    """Transform MCP inputSchema to Gemini-compatible format.
+
+    Gemini function calling only supports a subset of OpenAPI 3.0.3 schema.
+    This removes unsupported constructs like 'anyOf' for nullable types.
+
+    Args:
+        schema: The MCP inputSchema dictionary
+
+    Returns:
+        dict: Gemini-compatible schema
+    """
+    if not isinstance(schema, dict):
+        return schema
+
+    result = {}
+
+    # Handle anyOf (union types) - common for nullable fields in MCP schemas
+    # e.g., {"anyOf": [{"type": "string"}, {"type": "null"}], "default": null}
+    if "anyOf" in schema:
+        # Find the non-null type and use that
+        for option in schema["anyOf"]:
+            if option.get("type") != "null":
+                result = transform_schema_for_gemini(option)
+                break
+        # Preserve default if present at the anyOf level
+        if "default" in schema:
+            result["default"] = schema["default"]
+        # Preserve description if present at the anyOf level
+        if "description" in schema:
+            result["description"] = schema["description"]
+        return result
+
+    # Copy supported fields
+    for key in ["type", "description", "default", "enum"]:
+        if key in schema:
+            result[key] = schema[key]
+
+    # Handle object properties recursively
+    if "properties" in schema:
+        result["properties"] = {
+            k: transform_schema_for_gemini(v)
+            for k, v in schema["properties"].items()
+        }
+
+    # Handle required array
+    if "required" in schema:
+        result["required"] = schema["required"]
+
+    # Handle array items recursively
+    if "items" in schema:
+        result["items"] = transform_schema_for_gemini(schema["items"])
+
+    return result
+
+
 def fix_tool_arguments(name: str, arguments: dict) -> dict:
     """Fix common parameter mistakes made by LLMs."""
     args = arguments.copy()
@@ -690,11 +746,13 @@ def list_tools():
     if not tools:
         return jsonify({"success": False, "error": "No tools available"}), 503
 
-    # Convert to Gemini format
+    # Convert to Gemini format (transform schema to remove unsupported constructs)
     gemini_tools = [{
         "name": t.get("name", ""),
         "description": t.get("description", ""),
-        "parameters": t.get("inputSchema", {"type": "object", "properties": {}})
+        "parameters": transform_schema_for_gemini(
+            t.get("inputSchema", {"type": "object", "properties": {}})
+        )
     } for t in tools]
 
     return jsonify({"success": True, "tools": gemini_tools, "raw_tools": tools})
@@ -1258,11 +1316,13 @@ def execute_mcp_tool_loop(
             session_logger.log_error("MCP_TOOLS_UNAVAILABLE", "No MCP tools available")
         return "", [], "MCP tools not available"
 
-    # Convert tools to Gemini format
+    # Convert tools to Gemini format (transform schema to remove unsupported constructs)
     gemini_tools = [{
         "name": t.get("name", ""),
         "description": t.get("description", ""),
-        "parameters": t.get("inputSchema", {"type": "object", "properties": {}})
+        "parameters": transform_schema_for_gemini(
+            t.get("inputSchema", {"type": "object", "properties": {}})
+        )
     } for t in tools]
 
     # Build conversation - NO history for MCP calls (fresh search every time)
