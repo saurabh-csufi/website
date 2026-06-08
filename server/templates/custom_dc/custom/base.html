@@ -50,10 +50,10 @@
     globalThis.disableGoogleMaps = {{ config['DISABLE_GOOGLE_MAPS'] | tojson }};
   </script>
 
-  <title>{{ title }} - Custom Data Commons</title>
+  <title>{{ title }} - NDAP | National Data & Analytics Platform</title>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;600&family=Roboto&display=swap"
+  <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;600&family=Roboto&family=Mulish:wght@400;500;600;700;800;900&display=swap"
     rel="stylesheet">
   <link rel="stylesheet" href={{url_for('static', filename='css/static.min.css', t=config['VERSION'])}}>
   <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined">
@@ -74,117 +74,90 @@
   </div>
 
   <style>
-    /* MSME Portal Custom Header Styles */
-    .msme-tricolor {
-      display: flex;
-      height: 5px;
-      width: 100%;
+    /* ── NDAP Theme Variables ── */
+    :root {
+      --ndap-navy: #14284b;
+      --ndap-blue: #2450a8;
+      --ndap-orange: #f6821f;
+      --ndap-teal: #00a99d;
+      --ndap-line: #e3e9f2;
+      --ndap-muted: #5b6b82;
     }
-    .msme-tricolor .saffron { flex: 1; background: #FF9933; }
-    .msme-tricolor .white { flex: 1; background: #FFFFFF; }
-    .msme-tricolor .green { flex: 1; background: #138808; }
 
+    /* ── Gov Strip ── */
+    .ndap-gov-strip {
+      background: var(--ndap-navy);
+      color: #cdd8ec;
+      font-size: 12.5px;
+      font-family: 'Mulish', 'Segoe UI', sans-serif;
+    }
+    .ndap-gov-strip .strip-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      height: 34px;
+      max-width: 100%;
+      padding: 0 24px;
+    }
+    .ndap-gov-strip a { color: #cdd8ec; margin-left: 18px; text-decoration: none; }
+    .ndap-gov-strip a:hover { color: #fff; }
+
+    /* ── NDAP Header ── */
     #main-nav {
-      background: #174ea6 !important;
+      background: var(--ndap-navy) !important;
+      border-bottom: 3px solid var(--ndap-orange);
+      padding: 0 24px;
     }
-
-    .navbar-brand {
-      display: flex !important;
-      align-items: center !important;
-      gap: 12px !important;
-    }
-
-    .msme-logo-container {
+    .ndap-brand {
       display: flex;
       align-items: center;
       gap: 12px;
+      text-decoration: none;
     }
-
-    .msme-title {
-      display: flex;
-      flex-direction: column;
-      line-height: 1.2;
+    .ndap-brand img { height: 42px; width: auto; }
+    .ndap-brand-text b {
+      font-size: 20px;
+      font-weight: 900;
+      color: #fff;
+      letter-spacing: 0.5px;
+      display: block;
+      line-height: 1.1;
+      font-family: 'Mulish', sans-serif;
     }
-
-    .msme-title-main {
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: white;
-      letter-spacing: 0.3px;
+    .ndap-brand-text small {
+      font-size: 10px;
+      color: rgba(255,255,255,0.7);
+      display: block;
+      font-family: 'Mulish', sans-serif;
     }
-
-    .msme-title-sub {
-      font-size: 0.7rem;
-      color: rgba(255,255,255,0.8);
-      font-weight: 400;
-    }
-
-    .partner-logos {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-right: 20px;
-    }
-
-    .partner-logo {
-      height: 50px;
-      background: white;
-      border-radius: 6px;
-      padding: 6px 10px;
-    }
-
-    .partner-logo img {
-      height: 100%;
-      width: auto;
-      object-fit: contain;
-    }
-
-    .main-content {
-      margin-top: 0 !important;
-      padding-top: 0 !important;
-    }
-
-    #main-header {
-      margin-bottom: 0 !important;
-    }
+    .main-content { margin-top: 0 !important; padding-top: 0 !important; }
+    #main-header { margin-bottom: 0 !important; }
 
     .nav-link-main,
     .nav-link-main span,
     #dc-main-nav .nav-link {
       color: #ffffff !important;
-      font-weight: 500 !important;
+      font-weight: 600 !important;
+      font-family: 'Mulish', sans-serif;
       padding: 8px 16px !important;
       border-radius: 4px;
       transition: background 0.2s;
     }
-
-    .nav-link-main:hover,
-    #dc-main-nav .nav-link:hover {
-      background: rgba(255,255,255,0.15);
+    .nav-link-main:hover, #dc-main-nav .nav-link:hover {
+      background: rgba(255,255,255,0.12);
       color: white !important;
     }
-
-    .dropdown-toggle::after {
-      color: white !important;
-    }
-
-    .more-tools-dropdown {
-      position: relative;
-    }
-
+    .dropdown-toggle::after { color: white !important; }
     .more-tools-dropdown .dropdown-menu {
-      background: #174ea6 !important;
+      background: var(--ndap-navy) !important;
       border: 1px solid rgba(255,255,255,0.2) !important;
       border-radius: 8px !important;
       padding: 8px 0 !important;
       min-width: 180px !important;
     }
-
     #dc-main-nav .dropdown-menu .dropdown-item,
     .more-tools-dropdown .dropdown-menu .dropdown-item,
-    .more-tools-dropdown .dropdown-item,
     .dropdown-menu .dropdown-item,
-    .navbar .dropdown-item,
     a.dropdown-item {
       color: #fff !important;
       padding: 10px 18px !important;
@@ -192,69 +165,105 @@
       font-weight: 500 !important;
       background: transparent !important;
     }
-
     #dc-main-nav .dropdown-menu .dropdown-item:hover,
-    #dc-main-nav .dropdown-menu .dropdown-item:focus,
     .more-tools-dropdown .dropdown-menu .dropdown-item:hover,
-    .more-tools-dropdown .dropdown-menu .dropdown-item:focus,
-    .more-tools-dropdown .dropdown-item:hover,
-    .more-tools-dropdown .dropdown-item:focus,
     .dropdown-menu .dropdown-item:hover,
-    .dropdown-menu .dropdown-item:focus,
-    a.dropdown-item:hover,
-    a.dropdown-item:focus {
+    a.dropdown-item:hover {
       background: rgba(255,255,255,0.15) !important;
       color: #fff !important;
     }
 
+    /* ── NDAP Footer ── */
+    #main-footer {
+      background: var(--ndap-navy);
+      color: #c4d1ea;
+      font-family: 'Mulish', 'Segoe UI', sans-serif;
+      margin-top: 40px;
+    }
+    .ndap-foot-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 36px;
+      padding: 36px 24px 24px;
+      flex-wrap: wrap;
+    }
+    .ndap-foot-brand { max-width: 380px; }
+    .ndap-foot-brand b { color: #fff; font-size: 17px; font-weight: 900; display: block; margin-bottom: 6px; }
+    .ndap-foot-brand p { font-size: 13px; line-height: 1.7; color: #9fb0d2; }
+    .ndap-foot-links h4 {
+      color: #fff; font-size: 13px; font-weight: 800;
+      letter-spacing: 0.8px; text-transform: uppercase; margin-bottom: 12px;
+    }
+    .ndap-foot-links ul { list-style: none; padding: 0; }
+    .ndap-foot-links ul li { margin-bottom: 8px; font-size: 13px; }
+    .ndap-foot-links ul a { color: #c4d1ea; text-decoration: none; }
+    .ndap-foot-links ul a:hover { color: #fff; }
+    .ndap-foot-bottom {
+      border-top: 1px solid rgba(255,255,255,0.14);
+      padding: 14px 24px;
+      font-size: 12.5px;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .ndap-foot-bottom a { color: #c4d1ea; }
+    .ndap-foot-bottom a:hover { color: #fff; }
+    .ndap-disclaimer {
+      border-top: 1px solid rgba(255,255,255,0.1);
+      padding: 16px 24px;
+      font-size: 12px;
+      color: #9fb0d2;
+      line-height: 1.7;
+    }
   </style>
 
-  <!-- Tricolor Strip -->
-  <div class="msme-tricolor">
-    <div class="saffron"></div>
-    <div class="white"></div>
-    <div class="green"></div>
+  <!-- NDAP Government Strip -->
+  <div class="ndap-gov-strip">
+    <div class="strip-inner">
+      <span>भारत सरकार | Government of India &nbsp;•&nbsp; NITI Aayog</span>
+      <nav>
+        <a href="#">Skip to Main Content</a>
+        <a href="#">Screen Reader Access</a>
+        <a href="#">A- A A+</a>
+        <a href="#">हिन्दी</a>
+      </nav>
+    </div>
   </div>
 
   <div id="main">
     <header id="main-header">
       <nav class="navbar navbar-dark navbar-expand-lg col" id="main-nav">
         <div class="container-fluid">
-          <div class="navbar-brand">
-            <div class="partner-logos">
-              <div class="partner-logo">
-                <img src="/custom_dc/custom/ai_summit.png" alt="AI Summit">
-              </div>
-              <div class="partner-logo">
-                <img src="/custom_dc/custom/peopleplusai+ekstep.png" alt="People+AI & Ekstep">
-              </div>
+          <a href="{{ url_for('static.homepage') }}" class="ndap-brand navbar-brand">
+            <img src="https://ndap.niti.gov.in/logo192.png" alt="NDAP"
+                 onerror="this.style.display='none'">
+            <div class="ndap-brand-text">
+              <b>NDAP</b>
+              <small>National Data &amp; Analytics Platform &nbsp;|&nbsp; NITI Aayog, Government of India</small>
             </div>
-            <a href="{{ url_for('static.homepage') }}" class="msme-logo-container" style="text-decoration: none;">
-              <div class="msme-title">
-                <span class="msme-title-main">Data Commons Prototype</span>
-              </div>
-            </a>
-          </div>
+          </a>
           <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#dc-main-nav">
             <span class="navbar-toggler-icon"></span>
           </button>
           <div class="collapse navbar-collapse justify-content-md-end" id="dc-main-nav" style="background: transparent;">
             <ul class="navbar-nav float-md-right">
-                <li class="nav-item">
-                  <a href="{{ url_for('static.homepage') }}" id="nav-home" class="nav-link-main"><span>Home</span></a>
-                </li>
-                <li class="nav-item dropdown more-tools-dropdown">
-                  <a href="#" class="nav-link-main dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <span>Tools</span>
-                  </a>
-                  <div class="dropdown-menu dropdown-menu-right">
-                    <a class="dropdown-item" href="{{ url_for('tools.download') }}">Download</a>
-                    <a class="dropdown-item" href="{{ url_for('tools.stat_var') }}">Variables</a>
-                  </div>
-                </li>
-                <li class="nav-item">
-                  <a href="/about" id="nav-insights" class="nav-link-main"><span>Standard Insights</span></a>
-                </li>
+              <li class="nav-item">
+                <a href="{{ url_for('static.homepage') }}" id="nav-home" class="nav-link-main"><span>Home</span></a>
+              </li>
+              <li class="nav-item dropdown more-tools-dropdown">
+                <a href="#" class="nav-link-main dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  <span>Tools</span>
+                </a>
+                <div class="dropdown-menu dropdown-menu-right">
+                  <a class="dropdown-item" href="{{ url_for('tools.download') }}">Download</a>
+                  <a class="dropdown-item" href="{{ url_for('tools.stat_var') }}">Variables</a>
+                </div>
+              </li>
+              <li class="nav-item">
+                <a href="/about" id="nav-insights" class="nav-link-main"><span>About</span></a>
+              </li>
             </ul>
           </div>
         </div>
@@ -267,7 +276,35 @@
     </main>
 
     <footer id="main-footer">
-      <div class="container">
+      <div class="ndap-foot-top">
+        <div class="ndap-foot-brand">
+          <b>NDAP — National Data &amp; Analytics Platform</b>
+          <p>An initiative of NITI Aayog that aims to democratize access to public government data by making it accessible, interoperable, interactive, and available on a user-friendly platform.</p>
+        </div>
+        <div class="ndap-foot-links">
+          <h4>Quick Links</h4>
+          <ul>
+            <li><a href="{{ url_for('static.homepage') }}">Home</a></li>
+            <li><a href="{{ url_for('tools.download') }}">Download Data</a></li>
+            <li><a href="{{ url_for('tools.stat_var') }}">Variables</a></li>
+            <li><a href="/about">About NDAP</a></li>
+          </ul>
+        </div>
+        <div class="ndap-foot-links">
+          <h4>Contact</h4>
+          <ul>
+            <li>NITI Aayog, Sansad Marg</li>
+            <li>New Delhi — 110001, India</li>
+            <li><a href="mailto:ndap@gov.in">ndap[at]gov[dot]in</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="ndap-disclaimer">
+        This platform is designed, developed and hosted by NITI Aayog, Government of India. The datasets hosted are sourced from the respective Ministries, Departments and government agencies. While every effort has been made to ensure accuracy, NITI Aayog accepts no responsibility for the completeness or usefulness of the data.
+      </div>
+      <div class="ndap-foot-bottom">
+        <span>© 2026 NITI Aayog, Government of India. All rights reserved.</span>
+        <span><a href="https://ndap.niti.gov.in/">ndap.niti.gov.in</a></span>
       </div>
     </footer>
   </div>

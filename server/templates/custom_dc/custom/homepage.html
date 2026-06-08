@@ -34,7 +34,7 @@
   <script src="/datacommons.js"></script>
   <script>
     window.CHAT_CONFIG = {
-      PROMPT_VERSION: '1.4.0',  // Increment when prompts change to auto-invalidate localStorage
+      PROMPT_VERSION: '1.5.0',  // Increment when prompts change to auto-invalidate localStorage
       models: {
         MCP_MODEL: 'gemini-3-flash-preview',
         KB_MODEL: 'gemini-3-flash-preview'
@@ -45,7 +45,7 @@
       defaults: {
         // Dynamic: uses same hostname as the page (works for localhost AND public IPs)
         mcpProxyUrl: `${window.location.protocol}//${window.location.hostname}:${window.location.protocol === "https:" ? 5001 : 5002}`,
-        kbStoreId: 'fileSearchStores/msmepolicies-8pibj9lwmrws',
+        kbStoreId: 'fileSearchStores/msmepolicies-n3j470r9yrz3',
         kbEnabled: false  // Knowledge base is OFF by default
       },
       systemInstructions: {
@@ -471,54 +471,49 @@ You have access to ONLY these MCP tools: **search_indicators**, **get_observatio
 - This step is REQUIRED - do not skip it!
 - Do NOT respond with "no data" without first trying get_observations`,
 
-        kb: `## Data Agent: Policy & Compliance Intelligence
+        kb: `## NDAP Document Intelligence
 
 **Current Date & Time**: {{CURRENT_DATETIME}}
 
-### Role: Policy & Compliance Expert (India Regulatory Specialist)
+### Role: Government Data Analyst (India Public Statistics Specialist)
 
-You are Data Agent's Policy Wing - a legal compliance specialist for Indian businesses. Your purpose is to provide factual, actionable answers based strictly on the policy documents in your filestore.
+You are NDAP's document intelligence layer. You answer questions strictly from the government reports and surveys in your knowledge base. Your purpose is to provide precise, citation-grounded answers for Indian public health, labour, population, and environmental data.
 
 ### Default Context: INDIA
-All queries are in the Indian regulatory context. Assume the user is asking about Indian MSME policies, schemes, and regulations unless otherwise specified.
+All queries are in the Indian government data context — NFHS surveys, PLFS labour force data, TB reports, Census data, milk production statistics, air quality reports, and economic surveys.
 
+### Document Library (what you have access to)
+- **NFHS-5 Bihar Fact Sheet** — stunting, malnutrition, health indicators for Bihar
+- **NFHS-5 India Vol 1** — national health and family welfare survey 2019-21
+- **NFHS-6 India Report** — urban-poor subset, rolling 2024-26
+- **NCVBDC Dengue Situation India** — state-wise and national dengue case counts by year
+- **India TB Report 2024** — tuberculosis notifications, treatment outcomes (pg 156 for state data)
+- **National TB Prevalence Survey 2019-2021** — methodology and state group prevalence
+- **WHO Global TB Report 2024** — India country profile, national incidence estimate
+- **PLFS Annual Report 2023-24** — unemployment rates, LFPR, state-wise labour force tables
+- **PLFS Quarterly Report Jan-Mar 2026** — latest quarterly labour force data
+- **Economic Survey 2024-25 (full)** — macro indicators, policy context
+- **Economic Survey 2024-25 Chapter 13** — Labour in the AI Era
+- **Population Projections 2011-2036** — state-wise working-age population projections
+- **Census 2011 Urban Slum H-13** — slum population by selected cities
+- **Census H-2 Housing Condition** — housing conditions in slum and non-slum areas
+- **NSS 75th Round Health Schedule 25.0** — social consumption, housing and amenities
+- **Milk Production PCA India** — national milk yield and per capita availability
+- **State-wise Milk Production** — state-level milk production in '000 tonnes from 2001
+- **National Air Quality Index Report** — AQI methodology, city rankings
 
-### Mandatory Step: Query Classification
+### Mandatory Rules
 
-Before responding, classify the query:
-- **Scheme Eligibility**: Who qualifies? What are the criteria?
-- **Process/Procedure**: How to apply? What documents needed?
-- **Benefits/Incentives**: What subsidies, grants, or tax benefits?
-- **Compliance/Deadlines**: What are the requirements and timelines?
+**CRITICAL — Anti-Hallucination**:
+- Every fact must come from the documents above
+- Cite at the page, table, or section level — never just "NFHS" or "Census"
+- If data is not in the documents, say so explicitly and suggest the official source
 
+**Multilingual**: Answer in the language of the query (Hindi, Tamil, etc.). Keep numbers in canonical form.
 
-
-**Document Triangulation**: Connect related schemes.
-
-### Grounding & Citations
-
-**Source Integrity**: Every fact must be traceable to a specific document. Format citations as: [Source: Document Name, Section/Page]
-
-**Anti-Hallucination Protocol**: If information is not in the PDFs, state clearly:
-> "This specific policy detail is not in our document library. For the latest information, please check the official ministry website or contact the relevant authority."
-
-### 4. Rich Formatting & Output Structure
-
-**For Scheme Information**:
-- 📋 **Scheme Name**: Full name and ministry
-- 🎯 **Objective**: One-line purpose
-- ✅ **Eligibility**: Bullet points
-- 💰 **Benefits**: Specific amounts in ₹ (Lakhs/Crores)
-- 📝 **How to Apply**: Step-by-step process
-- ⏰ **Deadlines**: If any, in **bold**
-- 🔗 **Official Link**: If available
-
-**Visual Formatting**:
-- Use **Bold** for amounts, percentages, and deadlines
-- Use *Italics* for scheme names and official terms
-- Use tables for comparing multiple schemes
-- Use bullet points for eligibility criteria and document lists
-- Use numbered lists for step-by-step processes`,
+### Citation Format
+Use inline numbered citations [1], [2] and list sources at the end.
+- Format: [Ministry/Author. (Year). Title, specific table/page/section.]`,
 
         synthesis: `## Data Agent: Unified Intelligence Response
 
@@ -2660,7 +2655,7 @@ When you receive **RAW MCP TOOL RESULTS**, you MUST:
 
         <div class="config-section">
           <label for="kb-store-input">Knowledge Base</label>
-          <input type="text" id="kb-store-input" placeholder="fileSearchStores/your-store-id" value="fileSearchStores/msmepolicies-8pibj9lwmrws">
+          <input type="text" id="kb-store-input" placeholder="fileSearchStores/your-store-id" value="fileSearchStores/msmepolicies-n3j470r9yrz3">
           <div class="config-toggle">
             <span>Knowledge Base</span>
             <span class="status-badge" id="kb-status">Inactive</span>
@@ -2875,7 +2870,7 @@ When you receive **RAW MCP TOOL RESULTS**, you MUST:
       let mcpProxyUrl = localStorage.getItem('mcp_proxy_url') || config.defaults?.mcpProxyUrl || dynamicProxyUrl;
       
       let mcpEnabled = localStorage.getItem('mcp_enabled') !== 'false';
-      let kbStoreId = localStorage.getItem('kb_store_id') || config.defaults?.kbStoreId || 'fileSearchStores/msmepolicies-8pibj9lwmrws';
+      let kbStoreId = localStorage.getItem('kb_store_id') || config.defaults?.kbStoreId || 'fileSearchStores/msmepolicies-n3j470r9yrz3';
       // Knowledge base is OFF by default - only enable if explicitly set to 'true' in localStorage
       let kbEnabled = localStorage.getItem('kb_enabled') === 'true' ? true : (config.defaults?.kbEnabled ?? false);
       let selectedModel = localStorage.getItem('selected_model') || 'gemini-3-flash-preview';
@@ -4890,6 +4885,8 @@ When you receive **RAW MCP TOOL RESULTS**, you MUST:
           let fullText = '';
           let chartConfig = null;
           let durationMs = null;
+          let totalTokens = null;
+          let costUsd = null;
 
           while (true) {
             const { done, value } = await reader.read();
@@ -4959,12 +4956,12 @@ When you receive **RAW MCP TOOL RESULTS**, you MUST:
                   chartConfig = data.chart_config;
                 }
 
-                // Handle completion with duration
+                // Handle completion with duration + cost (GP-10)
                 if (data.done) {
                   console.log('Backend stream complete');
-                  if (data.duration_ms) {
-                    durationMs = data.duration_ms;
-                  }
+                  if (data.duration_ms) durationMs = data.duration_ms;
+                  if (data.total_tokens) totalTokens = data.total_tokens;
+                  if (data.cost_usd !== undefined) costUsd = data.cost_usd;
                 }
 
                 // Handle errors
@@ -4979,7 +4976,7 @@ When you receive **RAW MCP TOOL RESULTS**, you MUST:
             }
           }
 
-          return { text: fullText, chartConfig, sessionId: currentConversationSessionId, durationMs };
+          return { text: fullText, chartConfig, sessionId: currentConversationSessionId, durationMs, totalTokens, costUsd };
 
         } catch (err) {
           console.error('Backend chat stream error:', err);
@@ -5561,20 +5558,26 @@ When you receive **RAW MCP TOOL RESULTS**, you MUST:
             // Finalize the message
             streamingMessage.finalize();
 
-            // Show response duration
+            // Show response duration + cost (GP-10)
             if (result.durationMs) {
               const messageEl = streamingMessage.getElement();
               const durationEl = document.createElement('div');
               durationEl.className = 'response-duration';
-              durationEl.style.cssText = 'font-size: 0.75rem; color: var(--text-tertiary); margin-top: 12px; padding-top: 8px; border-top: 1px solid var(--border-color); display: flex; align-items: center; gap: 4px;';
+              durationEl.style.cssText = 'font-size: 0.72rem; color: var(--text-tertiary); margin-top: 12px; padding-top: 8px; border-top: 1px solid var(--border-color); display: flex; align-items: center; gap: 12px; flex-wrap: wrap;';
               const seconds = (result.durationMs / 1000).toFixed(1);
-              durationEl.innerHTML = `
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <circle cx="12" cy="12" r="10"></circle>
-                  <polyline points="12 6 12 12 16 14"></polyline>
-                </svg>
-                Response generated in ${seconds}s
-              `;
+              const clockIcon = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>`;
+              const coinIcon = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>`;
+              const tokenIcon = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>`;
+              let html = `<span style="display:flex;align-items:center;gap:4px">${clockIcon} ${seconds}s</span>`;
+              if (result.totalTokens) {
+                const tokK = result.totalTokens >= 1000 ? (result.totalTokens / 1000).toFixed(1) + 'K' : result.totalTokens;
+                html += `<span style="display:flex;align-items:center;gap:4px">${tokenIcon} ~${tokK} tokens</span>`;
+              }
+              if (result.costUsd !== null && result.costUsd !== undefined) {
+                const costStr = result.costUsd < 0.001 ? `$${(result.costUsd * 1000).toFixed(3)}m` : `$${result.costUsd.toFixed(4)}`;
+                html += `<span style="display:flex;align-items:center;gap:4px" title="Estimated API cost (Gemini Flash pricing)">${coinIcon} ~${costStr} est.</span>`;
+              }
+              durationEl.innerHTML = html;
               messageEl.querySelector('.message-content').appendChild(durationEl);
             }
 

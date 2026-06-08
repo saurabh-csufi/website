@@ -38,6 +38,7 @@ import sys
 import threading
 import time
 import uuid
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Generator, Optional
@@ -80,19 +81,30 @@ MCP_URL = f"http://localhost:{MCP_PORT}/mcp"
 # Backend config cache
 _config_cache = None
 _config_mtime = 0
+_config_last_check = 0.0
+_CONFIG_CHECK_TTL = 10.0  # Only hit the filesystem every 10 seconds
 
 
 def load_config() -> dict:
-    """Load configuration from config.json file."""
-    global _config_cache, _config_mtime
+    """Load configuration from config.json file.
+
+    Uses a two-level cache: a TTL guard (avoids stat() on every call within the
+    same request) and an mtime check (reloads only when the file actually changed).
+    """
+    global _config_cache, _config_mtime, _config_last_check
 
     config_path = Path(__file__).parent / 'config.json'
+
+    now = time.time()
+    # Fast-path: skip the filesystem stat() entirely within the TTL window
+    if _config_cache is not None and (now - _config_last_check) < _CONFIG_CHECK_TTL:
+        return _config_cache
 
     if not config_path.exists():
         logger.warning(f"Config file not found at {config_path}")
         return {}
 
-    # Check if file was modified
+    _config_last_check = now
     current_mtime = config_path.stat().st_mtime
     if _config_cache is not None and current_mtime == _config_mtime:
         return _config_cache
@@ -210,6 +222,7 @@ class SessionLogger:
         self.logs_dir.mkdir(exist_ok=True)
         self.log_file = self.logs_dir / f"{self.session_id}.log"
         self.entries = []
+        self._write_buffer: list[str] = []  # batched log lines, flushed periodically
         self._write_header()
 
     def _generate_session_id(self) -> str:
@@ -237,8 +250,27 @@ class SessionLogger:
                 f.write(f"Started: {datetime.now().isoformat()}\n")
                 f.write(f"{'='*80}\n\n")
 
+    def flush(self):
+        """Flush the write buffer to disk."""
+        if not self._write_buffer:
+            return
+        with open(self.log_file, 'a') as f:
+            f.write(''.join(self._write_buffer))
+        self._write_buffer.clear()
+
+    def __del__(self):
+        """Ensure buffered log entries reach disk on object destruction."""
+        try:
+            self.flush()
+        except Exception:
+            pass
+
     def log(self, event_type: str, data: dict):
-        """Log an event with full request/response details."""
+        """Log an event with full request/response details.
+
+        Writes are buffered and flushed every 10 events to reduce file I/O
+        from ~30 open/close cycles per request down to ~3.
+        """
         timestamp = datetime.now().isoformat()
         entry = {
             "timestamp": timestamp,
@@ -247,11 +279,13 @@ class SessionLogger:
         }
         self.entries.append(entry)
 
-        # Write to file immediately
-        with open(self.log_file, 'a') as f:
-            f.write(f"\n--- {event_type} @ {timestamp} ---\n")
-            f.write(json.dumps(data, indent=2, default=str))
-            f.write("\n")
+        # Buffer the line; flush every 10 entries or ~50KB
+        self._write_buffer.append(
+            f"\n--- {event_type} @ {timestamp} ---\n"
+            f"{json.dumps(data, indent=2, default=str)}\n"
+        )
+        if len(self._write_buffer) >= 10 or sum(len(x) for x in self._write_buffer) > 50_000:
+            self.flush()
 
     def log_user_message(self, message: str, history_count: int = 0):
         """Log the user's input message."""
@@ -337,6 +371,8 @@ CORS(app)
 # Global state
 session_id = None
 tools_cache = None
+_tools_cache_time = 0.0
+_TOOLS_CACHE_TTL = 300.0  # Re-fetch tools every 5 minutes (detects MCP server restarts)
 
 
 def mcp_request(method: str, params: dict = None, is_notification: bool = False) -> dict:
@@ -454,16 +490,22 @@ def initialize_mcp() -> bool:
 
 
 def get_tools() -> list:
-    """Get available tools from MCP server."""
-    global tools_cache
+    """Get available tools from MCP server.
 
-    if tools_cache:
+    Caches the tool list for _TOOLS_CACHE_TTL seconds so that MCP server
+    restarts are detected within that window without fetching on every request.
+    """
+    global tools_cache, _tools_cache_time
+
+    now = time.time()
+    if tools_cache and (now - _tools_cache_time) < _TOOLS_CACHE_TTL:
         return tools_cache
 
     result = mcp_request("tools/list", {})
 
     if "result" in result and result["result"] and "tools" in result["result"]:
         tools_cache = result["result"]["tools"]
+        _tools_cache_time = now
         return tools_cache
 
     return []
@@ -584,6 +626,11 @@ def call_tool(name: str, arguments: dict, session_logger: Optional[SessionLogger
     return error_result
 
 
+# Pre-compiled patterns for check_data_availability — avoids re-compiling on every call
+_RE_TIME_SERIES_HAS_DATA = re.compile(r'"time_series":\s*\[\s*\[')
+_RE_VALID_SOURCE_ID = re.compile(r'"source_id":\s*"(?!unknown)[^"]+')
+
+
 def check_data_availability(tool_calls_list: list) -> dict:
     """Check if MCP tool calls returned useful data.
 
@@ -602,12 +649,12 @@ def check_data_availability(tool_calls_list: list) -> dict:
 
     for tc in tool_calls_list:
         result_str = tc.get('result', '')
-        result_str_lower = result_str.lower()
         tool_name = tc.get('name', '')
 
         if tool_name == 'search_indicators':
             search_called = True
-            # Check if no variables found
+            # Check if no variables found (single lower() call)
+            result_str_lower = result_str.lower()
             if 'no indicators found' in result_str_lower or \
                '"variables": []' in result_str_lower or \
                'no matching' in result_str_lower or \
@@ -622,19 +669,20 @@ def check_data_availability(tool_calls_list: list) -> dict:
             # Look for patterns like: "time_series": [["2024", 14984.0]] (has data)
             # vs: "time_series": [] (empty)
 
-            # Check for non-empty time_series with actual values
-            has_data_pattern = re.search(r'"time_series":\s*\[\s*\[', result_str)
+            # Check for non-empty time_series with actual values (pre-compiled)
+            has_data_pattern = _RE_TIME_SERIES_HAS_DATA.search(result_str)
             if has_data_pattern:
                 has_any_observations = True
                 all_observations_empty = False
 
             # Also check for valid source_id (not "unknown")
-            valid_source = re.search(r'"source_id":\s*"(?!unknown)[^"]+', result_str_lower)
+            valid_source = _RE_VALID_SOURCE_ID.search(result_str.lower())
             if valid_source and has_data_pattern:
                 has_any_observations = True
                 all_observations_empty = False
 
-            # Check if this specific observation is empty
+            # Check if this specific observation is empty (single lower() call)
+            result_str_lower = result_str.lower()
             is_empty = ('no data' in result_str_lower or
                        '"observations": []' in result_str_lower or
                        '"time_series": []' in result_str_lower or
@@ -1387,27 +1435,40 @@ def execute_mcp_tool_loop(
                 })
             return tool_results_text, tool_calls_list, text_response
 
-        # Execute function calls
+        # Execute function calls — run independent calls in parallel
         contents.append({"role": "model", "parts": parts})
         function_responses = []
 
-        for fc in function_calls:
+        def _run_tool(fc: dict):
+            """Execute a single tool call and return (fc, result_text)."""
+            t_name = fc.get("name", "")
+            t_args = fc.get("args", {})
+            logger.info(f"Executing MCP tool: {t_name}")
+            res = call_tool(t_name, t_args, session_logger=session_logger)
+            if isinstance(res, dict):
+                if "content" in res and isinstance(res["content"], list):
+                    r_text = "\n".join([c.get("text", json.dumps(c)) for c in res["content"]])
+                else:
+                    r_text = json.dumps(res)
+            else:
+                r_text = str(res)
+            return fc, r_text
+
+        if len(function_calls) == 1:
+            # Skip thread overhead for the common single-tool case
+            results_ordered = [_run_tool(function_calls[0])]
+        else:
+            # Dispatch all tool calls concurrently; preserve submission order in output
+            with ThreadPoolExecutor(max_workers=min(len(function_calls), 5)) as pool:
+                futures = {pool.submit(_run_tool, fc): i for i, fc in enumerate(function_calls)}
+                results_ordered = [None] * len(function_calls)
+                for future in as_completed(futures):
+                    idx = futures[future]
+                    results_ordered[idx] = future.result()
+
+        for fc, result_text in results_ordered:
             tool_name = fc.get("name", "")
             tool_args = fc.get("args", {})
-
-            logger.info(f"Executing MCP tool: {tool_name}")
-            result = call_tool(tool_name, tool_args, session_logger=session_logger)
-
-            # Convert result to string
-            if isinstance(result, dict):
-                if "content" in result and isinstance(result["content"], list):
-                    result_text = "\n".join([
-                        c.get("text", json.dumps(c)) for c in result["content"]
-                    ])
-                else:
-                    result_text = json.dumps(result)
-            else:
-                result_text = str(result)
 
             tool_call_info = {
                 "name": tool_name,
@@ -1538,24 +1599,13 @@ def execute_kb_query(user_message: str, session_logger: Optional[SessionLogger] 
             },
             "tools": [{
                 "fileSearch": {
-                    "dynamicFileSearchConfig": {
-                        "mode": "MODE_DYNAMIC",
-                        "dynamicThreshold": 0.3
-                    }
+                    "fileSearchStoreNames": [store_id]
                 }
-            }],
-            "toolConfig": {
-                "fileSearch": {
-                    "vectorStore": {"storeResourceId": store_id}
-                }
-            }
+            }]
         }
 
-        # Add thinking config with includeThoughts for streaming
-        if thinking_level:
-            payload["generationConfig"].update(
-                build_thinking_config(thinking_level, include_thoughts=True)
-            )
+        # Note: thinking config omitted for KB — file search uses stable gemini-2.5-flash
+        # which does not support thinkingConfig in the same format
 
         attempt_count += 1
         start_time = time.time()
@@ -1570,16 +1620,17 @@ def execute_kb_query(user_message: str, session_logger: Optional[SessionLogger] 
 
         try:
             # Use streaming endpoint to get thoughts in real-time
-            url = f"{api_base}/{kb_model}:streamGenerateContent?key={api_key}&alt=sse"
+            url = f"{api_base}/{kb_model}:generateContent?key={api_key}"
             response = requests.post(
                 url,
                 json=payload,
                 headers={"Content-Type": "application/json"},
-                stream=True,
+                stream=False,
                 timeout=300
             )
 
             # Check for rate limit - immediately switch key
+            logger.info(f"KB HTTP status: {response.status_code}")
             if response.status_code == 429:
                 last_error = "Rate limited (429)"
                 logger.warning(f"KB API key rate limited, switching to next key...")
@@ -1591,37 +1642,32 @@ def execute_kb_query(user_message: str, session_logger: Optional[SessionLogger] 
                 logger.warning(f"KB server error {response.status_code}, switching to next key...")
                 continue
 
-            # Collect response while streaming thoughts
+            # Collect response (non-streaming JSON for file search compatibility)
             result_text = ""
             sources = []
             collected_thoughts = ""
             grounding_metadata = {}
 
-            for line in response.iter_lines():
-                if line:
-                    line_str = line.decode('utf-8')
-                    if line_str.startswith('data: '):
-                        try:
-                            data = json.loads(line_str[6:])
-                            if 'candidates' in data and data['candidates']:
-                                candidate = data['candidates'][0]
+            try:
+                data = response.json()
+            except Exception as e:
+                logger.error(f"KB JSON parse error: {e}")
+                data = {}
 
-                                # Extract grounding metadata when available
-                                if 'groundingMetadata' in candidate:
-                                    grounding_metadata = candidate['groundingMetadata']
-
-                                if 'content' in candidate and 'parts' in candidate['content']:
-                                    for part in candidate['content']['parts']:
-                                        if 'text' in part:
-                                            is_thought = part.get('thought', False)
-                                            if is_thought:
-                                                collected_thoughts += part['text']
-                                                if thought_callback:
-                                                    thought_callback(part['text'])
-                                            else:
-                                                result_text += part['text']
-                        except json.JSONDecodeError:
-                            continue
+            if 'candidates' in data and data['candidates']:
+                candidate = data['candidates'][0]
+                if 'groundingMetadata' in candidate:
+                    grounding_metadata = candidate['groundingMetadata']
+                if 'content' in candidate and 'parts' in candidate['content']:
+                    for part in candidate['content']['parts']:
+                        if 'text' in part:
+                            is_thought = part.get('thought', False)
+                            if is_thought:
+                                collected_thoughts += part['text']
+                                if thought_callback:
+                                    thought_callback(part['text'])
+                            else:
+                                result_text += part['text']
 
             # Extract source citations from grounding metadata
             grounding_chunks = grounding_metadata.get("groundingChunks", [])
@@ -2153,12 +2199,23 @@ Please provide a comprehensive response combining all available information."""
         if not show_charts:
             chart_config['hide_charts'] = True
 
-        # Log final response
+        # Log final response and flush buffered log entries to disk
         total_duration_ms = (time.time() - request_start_time) * 1000
         session_logger.log_final_response(full_text, chart_config, total_duration_ms)
+        session_logger.flush()
 
-        # Send final event with timing info
-        yield f"data: {json.dumps({'chart_config': chart_config, 'done': True, 'duration_ms': round(total_duration_ms, 0)})}\n\n"
+        # GP-10: Estimate token usage and cost for display
+        # 1 token ≈ 4 chars for English, ~2.5 for Hindi — use 4 as conservative estimate
+        input_chars = len(user_message) + len(mcp_results) + len(kb_response) + len(synthesis_message)
+        output_chars = len(full_text)
+        input_tokens_est = input_chars // 4
+        output_tokens_est = output_chars // 4
+        total_tokens_est = input_tokens_est + output_tokens_est
+        # Gemini Flash pricing: $0.075/1M input tokens, $0.30/1M output tokens
+        cost_usd_est = (input_tokens_est * 0.075 + output_tokens_est * 0.30) / 1_000_000
+
+        # Send final event with timing + cost info (GP-10)
+        yield f"data: {json.dumps({'chart_config': chart_config, 'done': True, 'duration_ms': round(total_duration_ms, 0), 'total_tokens': total_tokens_est, 'cost_usd': round(cost_usd_est, 6)})}\n\n"
 
     return Response(
         stream_with_context(generate()),
