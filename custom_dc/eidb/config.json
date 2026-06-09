@@ -240,6 +240,97 @@
         "unit": "unit",
         "measurementMethod": "measurementMethod"
       }
+    },
+    "ndap_milk_production_statewise.csv": {
+      "provenance": "NDAP Milk Production State-wise",
+      "format": "variablePerRow",
+      "columnMappings": {
+        "entity": "observationAbout",
+        "date": "observationDate",
+        "variable": "variableMeasured",
+        "value": "value",
+        "unit": "unit",
+        "measurementMethod": "measurementMethod",
+        "observationPeriod": "observationPeriod"
+      }
+    },
+    "ndap_milk_production_national.csv": {
+      "provenance": "NDAP Milk Production National",
+      "format": "variablePerRow",
+      "columnMappings": {
+        "entity": "observationAbout",
+        "date": "observationDate",
+        "variable": "variableMeasured",
+        "value": "value",
+        "unit": "unit",
+        "measurementMethod": "measurementMethod",
+        "observationPeriod": "observationPeriod"
+      }
+    },
+    "ndap_milk_pca_national.csv": {
+      "provenance": "NDAP Milk Per Capita Availability",
+      "format": "variablePerRow",
+      "columnMappings": {
+        "entity": "observationAbout",
+        "date": "observationDate",
+        "variable": "variableMeasured",
+        "value": "value",
+        "unit": "unit",
+        "measurementMethod": "measurementMethod",
+        "observationPeriod": "observationPeriod"
+      }
+    },
+    "ndap_tb_notifications_national.csv": {
+      "provenance": "NDAP TB Notifications National",
+      "format": "variablePerRow",
+      "columnMappings": {
+        "entity": "observationAbout",
+        "date": "observationDate",
+        "variable": "variableMeasured",
+        "value": "value",
+        "unit": "unit",
+        "measurementMethod": "measurementMethod",
+        "observationPeriod": "observationPeriod"
+      }
+    },
+    "ndap_plfs_unemployment_statewise.csv": {
+      "provenance": "NDAP PLFS Unemployment State-wise",
+      "format": "variablePerRow",
+      "columnMappings": {
+        "entity": "observationAbout",
+        "date": "observationDate",
+        "variable": "variableMeasured",
+        "value": "value",
+        "unit": "unit",
+        "measurementMethod": "measurementMethod",
+        "observationPeriod": "observationPeriod"
+      }
+    },
+    "ndap_dengue_statewise.csv": {
+      "provenance": "NDAP_NCVBDC_DengueSituation",
+      "format": "variablePerRow",
+      "columnMappings": {
+        "entity": "observationAbout",
+        "date": "observationDate",
+        "variable": "variableMeasured",
+        "value": "value",
+        "unit": "unit",
+        "measurementMethod": "measurementMethod",
+        "observationPeriod": "observationPeriod"
+      }
+    },
+    "ndap_census2011_pca_statewise.csv": {
+      "provenance": "NDAP_Census2011_PCA",
+      "format": "variablePerRow",
+      "columnMappings": {
+        "entity": "observationAbout",
+        "date": "observationDate",
+        "variable": "variableMeasured",
+        "value": "value",
+        "unit": "unit",
+        "measurementMethod": "measurementMethod",
+        "observationPeriod": "observationPeriod"
+      }
     }
   },
   "sources": {
@@ -278,6 +369,18 @@
       "provenances": {
         "NITI Aayog State Population Projections": "https://ndap.niti.gov.in/dataset/7208",
         "NITI Aayog State Urban Population Projections": "https://ndap.niti.gov.in/dataset/7209"
+      }
+    },
+    "NCVBDC MoHFW": {
+      "url": "https://ncvbdc.mohfw.gov.in/",
+      "provenances": {
+        "NDAP_NCVBDC_DengueSituation": "https://ncvbdc.mohfw.gov.in/index4.php?lang=1&level=0&linkid=431&lid=3715"
+      }
+    },
+    "Office of the Registrar General India": {
+      "url": "https://censusindia.gov.in/",
+      "provenances": {
+        "NDAP_Census2011_PCA": "https://censusindia.gov.in/census.website/data/census-tables"
       }
     }
   }

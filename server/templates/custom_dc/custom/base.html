@@ -173,6 +173,10 @@
       color: #fff !important;
     }
 
+    /* ── DEMO: Hide Tools + About nav items ── */
+    .more-tools-dropdown,
+    #nav-insights { display: none !important; }
+
     /* ── NDAP Footer ── */
     #main-footer {
       background: var(--ndap-navy);
@@ -252,7 +256,11 @@
               <li class="nav-item">
                 <a href="{{ url_for('static.homepage') }}" id="nav-home" class="nav-link-main"><span>Home</span></a>
               </li>
-              <li class="nav-item dropdown more-tools-dropdown">
+              <li class="nav-item">
+                <a href="/custom_dc/custom/dryrun_report.html" target="_blank" class="nav-link-main"><span>Dry Run Report</span></a>
+              </li>
+              <!-- DEMO: Tools and About hidden for demo — restore by removing style="display:none" -->
+              <li class="nav-item dropdown more-tools-dropdown" style="display:none">
                 <a href="#" class="nav-link-main dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                   <span>Tools</span>
                 </a>
@@ -261,7 +269,7 @@
                   <a class="dropdown-item" href="{{ url_for('tools.stat_var') }}">Variables</a>
                 </div>
               </li>
-              <li class="nav-item">
+              <li class="nav-item" style="display:none">
                 <a href="/about" id="nav-insights" class="nav-link-main"><span>About</span></a>
               </li>
             </ul>

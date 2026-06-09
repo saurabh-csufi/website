@@ -182,10 +182,22 @@ def apply_query_overrides(config: dict, query_params: dict) -> dict:
     # Deep copy to avoid modifying cached config
     effective = copy.deepcopy(config)
 
-    # Model override
+    # Model override — handle named aliases ("openrouter", "sarvam", "gemini")
+    # as well as explicit model IDs (e.g. "google/gemma-3-27b-it", "gemini-3-flash-preview")
     if query_params.get("model"):
-        effective["gemini"]["mcp_model"] = query_params["model"]
-        effective["gemini"]["kb_model"] = query_params["model"]
+        m = query_params["model"]
+        if m == "openrouter":
+            # Force OpenRouter synthesis by ensuring the openrouter model is kept intact
+            # and the gemini model is NOT overwritten with the alias string
+            pass  # synthesis routing uses _or_key + _or_model from config
+        elif m == "sarvam":
+            pass  # synthesis routing uses _sv_key + _sv_model from config
+        elif m == "gemini":
+            pass  # default, leave config unchanged
+        else:
+            # Explicit model ID — set on gemini config for MCP/KB calls
+            effective["gemini"]["mcp_model"] = m
+            effective["gemini"]["kb_model"] = m
 
     # Knowledge base toggle
     if query_params.get("kb_enabled"):
@@ -1731,7 +1743,7 @@ CHART_CONFIG_SCHEMA = {
                 "properties": {
                     "viz_type": {
                         "type": "string",
-                        "enum": ["line", "bar", "ranking", "pie", "highlight", "gauge", "scatter", "slider"]
+                        "enum": ["line", "bar", "ranking", "pie", "highlight", "gauge", "scatter", "slider","map"]
                     },
                     "title": {"type": "string", "description": "Descriptive chart title"},
                     "variable_dcids": {"type": "array", "items": {"type": "string"}},
@@ -1748,6 +1760,173 @@ CHART_CONFIG_SCHEMA = {
     },
     "required": ["should_render"]
 }
+
+
+
+
+def openrouter_stream_request(
+    messages: list,
+    system_instruction: str,
+    model: str,
+    temperature: float = 0.3,
+    session_logger=None
+):
+    """Stream a response from OpenRouter (OpenAI-compatible API).
+
+    Yields dicts with 'type' and 'content' keys (same interface as gemini_request include_thoughts=True).
+    """
+    config = load_config()
+    or_config = config.get("openrouter", {})
+    # Prefer env var over config file so the key is never stored in plain text
+    api_key = os.environ.get("OPENROUTER_API_KEY") or or_config.get("api_key", "")
+    api_base = or_config.get("api_base", "https://openrouter.ai/api/v1")
+
+    if not api_key or api_key == "PASTE_YOUR_OPENROUTER_API_KEY_HERE":
+        logger.error("OpenRouter API key not configured. Set OPENROUTER_API_KEY env var.")
+        yield {"type": "text", "content": "Error: OPENROUTER_API_KEY environment variable not set."}
+        return
+
+    # Convert Gemini-format messages to OpenAI format
+    oai_messages = []
+    if system_instruction:
+        oai_messages.append({"role": "system", "content": system_instruction})
+    for msg in messages:
+        role = msg.get("role", "user")
+        if role == "model":
+            role = "assistant"
+        parts = msg.get("parts", [])
+        content = " ".join(p.get("text", "") for p in parts if isinstance(p, dict))
+        oai_messages.append({"role": role, "content": content})
+
+    payload = {
+        "model": model,
+        "messages": oai_messages,
+        "temperature": temperature,
+        "stream": True,
+    }
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json",
+        "HTTP-Referer": "https://ndap.niti.gov.in",
+        "X-Title": "NDAP Data Agent",
+    }
+
+    try:
+        if session_logger:
+            session_logger.log("OPENROUTER_REQUEST", {"model": model, "messages_count": len(oai_messages)})
+
+        response = requests.post(
+            f"{api_base}/chat/completions",
+            headers=headers,
+            json=payload,
+            stream=True,
+            timeout=120
+        )
+        response.raise_for_status()
+
+        for line in response.iter_lines():
+            if not line:
+                continue
+            decoded = line.decode("utf-8") if isinstance(line, bytes) else line
+            if decoded.startswith("data: "):
+                decoded = decoded[6:]
+            if decoded.strip() == "[DONE]":
+                break
+            try:
+                chunk = json.loads(decoded)
+                delta = chunk.get("choices", [{}])[0].get("delta", {})
+                content = delta.get("content", "")
+                if content:
+                    yield {"type": "text", "content": content}
+            except json.JSONDecodeError:
+                continue
+
+    except Exception as e:
+        logger.error(f"OpenRouter stream error: {e}")
+        if session_logger:
+            session_logger.log_error("OPENROUTER_ERROR", str(e))
+        yield {"type": "text", "content": f"\n\n[OpenRouter error: {e}]"}
+
+
+def sarvam_stream_request(
+    messages: list,
+    system_instruction: str,
+    model: str,
+    temperature: float = 0.3,
+    session_logger=None
+):
+    """Stream a response from Sarvam AI (OpenAI-compatible API).
+
+    Yields dicts with 'type' and 'content' keys.
+    """
+    config = load_config()
+    sv_config = config.get("sarvam", {})
+    api_key = os.environ.get("SARVAM_API_KEY") or sv_config.get("api_key", "")
+    api_base = sv_config.get("api_base", "https://api.sarvam.ai/v1")
+
+    if not api_key:
+        logger.error("Sarvam API key not configured. Set SARVAM_API_KEY env var.")
+        yield {"type": "text", "content": "Error: SARVAM_API_KEY environment variable not set."}
+        return
+
+    # Convert Gemini-format messages to OpenAI format
+    oai_messages = []
+    if system_instruction:
+        oai_messages.append({"role": "system", "content": system_instruction})
+    for msg in messages:
+        role = msg.get("role", "user")
+        if role == "model":
+            role = "assistant"
+        parts = msg.get("parts", [])
+        content = " ".join(p.get("text", "") for p in parts if isinstance(p, dict))
+        oai_messages.append({"role": role, "content": content})
+
+    payload = {
+        "model": model,
+        "messages": oai_messages,
+        "temperature": temperature,
+        "stream": True,
+    }
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json",
+    }
+
+    try:
+        if session_logger:
+            session_logger.log("SARVAM_REQUEST", {"model": model, "messages_count": len(oai_messages)})
+
+        response = requests.post(
+            f"{api_base}/chat/completions",
+            headers=headers,
+            json=payload,
+            stream=True,
+            timeout=120
+        )
+        response.raise_for_status()
+
+        for line in response.iter_lines():
+            if not line:
+                continue
+            decoded = line.decode("utf-8") if isinstance(line, bytes) else line
+            if decoded.startswith("data: "):
+                decoded = decoded[6:]
+            if decoded.strip() == "[DONE]":
+                break
+            try:
+                chunk = json.loads(decoded)
+                delta = chunk.get("choices", [{}])[0].get("delta", {})
+                text = delta.get("content", "")
+                if text:
+                    yield {"type": "text", "content": text}
+            except json.JSONDecodeError:
+                continue
+
+    except Exception as e:
+        logger.error(f"Sarvam stream error: {e}")
+        if session_logger:
+            session_logger.log_error("SARVAM_ERROR", str(e))
+        yield {"type": "text", "content": f"\n\n[Sarvam error: {e}]"}
 
 
 def get_chart_config(mcp_results: str, user_message: str) -> dict:
@@ -1775,7 +1954,12 @@ Instructions:
    - Different unit types should be separate (e.g., "Count" vs "INR" vs "Percentage")
    - Vastly different scales should be separate (e.g., millions vs trillions)
 5. MAXIMUM 3 charts - if more groups exist, prioritize most relevant to the query
-6. Choose appropriate viz_type for each chart (line for time series, bar for comparison)
+6. Choose appropriate viz_type for each chart:
+   - "map": USE THIS when data covers multiple Indian states/UTs for a SINGLE variable at a SINGLE point in time (state-wise comparisons, geographic distribution). Set parent_place="country/IND" and child_place_type="State". Include a date field.
+   - "line": time series for one or more places/variables over multiple years
+   - "bar": comparison across multiple places or variables at a single point in time (when map is not suitable)
+   - "ranking": when ranking top/bottom states or entities
+   PREFER "map" over "bar" whenever the data has 5+ Indian states with a single variable.
 7. Give each chart a descriptive title related to data it is showing but do NOT include year/date in the title.
 8. For ALL bar charts, ALWAYS include a date field:
    - date can be in formats YYYY, YYYY-MM, or YYYY-MM-DD (e.g., "2021", "2022", "2021-01", "2022-01-01")
@@ -2106,7 +2290,18 @@ def chat_stream():
         yield f"data: {json.dumps({'status': 'synthesis_start', 'message': 'Generating response...'})}\n\n"
 
         synthesis_prompt = effective_config.get("prompts", {}).get("synthesis", "")
-        synthesis_model = effective_config.get("gemini", {}).get("mcp_model", "gemini-3-flash-preview")
+        # Model priority: Sarvam > OpenRouter > Gemini (whichever has a valid key)
+        _sv_key = os.environ.get("SARVAM_API_KEY") or effective_config.get("sarvam", {}).get("api_key", "")
+        _sv_model = effective_config.get("sarvam", {}).get("synthesis_model", "")
+        _or_key = os.environ.get("OPENROUTER_API_KEY") or effective_config.get("openrouter", {}).get("api_key", "")
+        _or_key = _or_key if _or_key and _or_key != "PASTE_YOUR_OPENROUTER_API_KEY_HERE" else ""
+        _or_model = effective_config.get("openrouter", {}).get("synthesis_model", "")
+        if _sv_key and _sv_model:
+            synthesis_model = _sv_model
+        elif _or_key and _or_model:
+            synthesis_model = _or_model
+        else:
+            synthesis_model = effective_config.get("gemini", {}).get("mcp_model", "gemini-3-flash-preview")
         thinking_level = effective_config.get("thinking", {}).get("synthesis_level", "low")
 
         # Build synthesis context with source labels for citations
@@ -2145,17 +2340,36 @@ Please provide a comprehensive response combining all available information."""
             # Add current query with MCP/KB context as final user message
             synthesis_messages.append({"role": "user", "parts": [{"text": synthesis_message}]})
 
-            stream_gen = gemini_request(
-                messages=synthesis_messages,
-                system_instruction=synthesis_prompt,
-                model=synthesis_model,
-                temperature=0.3,
-                thinking_level=thinking_level,
-                stream=True,
-                session_logger=session_logger,
-                include_thoughts=True,  # Enable thought streaming
-                demo_mode=demo_mode
-            )
+            # Route based on model: Sarvam models start with "sarvam-", OpenRouter has "/", else Gemini
+            _sv_key = os.environ.get("SARVAM_API_KEY") or load_config().get("sarvam", {}).get("api_key", "")
+            if synthesis_model.startswith("sarvam-") and _sv_key:
+                stream_gen = sarvam_stream_request(
+                    messages=synthesis_messages,
+                    system_instruction=synthesis_prompt,
+                    model=synthesis_model,
+                    temperature=0,
+                    session_logger=session_logger
+                )
+            elif "/" in synthesis_model:
+                stream_gen = openrouter_stream_request(
+                    messages=synthesis_messages,
+                    system_instruction=synthesis_prompt,
+                    model=synthesis_model,
+                    temperature=0,
+                    session_logger=session_logger
+                )
+            else:
+                stream_gen = gemini_request(
+                    messages=synthesis_messages,
+                    system_instruction=synthesis_prompt,
+                    model=synthesis_model,
+                    temperature=0,
+                    thinking_level=thinking_level,
+                    stream=True,
+                    session_logger=session_logger,
+                    include_thoughts=True,  # Enable thought streaming
+                    demo_mode=demo_mode
+                )
 
             if isinstance(stream_gen, dict) and "error" in stream_gen:
                 session_logger.log_error("SYNTHESIS_ERROR", stream_gen['error'])
@@ -2522,6 +2736,91 @@ def logs_session_detail(session_id):
         "session": parsed,
         "raw_log": raw_content
     })
+
+
+@app.route("/api/logs/session/<session_id>/download")
+def logs_session_download(session_id):
+    """Download a clean, evaluator-friendly execution log for a session.
+    No auth required — session ID is the access token.
+    Returns a plain-text file showing every step the system took.
+    """
+    logs_dir = Path(__file__).parent / 'logs'
+    log_file = logs_dir / f"{session_id}.log"
+
+    if not log_file.exists():
+        return jsonify({"error": "Session not found"}), 404
+
+    parsed = parse_log_file(log_file)
+
+    lines = []
+    lines.append("=" * 70)
+    lines.append("NDAP DATA AGENT — EXECUTION LOG")
+    lines.append("=" * 70)
+    lines.append(f"Session ID  : {session_id}")
+    lines.append(f"Started     : {parsed.get('timestamp', 'unknown')}")
+    lines.append(f"Model       : {parsed.get('model', 'unknown')}")
+    lines.append(f"KB Enabled  : {parsed.get('kb_enabled', False)}")
+    lines.append(f"Status      : {parsed.get('status', 'unknown')}")
+    if parsed.get('duration_ms'):
+        lines.append(f"Total Time  : {parsed['duration_ms']/1000:.1f}s")
+    lines.append("")
+
+    lines.append("USER QUERY")
+    lines.append("-" * 40)
+    lines.append(parsed.get('query') or "(not captured)")
+    lines.append("")
+
+    tool_calls = parsed.get('tool_calls', [])
+    if tool_calls:
+        lines.append(f"MCP TOOL CALLS ({len(tool_calls)} total)")
+        lines.append("-" * 40)
+        for i, tc in enumerate(tool_calls, 1):
+            lines.append(f"  [{i}] Tool    : {tc.get('name', '')}")
+            args = tc.get('arguments', {})
+            if 'query' in args:
+                lines.append(f"      Query   : {args['query']}")
+            if 'variable_dcid' in args:
+                lines.append(f"      Variable: {args['variable_dcid']}")
+            if 'entity_dcids' in args:
+                entities = args['entity_dcids']
+                if isinstance(entities, list):
+                    lines.append(f"      Entities: {', '.join(entities[:5])}")
+            lines.append(f"      Status  : {tc.get('status', 'unknown')}")
+            if tc.get('duration_ms'):
+                lines.append(f"      Duration: {tc['duration_ms']:.0f}ms")
+            lines.append("")
+
+    stat_vars = parsed.get('stat_vars', [])
+    if stat_vars:
+        lines.append(f"STATISTICAL VARIABLES FETCHED ({len(stat_vars)})")
+        lines.append("-" * 40)
+        for sv in stat_vars:
+            lines.append(f"  - {sv}")
+        lines.append("")
+
+    errors = parsed.get('errors', [])
+    if errors:
+        lines.append(f"ERRORS ({len(errors)})")
+        lines.append("-" * 40)
+        for e in errors:
+            lines.append(f"  [{e.get('type','')}] {e.get('message','')}")
+        lines.append("")
+
+    lines.append("=" * 70)
+    lines.append("RAW LOG (full detail)")
+    lines.append("=" * 70)
+    try:
+        with open(log_file, 'r') as f:
+            lines.append(f.read())
+    except:
+        lines.append("(raw log unavailable)")
+
+    output = "\n".join(lines)
+    filename = f"ndap_execution_log_{session_id}.txt"
+    return output, 200, {
+        "Content-Type": "text/plain; charset=utf-8",
+        "Content-Disposition": f'attachment; filename="{filename}"'
+    }
 
 
 @app.route("/logs")

@@ -240,3 +240,117 @@ Node: dcid:dc/g/NITI_GenderPopulation
 typeOf: dcs:StatVarGroup
 name: "Gender-wise Population"
 specializationOf: dcid:dc/g/NITI
+
+# ============================================================
+# NDAP Milk Production & Per Capita Availability
+# ============================================================
+
+Node: dcid:dc/g/NDAP_Milk
+typeOf: dcs:StatVarGroup
+name: "Milk Production & Availability"
+specializationOf: dcid:dc/g/Root
+
+Node: dcid:NDAP_MilkProduction_Statewise
+memberOf: dcid:dc/g/NDAP_Milk
+
+Node: dcid:NDAP_MilkProduction_National
+memberOf: dcid:dc/g/NDAP_Milk
+
+Node: dcid:NDAP_MilkPCA_National
+memberOf: dcid:dc/g/NDAP_Milk
+
+# ============================================================
+# NDAP TB Notifications
+# ============================================================
+
+Node: dcid:dc/g/NDAP_TB
+typeOf: dcs:StatVarGroup
+name: "TB Notifications"
+specializationOf: dcid:dc/g/Root
+
+Node: dcid:NDAP_TBNotifications_National
+memberOf: dcid:dc/g/NDAP_TB
+
+# ============================================================
+# NDAP PLFS Unemployment Rates
+# ============================================================
+
+Node: dcid:dc/g/NDAP_Unemployment
+typeOf: dcs:StatVarGroup
+name: "Unemployment Rates (PLFS)"
+specializationOf: dcid:dc/g/Root
+
+Node: dcid:NDAP_UnemploymentRate_Total
+memberOf: dcid:dc/g/NDAP_Unemployment
+
+Node: dcid:NDAP_UnemploymentRate_Male
+memberOf: dcid:dc/g/NDAP_Unemployment
+
+Node: dcid:NDAP_UnemploymentRate_Female
+memberOf: dcid:dc/g/NDAP_Unemployment
+
+Node: dcid:NDAP_UnemploymentRate_Rural
+memberOf: dcid:dc/g/NDAP_Unemployment
+
+Node: dcid:NDAP_UnemploymentRate_Urban
+memberOf: dcid:dc/g/NDAP_Unemployment
+
+# ============================================================
+# NDAP Dengue Case Notifications
+# ============================================================
+
+Node: dcid:dc/g/NDAP_Dengue
+typeOf: dcs:StatVarGroup
+name: "Dengue Case Notifications"
+specializationOf: dcid:dc/g/Root
+
+Node: dcid:NDAP_DengueCases_National
+memberOf: dcid:dc/g/NDAP_Dengue
+
+Node: dcid:NDAP_DengueDeaths_National
+memberOf: dcid:dc/g/NDAP_Dengue
+
+Node: dcid:NDAP_DengueCases_Statewise
+memberOf: dcid:dc/g/NDAP_Dengue
+
+Node: dcid:NDAP_DengueDeaths_Statewise
+memberOf: dcid:dc/g/NDAP_Dengue
+
+# ============================================================
+# NDAP Census 2011 — Primary Census Abstract
+# ============================================================
+
+Node: dcid:dc/g/NDAP_Census2011
+typeOf: dcs:StatVarGroup
+name: "Census 2011 Demographics"
+specializationOf: dcid:dc/g/Root
+
+Node: dcid:NDAP_Census2011_Population_Total
+memberOf: dcid:dc/g/NDAP_Census2011
+
+Node: dcid:NDAP_Census2011_Population_Male
+memberOf: dcid:dc/g/NDAP_Census2011
+
+Node: dcid:NDAP_Census2011_Population_Female
+memberOf: dcid:dc/g/NDAP_Census2011
+
+Node: dcid:NDAP_Census2011_Literate_Total
+memberOf: dcid:dc/g/NDAP_Census2011
+
+Node: dcid:NDAP_Census2011_Literate_Male
+memberOf: dcid:dc/g/NDAP_Census2011
+
+Node: dcid:NDAP_Census2011_Literate_Female
+memberOf: dcid:dc/g/NDAP_Census2011
+
+Node: dcid:NDAP_Census2011_SC_Population
+memberOf: dcid:dc/g/NDAP_Census2011
+
+Node: dcid:NDAP_Census2011_ST_Population
+memberOf: dcid:dc/g/NDAP_Census2011
+
+Node: dcid:NDAP_Census2011_Workers_Total
+memberOf: dcid:dc/g/NDAP_Census2011
+
+Node: dcid:NDAP_Census2011_Children_0_6
+memberOf: dcid:dc/g/NDAP_Census2011

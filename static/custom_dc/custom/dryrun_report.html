@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NDAP Demo — Dry Run Report | June 9, 2026 (Updated)</title>
+<style>
+  :root {
+    --navy: #14284b;
+    --blue: #2450a8;
+    --orange: #f6821f;
+    --teal: #00a99d;
+    --green: #1a9f4b;
+    --red: #c0392b;
+    --yellow: #e67e22;
+    --bg: #f5f7fa;
+    --card: #ffffff;
+    --border: #dde2ec;
+    --text: #1a1a2e;
+    --muted: #5a6478;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  /* ── Header ── */
+  .header {
+    background: var(--navy);
+    color: #fff;
+    padding: 0;
+    border-bottom: 4px solid var(--orange);
+  }
+  .header-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 28px 32px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+  .header h1 { font-size: 22px; font-weight: 700; letter-spacing: 0.3px; }
+  .header .sub { font-size: 13px; color: #a8bcd8; margin-top: 4px; }
+  .header .meta { text-align: right; font-size: 12px; color: #a8bcd8; }
+  .header .meta strong { color: #fff; display: block; font-size: 14px; margin-bottom: 2px; }
+
+  /* ── Layout ── */
+  .container { max-width: 1100px; margin: 0 auto; padding: 32px; }
+
+  /* ── Section headers ── */
+  .section-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--navy);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    border-left: 4px solid var(--orange);
+    padding-left: 12px;
+    margin-bottom: 16px;
+  }
+
+  /* ── Summary cards ── */
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 36px;
+  }
+  .stat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px 24px;
+    text-align: center;
+  }
+  .stat-card .val {
+    font-size: 32px;
+    font-weight: 800;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .stat-card .lbl { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+  .stat-card.green .val { color: var(--green); }
+  .stat-card.blue .val { color: var(--blue); }
+  .stat-card.orange .val { color: var(--orange); }
+  .stat-card.navy .val { color: var(--navy); }
+
+  /* ── Result table ── */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 24px;
+    margin-bottom: 28px;
+  }
+  table { width: 100%; border-collapse: collapse; }
+  thead th {
+    background: var(--navy);
+    color: #fff;
+    padding: 10px 14px;
+    text-align: left;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+  thead th:first-child { border-radius: 4px 0 0 4px; }
+  thead th:last-child { border-radius: 0 4px 4px 0; }
+  tbody tr { border-bottom: 1px solid var(--border); }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: #f8f9fc; }
+  tbody td { padding: 10px 14px; vertical-align: top; }
+  .badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+  .badge-pass { background: #e8f8ef; color: #1a7f3c; }
+  .badge-warn { background: #fef3e2; color: #a85e00; }
+  .badge-fail { background: #fde8e8; color: #c0392b; }
+  .badge-data { background: #e7f0ff; color: #2450a8; }
+  .badge-guard { background: #fff0e6; color: #c05000; }
+  .badge-kb { background: #e6f9f7; color: #007a73; }
+
+  .time-val { font-weight: 600; }
+  .time-slow { color: var(--yellow); font-weight: 700; }
+  .cost-val { font-family: monospace; }
+  .preview { font-size: 12px; color: var(--muted); max-width: 340px; }
+
+  /* ── Pending / blockers ── */
+  .pending-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 28px;
+  }
+  .pending-item {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .pending-header {
+    padding: 10px 16px;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .pending-header.blocker { background: #fde8e8; color: var(--red); border-bottom: 1px solid #f5c6c6; }
+  .pending-header.warning { background: #fef3e2; color: #a85e00; border-bottom: 1px solid #f5ddb0; }
+  .pending-header.info    { background: #e7f0ff; color: var(--blue); border-bottom: 1px solid #c0d4f5; }
+  .pending-body { padding: 14px 16px; font-size: 13px; line-height: 1.7; }
+  .pending-body ul { padding-left: 18px; }
+  .pending-body li { margin-bottom: 4px; }
+  .pending-body code { background: #f0f2f8; padding: 1px 6px; border-radius: 3px; font-size: 12px; }
+  .dot-blocker::before { content: "●"; color: var(--red); }
+  .dot-warn::before    { content: "●"; color: var(--yellow); }
+  .dot-ok::before      { content: "●"; color: var(--green); }
+
+  /* ── Mitigation table ── */
+  .mit-table td:first-child { font-weight: 600; width: 180px; }
+  .mit-table td:nth-child(2) { color: var(--muted); width: 140px; }
+  .mit-table td:nth-child(3) { font-size: 13px; }
+
+  /* ── Timeline ── */
+  .timeline {
+    display: flex;
+    gap: 0;
+    margin-bottom: 28px;
+    overflow-x: auto;
+  }
+  .tl-item {
+    flex: 1;
+    min-width: 130px;
+    text-align: center;
+    position: relative;
+    padding: 0 8px;
+  }
+  .tl-item::before {
+    content: "";
+    position: absolute;
+    top: 16px;
+    left: 50%;
+    right: -50%;
+    height: 2px;
+    background: var(--border);
+    z-index: 0;
+  }
+  .tl-item:last-child::before { display: none; }
+  .tl-dot {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    margin: 0 auto 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    position: relative;
+    z-index: 1;
+  }
+  .tl-dot.done  { background: var(--green); color: #fff; }
+  .tl-dot.today { background: var(--orange); color: #fff; }
+  .tl-dot.next  { background: var(--border); color: var(--muted); }
+  .tl-dot.demo  { background: var(--navy); color: #fff; }
+  .tl-date { font-size: 11px; font-weight: 700; color: var(--navy); }
+  .tl-label { font-size: 11px; color: var(--muted); margin-top: 2px; line-height: 1.4; }
+
+  /* ── Footer ── */
+  .footer {
+    border-top: 1px solid var(--border);
+    padding: 20px 32px;
+    max-width: 1100px;
+    margin: 0 auto;
+    font-size: 12px;
+    color: var(--muted);
+    display: flex;
+    justify-content: space-between;
+  }
+
+  @media (max-width: 768px) {
+    .summary-grid { grid-template-columns: repeat(2, 1fr); }
+    .pending-grid { grid-template-columns: 1fr; }
+    .container { padding: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── Header ── -->
+<div class="header">
+  <div class="header-inner">
+    <div>
+      <div class="sub">National Data &amp; Analytics Platform — CloudSufi PoC</div>
+      <h1>Demo Dry Run Report</h1>
+    </div>
+    <div class="meta">
+      <strong>June 9, 2026 (Updated)</strong>
+      Run by: Yash Tripathi<br>
+      Demo date: June 15–16, 2026
+    </div>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- ── Summary cards ── -->
+  <div class="summary-grid">
+    <div class="stat-card green">
+      <div class="val">14/14</div>
+      <div class="lbl">Queries Passed</div>
+    </div>
+    <div class="stat-card blue">
+      <div class="val">10.7m</div>
+      <div class="lbl">Total Wall Time</div>
+    </div>
+    <div class="stat-card orange">
+      <div class="val">$0.0005</div>
+      <div class="lbl">Avg Cost / Query</div>
+    </div>
+    <div class="stat-card navy">
+      <div class="val">748,736</div>
+      <div class="lbl">Total Observations</div>
+    </div>
+  </div>
+
+  <!-- ── Query Results ── -->
+  <div class="section-title">Query Results — All 14 Queries</div>
+  <div class="card" style="padding: 0; overflow: hidden; margin-bottom: 28px;">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Query</th>
+          <th>Type</th>
+          <th>Time</th>
+          <th>Tokens</th>
+          <th>Cost</th>
+          <th>Result</th>
+          <th>Response Preview</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>A4</strong></td>
+          <td>Jharkhand milk production before 2000?</td>
+          <td><span class="badge badge-data">Estimation</span></td>
+          <td class="time-val">58.4s</td>
+          <td>~5.1K</td>
+          <td class="cost-val">$0.0005</td>
+          <td><span class="badge badge-pass">PASS</span></td>
+          <td class="preview">Jharkhand's recorded milk production data begins in 2001 with 940,000 Tonnes. Pre-2001 estimate applied using Bihar+JH 2001 ratio...</td>
+        </tr>
+        <tr>
+          <td><strong>A3</strong></td>
+          <td>Will dengue cases decline next year?</td>
+          <td><span class="badge badge-guard">Guardrail</span></td>
+          <td class="time-val">8.7s</td>
+          <td>~0.4K</td>
+          <td class="cost-val">$0.0001</td>
+          <td><span class="badge badge-pass">DECLINED</span></td>
+          <td class="preview">"I can only report verified historical data — predictions or forecasts are outside the scope of this system."</td>
+        </tr>
+        <tr>
+          <td><strong>A2</strong></td>
+          <td>Bihar NFHS-5 child nutrition (Hindi)</td>
+          <td><span class="badge badge-kb">KB + Hindi</span></td>
+          <td class="time-slow">77.6s</td>
+          <td>~6.4K</td>
+          <td class="cost-val">$0.0005</td>
+          <td><span class="badge badge-pass">PASS</span></td>
+          <td class="preview">बिहार में NFHS-5 (2019-21) के अनुसार, बाल पोषण की स्थिति में कुछ सुधार हुआ है, लेकिन कुपोषण अभी भी एक गंभीर चुनौती है...</td>
+        </tr>
+        <tr>
+          <td><strong>M1</strong></td>
+          <td>What is India GDP in 2022?</td>
+          <td><span class="badge badge-data">MCP Data</span></td>
+          <td class="time-val">37.1s</td>
+          <td>~6.3K</td>
+          <td class="cost-val">$0.0005</td>
+          <td><span class="badge badge-pass">PASS</span></td>
+          <td class="preview">India's nominal GDP in 2022 was ₹235,97,398.53 Crore based on Second Revised Estimates from MoSPI...</td>
+        </tr>
+        <tr>
+          <td><strong>M2</strong></td>
+          <td>India GDP growth trend 2015–2022 (chart)</td>
+          <td><span class="badge badge-data">MCP + Chart</span></td>
+          <td class="time-val">41.0s</td>
+          <td>~4.3K</td>
+          <td class="cost-val">$0.0004</td>
+          <td><span class="badge badge-pass">PASS</span></td>
+          <td class="preview">India's GDP growth rate fluctuated between 2015–2022. In 2015 it was 7.99%, peaked at 8.79% in 2016, contracted in 2020 due to COVID...</td>
+        </tr>
+        <tr>
+          <td><strong>M3</strong></td>
+          <td>Compare unemployment: MH, BR, KL, JH</td>
+          <td><span class="badge badge-data">Multi-state</span></td>
+          <td class="time-slow">60.3s</td>
+          <td>~3.0K</td>
+          <td class="cost-val">$0.0003</td>
+          <td><span class="badge badge-pass">PASS</span></td>
+          <td class="preview">Maharashtra: 3.3%, Bihar: 3.0%, Kerala: 4.8%, Jharkhand: 5.1% (PLFS 2023-24)...</td>
+        </tr>
+        <tr>
+          <td><strong>M4</strong></td>
+          <td>India milk production trend 2010–2023</td>
+          <td><span class="badge badge-data">MCP Data</span></td>
+          <td class="time-val">43.8s</td>
+          <td>~3.2K</td>
+          <td class="cost-val">$0.0003</td>
+          <td><span class="badge badge-pass">PASS</span></td>
+          <td class="preview">India's milk production grew consistently, reaching 230.6 Million tonnes in 2022-23 from ~121M in 2010-11...</td>
+        </tr>
+        <tr>
+          <td><strong>M5</strong></td>
+          <td>India food inflation trend 2020–2024</td>
+          <td><span class="badge badge-data">MCP Data</span></td>
+          <td class="time-val">52.6s</td>
+          <td>~5.3K</td>
+          <td class="cost-val">$0.0005</td>
+          <td><span class="badge badge-pass">PASS</span></td>
+          <td class="preview">Food CPI in Jan 2020 was 13.63%. Post-COVID surge peaked in 2022. Monthly CPI data 2011–2025 returned...</td>
+        </tr>
+        <tr>
+          <td><strong>M6</strong></td>
+          <td>Factory employment in India (ASI)</td>
+          <td><span class="badge badge-data">MCP Data</span></td>
+          <td class="time-val">39.1s</td>
+          <td>~3.7K</td>
+          <td class="cost-val">$0.0004</td>
+          <td><span class="badge badge-pass">PASS</span></td>
+          <td class="preview">Number of factory workers has shown increasing trend. State-wise ASI data returned with factory count, employment, output...</td>
+        </tr>
+        <tr>
+          <td><strong>M7</strong></td>
+          <td>Compare GSDP: MH, UP, TN, KA, GJ</td>
+          <td><span class="badge badge-data">Multi-state</span></td>
+          <td class="time-slow">64.9s</td>
+          <td>~9.1K</td>
+          <td class="cost-val">$0.0008</td>
+          <td><span class="badge badge-pass">PASS</span></td>
+          <td class="preview">Maharashtra leads with highest GSDP, followed by UP, TN, KA, GJ. Full state-wise comparison table returned...</td>
+        </tr>
+        <tr>
+          <td><strong>K1</strong></td>
+          <td>What is NDAP? (one sentence)</td>
+          <td><span class="badge badge-kb">KB</span></td>
+          <td class="time-val">8.1s</td>
+          <td>~0.3K</td>
+          <td class="cost-val">$0.0000</td>
+          <td><span class="badge badge-pass">PASS</span></td>
+          <td class="preview">NDAP is a document intelligence layer that delivers precise, citation-grounded answers to questions about Indian public data...</td>
+        </tr>
+        <tr>
+          <td><strong>K2</strong></td>
+          <td>NFHS-6 district-level data?</td>
+          <td><span class="badge badge-kb">KB Edge</span></td>
+          <td class="time-val">48.9s</td>
+          <td>~10.0K</td>
+          <td class="cost-val">$0.0008</td>
+          <td><span class="badge badge-pass">PASS</span></td>
+          <td class="preview">NFHS-6 provides estimates at national, state/UT, and district levels. State-level only in current KB corpus...</td>
+        </tr>
+        <tr>
+          <td><strong>G1</strong></td>
+          <td>What will India GDP be in 2030?</td>
+          <td><span class="badge badge-guard">Guardrail</span></td>
+          <td class="time-val">34.8s</td>
+          <td>~6.7K</td>
+          <td class="cost-val">$0.0006</td>
+          <td><span class="badge badge-pass">DECLINED</span></td>
+          <td class="preview">"I can only report verified historical data — predictions or forecasts are outside the scope of this system."</td>
+        </tr>
+        <tr>
+          <td><strong>G2</strong></td>
+          <td>Why did inflation spike in India in 2022?</td>
+          <td><span class="badge badge-data">Causal</span></td>
+          <td class="time-slow">64.8s</td>
+          <td>~7.5K</td>
+          <td class="cost-val">$0.0007</td>
+          <td><span class="badge badge-pass">PASS</span></td>
+          <td class="preview">In 2022, general CPI reached 6.01%. Response provides data context without speculative causal claims...</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div style="background: #e8f8ef; border: 1px solid #a8dfc0; border-radius: 8px; padding: 14px 20px; margin-bottom: 36px; display: flex; align-items: center; gap: 12px;">
+    <span style="font-size: 22px; color: var(--green);">&#10003;</span>
+    <div>
+      <strong style="color: #1a6632;">All 14 queries passed.</strong>
+      <span style="color: #2d7a4a; margin-left: 8px;">Both guardrails fired correctly. All data queries returned actual numbers. Hindi multilingual query responded in Hindi. Demo is within the 55-minute budget.</span>
+    </div>
+  </div>
+
+  <!-- ── Warnings ── -->
+  <div class="section-title">Performance Warnings — Queries &gt; 60s</div>
+  <div class="card" style="margin-bottom: 36px;">
+    <p style="color: var(--muted); margin-bottom: 14px; font-size: 13px;">4 queries exceeded 60s. All are MCP-heavy multi-variable or KB + multilingual queries. These are acceptable for demo (well within 1 query / 5-min window), but presenters should narrate while waiting.</p>
+    <table class="mit-table">
+      <thead>
+        <tr style="background: #fff8f0;">
+          <th style="padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--border); font-size: 12px; color: var(--orange);">Query</th>
+          <th style="padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--border); font-size: 12px; color: var(--orange);">Time</th>
+          <th style="padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--border); font-size: 12px; color: var(--orange);">Reason</th>
+          <th style="padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--border); font-size: 12px; color: var(--orange);">Presenter Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="border-bottom: 1px solid var(--border);">
+          <td style="padding: 10px 12px;"><strong>A2</strong> — Bihar NFHS-5 Hindi</td>
+          <td style="padding: 10px 12px; color: var(--yellow); font-weight: 700;">77.6s</td>
+          <td style="padding: 10px 12px; color: var(--muted);">KB search + multilingual synthesis</td>
+          <td style="padding: 10px 12px;">Explain: "Hindi queries go through knowledge base + language detection — this demonstrates multilingual depth."</td>
+        </tr>
+        <tr style="border-bottom: 1px solid var(--border);">
+          <td style="padding: 10px 12px;"><strong>M3</strong> — Unemployment 4 states</td>
+          <td style="padding: 10px 12px; color: var(--yellow); font-weight: 700;">60.3s</td>
+          <td style="padding: 10px 12px; color: var(--muted);">4 separate state entity lookups in MCP</td>
+          <td style="padding: 10px 12px;">Narrate tool activity panel: "Notice the system is making parallel lookups for each state in real time."</td>
+        </tr>
+        <tr style="border-bottom: 1px solid var(--border);">
+          <td style="padding: 10px 12px;"><strong>M7</strong> — GSDP top 5 states</td>
+          <td style="padding: 10px 12px; color: var(--yellow); font-weight: 700;">64.9s</td>
+          <td style="padding: 10px 12px; color: var(--muted);">5 state GSDP lookups + synthesis</td>
+          <td style="padding: 10px 12px;">Point to left sidebar as tool calls stream in. High token count (~9K) shows depth of data.</td>
+        </tr>
+        <tr>
+          <td style="padding: 10px 12px;"><strong>G2</strong> — Inflation 2022 causal</td>
+          <td style="padding: 10px 12px; color: var(--yellow); font-weight: 700;">64.8s</td>
+          <td style="padding: 10px 12px; color: var(--muted);">Full CPI history (671K obs) scan + synthesis</td>
+          <td style="padding: 10px 12px;">Explain: "This query searches our complete CPI dataset — 14 years of monthly data across 30 commodity categories."</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ── Pending Items ── -->
+  <div class="section-title">Pending Items &amp; Blockers</div>
+  <div class="pending-grid" style="margin-bottom: 36px;">
+
+    <div class="pending-item">
+      <div class="pending-header" style="background: #e8f8ef; color: #1a6632; border-bottom: 1px solid #a8dfc0;">
+        <span style="color: var(--green);">&#10003;</span> RESOLVED — Dengue Dataset Ingested (Annexure I Q1)
+      </div>
+      <div class="pending-body">
+        <strong>Status:</strong> NCVBDC Dengue Situation India CSV received and ingested. <strong>368 observations</strong> added to SQLite (748,386 total).<br><br>
+        <strong>Coverage:</strong> 35 states/UTs, 2021–2025, cases + deaths. National totals per year.<br><br>
+        <strong>Verified:</strong> Live proxy queries return correct numbers — 289,235 cases in 2023, state-wise breakdown, trend 2021–2024. Guardrail fires on future queries.<br><br>
+        <strong>Datasets now:</strong> 24 datasets ingested (was 23). Annexure I Q1 fully covered.
+      </div>
+    </div>
+
+    <div class="pending-item">
+      <div class="pending-header blocker">
+        <span>&#9632;</span> BLOCKER — Official NDAP Dataset (Not Received)
+      </div>
+      <div class="pending-body">
+        <strong>Issue:</strong> Niti Aayog promised official NDAP dataset delivery on June 9. Not yet received.<br><br>
+        <strong>Impact:</strong> Demo must use only NDAP-shared data (per RFP rules). Current CSVs are from public GoI sources — acceptable if official data doesn't arrive.<br><br>
+        <strong>Owner:</strong> Saurabh Gupta (chase Niti Aayog)<br>
+        <strong>Deadline:</strong> Must arrive by June 13 for ingestion + re-dry-run on June 14.
+      </div>
+    </div>
+
+    <div class="pending-item">
+      <div class="pending-header warning">
+        <span>&#9632;</span> PENDING — Sarvam API Key
+      </div>
+      <div class="pending-body">
+        <strong>Issue:</strong> Sarvam AI model integration is fully coded and wired into proxy. API key not received yet.<br><br>
+        <strong>Impact:</strong> Demo will run on Gemini Flash 2.5 (current). Sarvam is a bonus — stronger multilingual story for Hindi queries.<br><br>
+        <strong>Owner:</strong> Yash Tripathi (sarvam.ai)<br>
+        <strong>Fallback:</strong> Gemini Flash handles Hindi fine (A2 passed — 77.6s).
+      </div>
+    </div>
+
+    <div class="pending-item">
+      <div class="pending-header warning">
+        <span>&#9632;</span> PENDING — 3 Attendees Confirmation
+      </div>
+      <div class="pending-body">
+        <strong>Issue:</strong> Niti Aayog requires names of 3 CloudSufi attendees for physical demo on June 15–16.<br><br>
+        <strong>Owner:</strong> Saurabh Gupta<br>
+        <strong>Action:</strong> Confirm names + share with Niti Aayog event coordinator by June 12.<br><br>
+        <strong>Note:</strong> Physical attendance required — online participation not confirmed as option.
+      </div>
+    </div>
+
+    <div class="pending-item">
+      <div class="pending-header info">
+        <span>&#9632;</span> LINED UP — State-wise TB Notifications
+      </div>
+      <div class="pending-body">
+        <strong>Status:</strong> Data exists in India TB Report 2024 PDF. Extraction pending.<br><br>
+        <strong>Value:</strong> Enhances TB query support — currently only national-level data (2018–2023).<br><br>
+        <strong>Owner:</strong> Yash Tripathi<br>
+        <strong>Timeline:</strong> 1 hour. Non-blocking for demo.
+      </div>
+    </div>
+
+    <div class="pending-item">
+      <div class="pending-header info">
+        <span>&#9632;</span> LINED UP — Full Dry Run Repeat (June 14)
+      </div>
+      <div class="pending-body">
+        <strong>Status:</strong> Dry run script ready at <code>/tmp/ndap_dryrun.py</code>.<br><br>
+        <strong>Purpose:</strong> Final validation after NDAP dataset ingestion (if received). Confirm all 14 queries still pass on demo hardware.<br><br>
+        <strong>Owner:</strong> Yash Tripathi<br>
+        <strong>Time needed:</strong> ~11 minutes to run. Review: 20 minutes.
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── Mitigation Plan ── -->
+  <div class="section-title">Mitigation Plan — Demo Environment Gaps</div>
+  <div class="card" style="padding: 0; overflow: hidden; margin-bottom: 36px;">
+    <table class="mit-table">
+      <thead>
+        <tr>
+          <th style="padding: 10px 14px;">Gap</th>
+          <th style="padding: 10px 14px;">Owner</th>
+          <th style="padding: 10px 14px;">Deadline</th>
+          <th style="padding: 10px 14px;">Mitigation / Fallback</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="border-bottom: 1px solid var(--border); background: #f6fff9;">
+          <td style="padding: 10px 14px;">Dengue CSV unavailable</td>
+          <td style="padding: 10px 14px; color: var(--muted);">Yash</td>
+          <td style="padding: 10px 14px; color: var(--green); font-weight: 600;">DONE ✓</td>
+          <td style="padding: 10px 14px;">NCVBDC CSV ingested Jun 9. 368 obs, 35 states/UTs, 2021–2025. All dengue queries now return live data. Annexure I Q1 fully unblocked.</td>
+        </tr>
+        <tr style="border-bottom: 1px solid var(--border);">
+          <td style="padding: 10px 14px;">Official NDAP dataset not received</td>
+          <td style="padding: 10px 14px; color: var(--muted);">Saurabh</td>
+          <td style="padding: 10px 14px; color: var(--red); font-weight: 600;">Jun 13</td>
+          <td style="padding: 10px 14px;">Current 23 datasets from public GoI sources (MoSPI, DAHD, PLFS) are all official government data — acceptable if evaluators confirm. Chase daily. If received, re-ingest in &lt;2 hours and re-run dry run.</td>
+        </tr>
+        <tr style="border-bottom: 1px solid var(--border);">
+          <td style="padding: 10px 14px;">Sarvam API key missing</td>
+          <td style="padding: 10px 14px; color: var(--muted);">Yash</td>
+          <td style="padding: 10px 14px; color: var(--yellow); font-weight: 600;">Jun 13</td>
+          <td style="padding: 10px 14px;">Demo uses Gemini Flash 2.5. Hindi query (A2) already passed. If Sarvam key arrives, enable and re-test A2. If not: no change to demo script.</td>
+        </tr>
+        <tr style="border-bottom: 1px solid var(--border);">
+          <td style="padding: 10px 14px;">4 queries &gt;60s response time</td>
+          <td style="padding: 10px 14px; color: var(--muted);">Yash</td>
+          <td style="padding: 10px 14px; color: var(--yellow); font-weight: 600;">Jun 14</td>
+          <td style="padding: 10px 14px;">Presenter script prepared (see table above). All 4 are demonstrably complex queries — latency is explainable. MCP server warm-up: run one dummy query before demo starts to eliminate cold-start delay.</td>
+        </tr>
+        <tr style="border-bottom: 1px solid var(--border);">
+          <td style="padding: 10px 14px;">Data sovereignty concern (Gemini = US servers)</td>
+          <td style="padding: 10px 14px; color: var(--muted);">Saurabh / Yash</td>
+          <td style="padding: 10px 14px; color: var(--muted);">Jun 15</td>
+          <td style="padding: 10px 14px;">Addressed in Methodology Document (NDAP_Methodology.md). PoC uses Gemini for speed; production will use Gemma 3 27B via Ollama, fully on-premise. Evaluators confirmed they understand PoC vs Production distinction.</td>
+        </tr>
+        <tr style="border-bottom: 1px solid var(--border);">
+          <td style="padding: 10px 14px;">Attendee names not submitted</td>
+          <td style="padding: 10px 14px; color: var(--muted);">Saurabh</td>
+          <td style="padding: 10px 14px; color: var(--red); font-weight: 600;">Jun 12</td>
+          <td style="padding: 10px 14px;">Share 3 names + employee IDs to Niti Aayog event coordinator. No fallback — physical presence required.</td>
+        </tr>
+        <tr>
+          <td style="padding: 10px 14px;">Final dry run not done on demo hardware</td>
+          <td style="padding: 10px 14px; color: var(--muted);">Yash</td>
+          <td style="padding: 10px 14px; color: var(--yellow); font-weight: 600;">Jun 14</td>
+          <td style="padding: 10px 14px;">Run <code>python3 /tmp/ndap_dryrun.py</code> on June 14 evening. Must pass 14/14 before demo day. Dry run takes ~11 minutes.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ── Timeline ── -->
+  <div class="section-title">Remaining Timeline</div>
+  <div class="card" style="margin-bottom: 36px;">
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-dot done">&#10003;</div>
+        <div class="tl-date">Jun 9</div>
+        <div class="tl-label">Dry run complete<br>14/14 pass</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot today">!</div>
+        <div class="tl-date">Jun 10–11</div>
+        <div class="tl-label">Dengue CSV chase<br>Attendee names</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot next">12</div>
+        <div class="tl-date">Jun 12</div>
+        <div class="tl-label">Attendee names<br>to Niti Aayog</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot next">13</div>
+        <div class="tl-date">Jun 13</div>
+        <div class="tl-label">NDAP dataset<br>ingest (if received)</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot next">14</div>
+        <div class="tl-date">Jun 14</div>
+        <div class="tl-label">Final dry run<br>on demo hardware</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot demo">D</div>
+        <div class="tl-date">Jun 15–16</div>
+        <div class="tl-label">DEMO DAY<br>Niti Aayog</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── System Status ── -->
+  <div class="section-title">System Components — Current Status</div>
+  <div class="card" style="margin-bottom: 36px;">
+    <table>
+      <thead>
+        <tr>
+          <th>Component</th>
+          <th>Status</th>
+          <th>Port</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="border-bottom: 1px solid var(--border);">
+          <td style="padding: 10px 14px;"><strong>Docker — Data Container</strong></td>
+          <td style="padding: 10px 14px;"><span class="badge badge-pass">RUNNING</span></td>
+          <td style="padding: 10px 14px;">—</td>
+          <td style="padding: 10px 14px;">748,736 observations in SQLite. 25 datasets (6 groups) ingested. Added Jun 9: Dengue (368 obs), Census 2011 PCA (350 obs).</td>
+        </tr>
+        <tr style="border-bottom: 1px solid var(--border);">
+          <td style="padding: 10px 14px;"><strong>Docker — Services Container</strong></td>
+          <td style="padding: 10px 14px;"><span class="badge badge-pass">RUNNING</span></td>
+          <td style="padding: 10px 14px;">:8080</td>
+          <td style="padding: 10px 14px;">NDAP-branded UI. Tool Activity panel visible by default.</td>
+        </tr>
+        <tr style="border-bottom: 1px solid var(--border);">
+          <td style="padding: 10px 14px;"><strong>MCP Server</strong></td>
+          <td style="padding: 10px 14px;"><span class="badge badge-pass">RUNNING</span></td>
+          <td style="padding: 10px 14px;">:3000</td>
+          <td style="padding: 10px 14px;">datacommons-mcp 1.1.4. search_indicators + get_observations tools.</td>
+        </tr>
+        <tr style="border-bottom: 1px solid var(--border);">
+          <td style="padding: 10px 14px;"><strong>AI Proxy (Flask)</strong></td>
+          <td style="padding: 10px 14px;"><span class="badge badge-pass">RUNNING</span></td>
+          <td style="padding: 10px 14px;">:5001</td>
+          <td style="padding: 10px 14px;">Gemini Flash 2.5. Temperature=0. SSE streaming. Session logs. Download endpoint live.</td>
+        </tr>
+        <tr style="border-bottom: 1px solid var(--border);">
+          <td style="padding: 10px 14px;"><strong>Knowledge Base (PDF corpus)</strong></td>
+          <td style="padding: 10px 14px;"><span class="badge badge-pass">ACTIVE</span></td>
+          <td style="padding: 10px 14px;">—</td>
+          <td style="padding: 10px 14px;">18 PDFs in Gemini Filestore. Covers: NFHS-5/6, TB Reports (India + WHO + Prevalence), Dengue, Economic Survey, PLFS, NSS, Air Quality, Census Slum, Population Projections, Milk data.</td>
+        </tr>
+        <tr style="border-bottom: 1px solid var(--border);">
+          <td style="padding: 10px 14px;"><strong>Session Log Download</strong></td>
+          <td style="padding: 10px 14px;"><span class="badge badge-pass">LIVE</span></td>
+          <td style="padding: 10px 14px;">:5001</td>
+          <td style="padding: 10px 14px;"><code>GET /api/logs/session/&lt;id&gt;/download</code>. "Download Log" button in settings panel.</td>
+        </tr>
+        <tr style="border-bottom: 1px solid var(--border);">
+          <td style="padding: 10px 14px;"><strong>Guardrails</strong></td>
+          <td style="padding: 10px 14px;"><span class="badge badge-pass">VERIFIED</span></td>
+          <td style="padding: 10px 14px;">—</td>
+          <td style="padding: 10px 14px;">Both speculative queries (dengue future + GDP 2030) declined with exact required sentence.</td>
+        </tr>
+        <tr>
+          <td style="padding: 10px 14px;"><strong>Sarvam Model</strong></td>
+          <td style="padding: 10px 14px;"><span class="badge badge-warn">PENDING KEY</span></td>
+          <td style="padding: 10px 14px;">—</td>
+          <td style="padding: 10px 14px;">Code ready. Waiting for sarvam.ai API key. Gemini Flash is active fallback.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ── GP Compliance ── -->
+  <div class="section-title">Evaluation Parameter Compliance</div>
+  <div class="card" style="margin-bottom: 36px;">
+    <table>
+      <thead>
+        <tr>
+          <th>Parameter</th>
+          <th>Status</th>
+          <th>Implementation</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="border-bottom: 1px solid var(--border);">
+          <td style="padding: 10px 14px;"><strong>GP-8 Consistency</strong></td>
+          <td style="padding: 10px 14px;"><span class="badge badge-pass">MET</span></td>
+          <td style="padding: 10px 14px;">Synthesis model temperature = 0 (deterministic). SQLite data = always same values for same query.</td>
+        </tr>
+        <tr style="border-bottom: 1px solid var(--border);">
+          <td style="padding: 10px 14px;"><strong>GP-10 Cost + Time Display</strong></td>
+          <td style="padding: 10px 14px;"><span class="badge badge-pass">MET</span></td>
+          <td style="padding: 10px 14px;">Every response shows: response time (s), token count (~XK), cost estimate (~$X.XXX est.).</td>
+        </tr>
+        <tr style="border-bottom: 1px solid var(--border);">
+          <td style="padding: 10px 14px;"><strong>Traceability</strong></td>
+          <td style="padding: 10px 14px;"><span class="badge badge-pass">MET</span></td>
+          <td style="padding: 10px 14px;">Tool Activity panel (left sidebar) + inline citations [1][2] + Download Log button per session.</td>
+        </tr>
+        <tr style="border-bottom: 1px solid var(--border);">
+          <td style="padding: 10px 14px;"><strong>Guardrails</strong></td>
+          <td style="padding: 10px 14px;"><span class="badge badge-pass">MET</span></td>
+          <td style="padding: 10px 14px;">Speculative queries declined. Multilingual (Hindi in → Hindi out). Data gaps flagged explicitly.</td>
+        </tr>
+        <tr style="border-bottom: 1px solid var(--border);">
+          <td style="padding: 10px 14px;"><strong>Data Sovereignty</strong></td>
+          <td style="padding: 10px 14px;"><span class="badge badge-warn">PARTIAL</span></td>
+          <td style="padding: 10px 14px;">PoC: Gemini API (US). Production roadmap: Gemma 3 27B on-premise (fully air-gapped). Documented in Methodology.</td>
+        </tr>
+        <tr>
+          <td style="padding: 10px 14px;"><strong>Audit Log</strong></td>
+          <td style="padding: 10px 14px;"><span class="badge badge-pass">MET</span></td>
+          <td style="padding: 10px 14px;">Per-session logs at <code>additional_features/logs/&lt;session_id&gt;.log</code>. Downloadable via UI or API.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<!-- ── Footer ── -->
+<div class="footer" style="border-top: 1px solid var(--border);">
+  <div>
+    <strong>NDAP Demo — Dry Run Report</strong> &nbsp;|&nbsp; Generated June 9, 2026 &nbsp;|&nbsp; CloudSufi
+  </div>
+  <div>
+    Yash Tripathi — yash.tripathi@cloudsufi.com &nbsp;|&nbsp; Demo date: June 15–16, 2026
+  </div>
+</div>
+
+</body>
+</html>

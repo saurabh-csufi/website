@@ -1,0 +1,195 @@
+# NDAP Custom StatVars — Milk, TB, Unemployment
+# Source: DAHD Basic Animal Husbandry Statistics, India TB Report 2024, MoSPI PLFS 2023-24
+
+Node: dcid:NDAP_MilkProduction_Statewise
+typeOf: dcid:StatisticalVariable
+name: "Milk Production (State-wise)"
+populationType: dcid:Agriculture
+measuredProperty: dcid:production
+statType: dcid:measuredValue
+measurementDenominator: dcid:Count_Person
+description: "Annual milk production by Indian state, in tonnes. Source: DAHD Basic Animal Husbandry Statistics, GoI."
+
+Node: dcid:NDAP_MilkProduction_National
+typeOf: dcid:StatisticalVariable
+name: "Milk Production (National)"
+populationType: dcid:Agriculture
+measuredProperty: dcid:production
+statType: dcid:measuredValue
+description: "Annual national milk production in India, in tonnes (converted from million tonnes). Source: DAHD Basic Animal Husbandry Statistics, GoI."
+
+Node: dcid:NDAP_MilkPCA_National
+typeOf: dcid:StatisticalVariable
+name: "Per Capita Milk Availability"
+populationType: dcid:Person
+measuredProperty: dcid:consumption
+statType: dcid:measuredValue
+description: "Per capita availability of milk in India in grams per day. Source: DAHD Basic Animal Husbandry Statistics, GoI."
+
+Node: dcid:NDAP_TBNotifications_National
+typeOf: dcid:StatisticalVariable
+name: "TB Case Notifications (National)"
+populationType: dcid:MedicalConditionIncident
+measuredProperty: dcid:count
+statType: dcid:measuredValue
+description: "Annual TB case notifications in India (public + private sector). Source: India TB Report 2024, Central TB Division, MoHFW."
+
+Node: dcid:NDAP_UnemploymentRate_Total
+typeOf: dcid:StatisticalVariable
+name: "Unemployment Rate (Total, Usual Status)"
+populationType: dcid:Person
+measuredProperty: dcid:unemploymentRate
+statType: dcid:measuredValue
+description: "State-wise unemployment rate (%) for persons aged 15+, rural+urban combined, usual status (ps+ss). Source: PLFS Annual Report 2023-24, MoSPI."
+
+Node: dcid:NDAP_UnemploymentRate_Male
+typeOf: dcid:StatisticalVariable
+name: "Unemployment Rate (Male, Usual Status)"
+populationType: dcid:Person
+measuredProperty: dcid:unemploymentRate
+statType: dcid:measuredValue
+gender: dcid:Male
+description: "State-wise unemployment rate (%) for males aged 15+, rural+urban combined, usual status. Source: PLFS 2023-24, MoSPI."
+
+Node: dcid:NDAP_UnemploymentRate_Female
+typeOf: dcid:StatisticalVariable
+name: "Unemployment Rate (Female, Usual Status)"
+populationType: dcid:Person
+measuredProperty: dcid:unemploymentRate
+statType: dcid:measuredValue
+gender: dcid:Female
+description: "State-wise unemployment rate (%) for females aged 15+, rural+urban combined, usual status. Source: PLFS 2023-24, MoSPI."
+
+Node: dcid:NDAP_UnemploymentRate_Rural
+typeOf: dcid:StatisticalVariable
+name: "Unemployment Rate (Rural, Usual Status)"
+populationType: dcid:Person
+measuredProperty: dcid:unemploymentRate
+statType: dcid:measuredValue
+placeOfResidenceClassification: dcid:Rural
+description: "State-wise rural unemployment rate (%) for persons aged 15+, usual status. Source: PLFS 2023-24, MoSPI."
+
+Node: dcid:NDAP_UnemploymentRate_Urban
+typeOf: dcid:StatisticalVariable
+name: "Unemployment Rate (Urban, Usual Status)"
+populationType: dcid:Person
+measuredProperty: dcid:unemploymentRate
+statType: dcid:measuredValue
+placeOfResidenceClassification: dcid:Urban
+description: "State-wise urban unemployment rate (%) for persons aged 15+, usual status. Source: PLFS 2023-24, MoSPI."
+
+Node: dcid:NDAP_DengueCases_Statewise
+typeOf: dcid:StatisticalVariable
+name: "Dengue Cases (State-wise)"
+populationType: dcid:MedicalConditionIncident
+measuredProperty: dcid:count
+statType: dcid:measuredValue
+description: "Annual state-wise dengue case count in India. Source: NCVBDC Dengue Situation Report, MoHFW, GoI."
+
+Node: dcid:NDAP_DengueDeaths_Statewise
+typeOf: dcid:StatisticalVariable
+name: "Dengue Deaths (State-wise)"
+populationType: dcid:MedicalConditionIncident
+measuredProperty: dcid:count
+statType: dcid:measuredValue
+description: "Annual state-wise dengue death count in India. Source: NCVBDC Dengue Situation Report, MoHFW, GoI."
+
+Node: dcid:NDAP_DengueCases_National
+typeOf: dcid:StatisticalVariable
+name: "Dengue Cases (National)"
+populationType: dcid:MedicalConditionIncident
+measuredProperty: dcid:count
+statType: dcid:measuredValue
+description: "Annual national dengue case total in India. Source: NCVBDC Dengue Situation Report, MoHFW, GoI."
+
+Node: dcid:NDAP_DengueDeaths_National
+typeOf: dcid:StatisticalVariable
+name: "Dengue Deaths (National)"
+populationType: dcid:MedicalConditionIncident
+measuredProperty: dcid:count
+statType: dcid:measuredValue
+description: "Annual national dengue death total in India. Source: NCVBDC Dengue Situation Report, MoHFW, GoI."
+
+Node: dcid:NDAP_Census2011_Population_Total
+typeOf: dcid:StatisticalVariable
+name: "Census 2011 — Total Population (State-wise)"
+populationType: dcid:Person
+measuredProperty: dcid:count
+statType: dcid:measuredValue
+description: "Total population by Indian state from Census 2011. Source: Primary Census Abstract, Office of the Registrar General, GoI."
+
+Node: dcid:NDAP_Census2011_Population_Male
+typeOf: dcid:StatisticalVariable
+name: "Census 2011 — Male Population (State-wise)"
+populationType: dcid:Person
+measuredProperty: dcid:count
+statType: dcid:measuredValue
+gender: dcid:Male
+description: "Male population by Indian state from Census 2011. Source: Primary Census Abstract, Office of the Registrar General, GoI."
+
+Node: dcid:NDAP_Census2011_Population_Female
+typeOf: dcid:StatisticalVariable
+name: "Census 2011 — Female Population (State-wise)"
+populationType: dcid:Person
+measuredProperty: dcid:count
+statType: dcid:measuredValue
+gender: dcid:Female
+description: "Female population by Indian state from Census 2011. Source: Primary Census Abstract, Office of the Registrar General, GoI."
+
+Node: dcid:NDAP_Census2011_Literate_Total
+typeOf: dcid:StatisticalVariable
+name: "Census 2011 — Literate Population (State-wise)"
+populationType: dcid:Person
+measuredProperty: dcid:count
+statType: dcid:measuredValue
+description: "Total literate population by Indian state from Census 2011. Source: Primary Census Abstract, Office of the Registrar General, GoI."
+
+Node: dcid:NDAP_Census2011_Literate_Male
+typeOf: dcid:StatisticalVariable
+name: "Census 2011 — Male Literate Population (State-wise)"
+populationType: dcid:Person
+measuredProperty: dcid:count
+statType: dcid:measuredValue
+gender: dcid:Male
+description: "Male literate population by Indian state from Census 2011."
+
+Node: dcid:NDAP_Census2011_Literate_Female
+typeOf: dcid:StatisticalVariable
+name: "Census 2011 — Female Literate Population (State-wise)"
+populationType: dcid:Person
+measuredProperty: dcid:count
+statType: dcid:measuredValue
+gender: dcid:Female
+description: "Female literate population by Indian state from Census 2011."
+
+Node: dcid:NDAP_Census2011_SC_Population
+typeOf: dcid:StatisticalVariable
+name: "Census 2011 — Scheduled Caste Population (State-wise)"
+populationType: dcid:Person
+measuredProperty: dcid:count
+statType: dcid:measuredValue
+description: "Scheduled Caste population by Indian state from Census 2011. Source: Primary Census Abstract, Office of the Registrar General, GoI."
+
+Node: dcid:NDAP_Census2011_ST_Population
+typeOf: dcid:StatisticalVariable
+name: "Census 2011 — Scheduled Tribe Population (State-wise)"
+populationType: dcid:Person
+measuredProperty: dcid:count
+statType: dcid:measuredValue
+description: "Scheduled Tribe population by Indian state from Census 2011. Source: Primary Census Abstract, Office of the Registrar General, GoI."
+
+Node: dcid:NDAP_Census2011_Workers_Total
+typeOf: dcid:StatisticalVariable
+name: "Census 2011 — Total Workers (State-wise)"
+populationType: dcid:Person
+measuredProperty: dcid:count
+statType: dcid:measuredValue
+description: "Total workers (main + marginal) by Indian state from Census 2011. Source: Primary Census Abstract, Office of the Registrar General, GoI."
+
+Node: dcid:NDAP_Census2011_Children_0_6
+typeOf: dcid:StatisticalVariable
+name: "Census 2011 — Children 0-6 years (State-wise)"
+populationType: dcid:Person
+measuredProperty: dcid:count
+statType: dcid:measuredValue
+description: "Children aged 0-6 years by Indian state from Census 2011. Source: Primary Census Abstract, Office of the Registrar General, GoI."

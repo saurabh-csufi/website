@@ -131,3 +131,18 @@ server/tests/test_data/webdriver_recordings/
 
 additional_features/config.json
 additional_features/logs/
+# Generated SQLite database (rebuild via Docker data container)
+custom_dc/eidb/datacommons/datacommons.db
+
+# Generated NL embeddings (rebuilt by DC container)
+custom_dc/eidb/datacommons/nl/embeddings/
+custom_dc/eidb/datacommons/nl/custom_dc_topic_cache.json
+custom_dc/eidb/datacommons/process/debug_resolve_*
+
+# RAG corpus PDFs (large, not committed — store separately)
+additional_features/RAG_Corpus/
+additional_features/RAG_Corpus_MSME_backup/
+
+# Python virtual envs
+customdc-env/
+proxy-env/
