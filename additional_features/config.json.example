@@ -12,14 +12,10 @@
       "YOUR_DEMO_API_KEY_3"
     ],
     "filestores": [
-      "fileSearchStores/msmepolicies-4n24dqso4mua",
-      "fileSearchStores/msmepolicies-qoy7bml5tuy8",
-      "fileSearchStores/msmepolicies-4wt7dnzadio8"
+      "fileSearchStores/YOUR_NDAP_FILESTORE_ID"
     ],
     "demo_filestores": [
-      "fileSearchStores/YOUR_DEMO_FILESTORE_1",
-      "fileSearchStores/YOUR_DEMO_FILESTORE_2",
-      "fileSearchStores/YOUR_DEMO_FILESTORE_3"
+      "fileSearchStores/YOUR_NDAP_FILESTORE_ID"
     ],
     "api_key": "DEPRECATED_FALLBACK_USE_api_keys_ARRAY_INSTEAD",
     "api_base": "https://generativelanguage.googleapis.com/v1beta/models",
